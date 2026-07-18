@@ -1,0 +1,11 @@
+{
+  "name": "animaps",
+  "private": true,
+  "packageManager": "pnpm@10.28.2",
+  "scripts": {
+    "dev": "pnpm --filter @animaps/web dev",
+    "build": "pnpm --filter @animaps/web build",
+    "lint": "pnpm --filter @animaps/web lint",
+    "typecheck": "pnpm --filter @animaps/web typecheck"
+  }
+}

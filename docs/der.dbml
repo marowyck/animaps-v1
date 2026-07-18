@@ -1,0 +1,275 @@
+// ANIMAPS — DER (dbdiagram.io)
+// Import at https://dbdiagram.io/d
+// Convention: snake_case tables/columns; domain names in English (see roadmap §0.5)
+
+Enum user_role {
+  guardian
+  ngo
+  clinic
+  public_agency
+  biologist
+}
+
+Enum available_space {
+  small_apartment
+  large_apartment
+  house_with_yard
+  farm
+}
+
+Enum available_time {
+  low
+  moderate
+  high
+}
+
+Enum preferred_size {
+  small
+  medium
+  large
+  any
+}
+
+Enum preferred_species {
+  dog
+  cat
+  other
+  any
+}
+
+Enum animal_species {
+  dog
+  cat
+  other
+}
+
+Enum animal_size {
+  small
+  medium
+  large
+}
+
+Enum animal_status {
+  available
+  in_process
+  adopted
+}
+
+Enum adoption_status {
+  requested
+  under_review
+  approved
+  rejected
+  completed
+  cancelled
+}
+
+Enum occurrence_type {
+  abandonment
+  mistreatment
+  vehicle_collision
+  wildlife_sighting
+  lost_animal
+  found_animal
+}
+
+Enum occurrence_status {
+  open
+  in_progress
+  resolved
+  invalid
+}
+
+Table users {
+  id uuid [pk]
+  name varchar [not null]
+  email varchar [unique, not null]
+  password_hash varchar [not null]
+  role user_role [not null]
+  phone varchar
+  city varchar
+  state varchar
+  lgpd_consent boolean [not null, default: false]
+  lgpd_consent_at timestamp
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp [not null]
+}
+
+Table guardian_profiles {
+  user_id uuid [pk, ref: - users.id]
+  available_space available_space
+  available_time available_time
+  has_previous_experience boolean [not null, default: false]
+  has_other_pets boolean [not null, default: false]
+  preferred_size preferred_size
+  preferred_species preferred_species
+  is_rescuer boolean [not null, default: false, note: 'Allows guardian to register animals']
+  tax_id varchar [note: 'Individual tax id (e.g. CPF in BR)']
+}
+
+Table ngo_profiles {
+  user_id uuid [pk, ref: - users.id]
+  company_tax_id varchar [not null]
+  trade_name varchar [not null]
+  service_area_radius_km decimal
+  // service_area polygon handled later (PostGIS); radius is MVP
+  service_capacity int
+  verified boolean [not null, default: false]
+}
+
+Table clinic_profiles {
+  user_id uuid [pk, ref: - users.id]
+  company_tax_id varchar [not null]
+  services_offered varchar[] [note: 'vaccination, neutering, emergency_care, grooming']
+  business_hours text
+  verified boolean [not null, default: false, note: 'Manual validation — same as NGO']
+}
+
+Table animals {
+  id uuid [pk]
+  ngo_id uuid [ref: > users.id, note: 'NGO owner user id when applicable']
+  guardian_id uuid [ref: > users.id, note: 'Rescuer guardian when applicable']
+  clinic_id uuid [ref: > users.id, note: 'Clinic that registered when applicable']
+  name varchar [not null]
+  species animal_species [not null]
+  breed varchar
+  estimated_age varchar
+  size animal_size
+  temperament varchar[] [note: 'docile, playful, independent, needs_space, ...']
+  health_history text
+  photos text[] [note: 'Array of object-storage URLs']
+  status animal_status [not null, default: 'available']
+  created_at timestamp [not null, default: `now()`]
+}
+
+Table adoptions {
+  id uuid [pk]
+  animal_id uuid [not null, ref: > animals.id]
+  guardian_id uuid [not null, ref: > users.id]
+  ngo_id uuid [ref: > users.id, note: 'Origin NGO when applicable']
+  compatibility_score decimal [note: '0-100 at request time']
+  status adoption_status [not null, default: 'requested']
+  requested_at timestamp [not null, default: `now()`]
+  completed_at timestamp
+}
+
+Table occurrences {
+  id uuid [pk]
+  user_id uuid [ref: > users.id, note: 'Nullable = anonymous report']
+  type occurrence_type [not null]
+  description text
+  // PostGIS: geography(Point, 4326) — Prisma Unsupported; GIST index via raw SQL migration
+  location geography [not null, note: 'geography(Point, 4326)']
+  photos text[]
+  status occurrence_status [not null, default: 'open']
+  validated_by uuid [ref: > users.id, note: 'NGO or public_agency user id']
+  created_at timestamp [not null, default: `now()`]
+}
+
+Table occurrence_followers {
+  occurrence_id uuid [not null, ref: > occurrences.id]
+  user_id uuid [not null, ref: > users.id, note: 'NGO / public_agency / biologist following the case']
+  created_at timestamp [not null, default: `now()`]
+
+  indexes {
+    (occurrence_id, user_id) [unique]
+  }
+}
+
+Table notifications {
+  id uuid [pk]
+  user_id uuid [not null, ref: > users.id]
+  type varchar [not null]
+  message text [not null]
+  read boolean [not null, default: false]
+  created_at timestamp [not null, default: `now()`]
+}
+
+// --- Auth / session tokens (identity) ---
+// Store only hashes — never plaintext tokens
+
+Table refresh_tokens {
+  id uuid [pk]
+  user_id uuid [not null, ref: > users.id]
+  token_hash varchar [unique, not null]
+  revoked boolean [not null, default: false]
+  expires_at timestamp [not null]
+  created_at timestamp [not null, default: `now()`]
+
+  indexes {
+    user_id
+  }
+}
+
+Table email_verification_tokens {
+  id uuid [pk]
+  user_id uuid [not null, ref: > users.id]
+  token_hash varchar [unique, not null]
+  expires_at timestamp [not null]
+  used_at timestamp
+  created_at timestamp [not null, default: `now()`]
+
+  indexes {
+    user_id
+  }
+}
+
+Table password_reset_tokens {
+  id uuid [pk]
+  user_id uuid [not null, ref: > users.id]
+  token_hash varchar [unique, not null]
+  expires_at timestamp [not null]
+  used_at timestamp
+  created_at timestamp [not null, default: `now()`]
+
+  indexes {
+    user_id
+  }
+}
+
+// --- Cross-cutting audit (LGPD / sensitive actions) ---
+
+Enum audit_action {
+  ngo_verified
+  clinic_verified
+  role_changed
+  account_deleted
+  data_exported
+  occurrence_validated
+}
+
+Table audit_logs {
+  id uuid [pk]
+  actor_id uuid [ref: > users.id, note: 'Nullable for system actions']
+  action audit_action [not null]
+  target_type varchar [note: 'e.g. user, occurrence, animal']
+  target_id uuid
+  metadata jsonb [note: 'Avoid storing secrets or full PII payloads']
+  created_at timestamp [not null, default: `now()`]
+
+  indexes {
+    (actor_id, created_at)
+  }
+}
+
+// --- Occurrence spam / fraud reports ---
+
+Enum occurrence_report_reason {
+  spam
+  duplicate
+  false_information
+  inappropriate_content
+}
+
+Table occurrence_reports {
+  id uuid [pk]
+  occurrence_id uuid [not null, ref: > occurrences.id]
+  reported_by uuid [ref: > users.id, note: 'Nullable if anonymous']
+  reason occurrence_report_reason [not null]
+  notes text
+  created_at timestamp [not null, default: `now()`]
+
+  indexes {
+    occurrence_id
+  }
+}
