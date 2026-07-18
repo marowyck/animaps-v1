@@ -1,9 +1,57 @@
-node_modules
-.next
-dist
-.turbo
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Build / Next.js
+.next/
+out/
+dist/
+build/
+.turbo/
+*.tsbuildinfo
+
+# Environment & secrets
 .env
-.env.local
-.env.*.local
+.env.*
+!.env.example
+
+# Logs & debug
 *.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS
 .DS_Store
+Thumbs.db
+Desktop.ini
+
+# IDE / editor
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+*.swp
+*.swo
+
+# Cursor / local agent
+.cursor/
+.cursorignore
+
+# Test / coverage
+coverage/
+.nyc_output/
+playwright-report/
+test-results/
+
+# Vercel / local tooling
+.vercel/
+
+# Internal planning (not for public consumers of the repo)
+ANIMAPS_Roadmap.md
+KANBAN.md
+
+# Misc
+*.local
+.cache/
