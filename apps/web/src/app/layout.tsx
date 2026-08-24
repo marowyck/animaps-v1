@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Sour_Gummy, Oi } from "next/font/google";
-import { SmoothScrollProvider } from "@/components/providers/SmoothScrollProvider";
+import { SmoothScrollProvider } from "@/providers/SmoothScrollProvider";
 import "./globals.css";
 
 const sourGummy = Sour_Gummy({
