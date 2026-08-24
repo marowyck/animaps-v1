@@ -44,7 +44,7 @@
 - [x] Mapear quais dados são pessoais — ver [`docs/lgpd-checklist.md`](docs/lgpd-checklist.md) + dicionário
 - [x] Definir política de retenção e exclusão (conta ativa + **90 dias** após exclusão)
 - [x] Anonimizar localização em exportações — **agregação por bairro/cidade** (sem coordenadas)
-- [x] Termo de consentimento explícito — microcopy no checklist; rascunho em [`docs/politica-privacidade-rascunho.md`](docs/politica-privacidade-rascunho.md)
+- [x] Termo de consentimento explícito — microcopy no checklist; rascunho em [`docs/privacy-policy-draft.md`](docs/privacy-policy-draft.md)
 - [ ] Nomear responsável pelo tratamento de dados — **A DEFINIR** (bloqueante para lançamento público)
 
 ### 0.3 Personas (para orientar decisões de UX)
@@ -171,10 +171,10 @@ Notification
 
 - [x] Desenhar o DER visualmente — artefato: [`docs/der.dbml`](docs/der.dbml) (importar em [dbdiagram.io](https://dbdiagram.io))
 - [x] Definir relacionamentos N:N onde necessário — `occurrence_followers` (Occurrence × User)
-- [x] Criar dicionário de dados completo — [`docs/dicionario-de-dados.md`](docs/dicionario-de-dados.md) · rascunho [`docs/schema.prisma`](docs/schema.prisma)
+- [x] Criar dicionário de dados completo — [`docs/data-dictionary.md`](docs/data-dictionary.md) · rascunho [`docs/schema.prisma`](docs/schema.prisma)
 - [x] Definir estratégia de índices (GIST em `location`, compostos `status + type`, etc.) — ver dicionário
 
-**Artefatos de domínio:** [`docs/bounded-contexts.md`](docs/bounded-contexts.md) · [`docs/der.dbml`](docs/der.dbml) · [`docs/dicionario-de-dados.md`](docs/dicionario-de-dados.md) · [`docs/schema.prisma`](docs/schema.prisma) · [`docs/matriz-permissoes.md`](docs/matriz-permissoes.md) · [`docs/lgpd-checklist.md`](docs/lgpd-checklist.md) · [`docs/politica-privacidade-rascunho.md`](docs/politica-privacidade-rascunho.md) · [`docs/git-e-ci.md`](docs/git-e-ci.md) · [`docs/ong-piloto.md`](docs/ong-piloto.md) · [`docs/personas.md`](docs/personas.md)
+**Artefatos de domínio:** [`docs/bounded-contexts.md`](docs/bounded-contexts.md) · [`docs/der.dbml`](docs/der.dbml) · [`docs/data-dictionary.md`](docs/data-dictionary.md) · [`docs/schema.prisma`](docs/schema.prisma) · [`docs/permissions-matrix.md`](docs/permissions-matrix.md) · [`docs/lgpd-checklist.md`](docs/lgpd-checklist.md) · [`docs/privacy-policy-draft.md`](docs/privacy-policy-draft.md) · [`docs/git-and-ci.md`](docs/git-and-ci.md) · [`docs/pilot-ngo.md`](docs/pilot-ngo.md) · [`docs/personas.md`](docs/personas.md)
 
 ### 0.6 Arquitetura — monorepo, DDD (API) e MVC (web)
 
@@ -234,7 +234,7 @@ apps/web/src/
 - [x] Definir integração entre contextos via eventos de domínio in-process (NestJS)
 - [ ] Definir padrão de API REST versionada: `/api/v1/users`, `/api/v1/animals`, `/api/v1/occurrences`, `/api/v1/adoptions`
 - [ ] Documentar API com Swagger/OpenAPI desde o início (base para o app mobile e parceiros)
-- [x] Configurar repositório Git com convenção de branches (`main`, `develop`, `feature/*`, `hotfix/*`) e conventional commits — [`docs/git-e-ci.md`](docs/git-e-ci.md)
+- [x] Configurar repositório Git com convenção de branches (`main`, `develop`, `feature/*`, `hotfix/*`) e conventional commits — [`docs/git-and-ci.md`](docs/git-and-ci.md)
 - [x] Definir CI/CD básico (GitHub Actions): lint + typecheck + test + build por app (`api` / `web`) — doc pronto; YAML no scaffold
 - [x] Definir ambiente de staging (`develop`) separado do de produção (`main`)
 
@@ -250,7 +250,7 @@ Documentação apenas nesta fase — **sem implementação** na Fase 0.
 ### 0.8 Governança do projeto
 - [x] Definir ferramenta de gestão de tarefas — [`KANBAN.md`](KANBAN.md) (oficial no repo)
 - [x] Definir cadência — fluxo contínuo Kanban + **review semanal** do board (WIP sugerido: 1 épico em Doing)
-- [ ] Confirmar ONG piloto real para Fases 3/4 — processo em [`docs/ong-piloto.md`](docs/ong-piloto.md); parceira **A DEFINIR**
+- [ ] Confirmar ONG piloto real para Fases 3/4 — processo em [`docs/pilot-ngo.md`](docs/pilot-ngo.md); parceira **A DEFINIR**
 
 ### 0.9 Épicos sugeridos para o Kanban (Fase 0)
 
@@ -259,12 +259,12 @@ Ordem sugerida de cards (copiar para o board quando a ferramenta de gestão esti
 1. **Atualizar roadmap 0.4 / 0.6–0.7** — stack, monorepo, DDD e MVC *(feito)*
 2. **Documentar bounded contexts** — [`docs/bounded-contexts.md`](docs/bounded-contexts.md) *(feito)*
 3. **Desenhar DER** — [`docs/der.dbml`](docs/der.dbml) *(feito)*
-4. **Dicionário de dados** — [`docs/dicionario-de-dados.md`](docs/dicionario-de-dados.md) · [`docs/schema.prisma`](docs/schema.prisma) *(feito)*
-5. **Matriz de permissões** — [`docs/matriz-permissoes.md`](docs/matriz-permissoes.md) *(feito)*
-6. **Checklist LGPD mínimo** — [`docs/lgpd-checklist.md`](docs/lgpd-checklist.md) · [`docs/politica-privacidade-rascunho.md`](docs/politica-privacidade-rascunho.md) *(feito; controlador A DEFINIR)*
-7. **Convenções Git + CI** — [`docs/git-e-ci.md`](docs/git-e-ci.md) *(feito; YAML no scaffold)*
+4. **Dicionário de dados** — [`docs/data-dictionary.md`](docs/data-dictionary.md) · [`docs/schema.prisma`](docs/schema.prisma) *(feito)*
+5. **Matriz de permissões** — [`docs/permissions-matrix.md`](docs/permissions-matrix.md) *(feito)*
+6. **Checklist LGPD mínimo** — [`docs/lgpd-checklist.md`](docs/lgpd-checklist.md) · [`docs/privacy-policy-draft.md`](docs/privacy-policy-draft.md) *(feito; controlador A DEFINIR)*
+7. **Convenções Git + CI** — [`docs/git-and-ci.md`](docs/git-and-ci.md) *(feito; YAML no scaffold)*
 8. **Escolher ferramenta Kanban + cadência** — `KANBAN.md` + fluxo contínuo + review semanal *(feito)*
-9. **ONG piloto** — processo/template em [`docs/ong-piloto.md`](docs/ong-piloto.md) *(feito; parceira A DEFINIR)*
+9. **ONG piloto** — processo/template em [`docs/pilot-ngo.md`](docs/pilot-ngo.md) *(feito; parceira A DEFINIR)*
 
 **Ainda em aberto na Fase 0 (além dos épicos acima):** Controlador LGPD e ONG nomeada continuam bloqueantes de go-live / piloto real. *(Objetivo primário da landing fechado na Fase 1: lista de espera — ver [`docs/landing-content-brief.md`](docs/landing-content-brief.md).)*
 
@@ -304,7 +304,7 @@ Ordem sugerida de cards (copiar para o board quando a ferramenta de gestão esti
   7. **Prova social**: números projetados com transparência (sem depoimentos falsos)
   8. **CTA final** reforçado + formulário segmentado
 - [x] Definir campos/microcopy-diretrizes do formulário (segmentação tutor/ONG/clínica/outro)
-- [x] Estratégia de política: **adaptar** [`docs/politica-privacidade-rascunho.md`](docs/politica-privacidade-rascunho.md) + termos mínimos
+- [x] Estratégia de política: **adaptar** [`docs/privacy-policy-draft.md`](docs/privacy-policy-draft.md) + termos mínimos
 - [ ] Escrever copy final (dor, solução, seções) em **PT e EN**
 - [ ] Pesquisar e citar estatísticas de abandono com fonte validada
 - [ ] Escrever microcopy final dos formulários (labels, erros, confirmação) PT/EN

@@ -1,5 +1,7 @@
 // ANIMAPS — Prisma schema draft (documentation only)
-// Move to apps/api/prisma/schema.prisma when scaffolding the monorepo.
+// Move to apps/api/prisma/schema.prisma when scaffolding the API.
+// Evolution rules: docs/schema-evolution.md
+// dbdiagram.io: paste docs/der.dbml (DBML) — do NOT paste this Prisma file.
 // PostGIS: enable extension + GIST index on occurrences.location via raw SQL in migration.
 //   CREATE EXTENSION IF NOT EXISTS postgis;
 //   CREATE INDEX occurrences_location_gix ON occurrences USING GIST (location);
@@ -109,52 +111,93 @@ enum OccurrenceReportReason {
   inappropriate_content
 }
 
+/// Waitlist lead profile (landing form) — distinct from UserRole (product accounts).
+enum WaitlistProfileType {
+  guardian
+  ngo
+  clinic
+  other
+}
+
+enum ClientType {
+  web
+  mobile_ios
+  mobile_android
+  unknown
+}
+
+enum PushPlatform {
+  ios
+  android
+}
+
+/// Starter set aligned to bounded-context domain events — add values only.
+enum NotificationType {
+  user_registered
+  ngo_verified
+  clinic_verified
+  adoption_requested
+  adoption_completed
+  animal_registered_for_matching
+  new_compatible_animal_available
+  occurrence_created
+  occurrence_status_changed
+  occurrence_resolved
+  generic
+}
+
 model User {
-  id             String    @id @default(uuid()) @db.Uuid
-  name           String
-  email          String    @unique
-  passwordHash   String    @map("password_hash")
-  role           UserRole
-  phone          String?
-  city           String?
-  state          String?
-  lgpdConsent    Boolean   @default(false) @map("lgpd_consent")
-  lgpdConsentAt  DateTime? @map("lgpd_consent_at")
-  createdAt      DateTime  @default(now()) @map("created_at")
-  updatedAt      DateTime  @updatedAt @map("updated_at")
+  id              String    @id @default(uuid()) @db.Uuid
+  name            String
+  email           String    @unique
+  /// Nullable for future OAuth — app rule: passwordHash OR external identity required.
+  passwordHash    String?   @map("password_hash")
+  role            UserRole
+  phone           String?
+  city            String?
+  state           String?
+  lgpdConsent     Boolean   @default(false) @map("lgpd_consent")
+  lgpdConsentAt   DateTime? @map("lgpd_consent_at")
+  emailVerifiedAt DateTime? @map("email_verified_at")
+  deletedAt       DateTime? @map("deleted_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
 
   guardianProfile GuardianProfile?
   ngoProfile      NgoProfile?
   clinicProfile   ClinicProfile?
 
-  animalsAsNgo      Animal[]             @relation("AnimalNgo")
-  animalsAsGuardian Animal[]             @relation("AnimalGuardian")
-  animalsAsClinic   Animal[]             @relation("AnimalClinic")
-  adoptionsAsGuardian Adoption[]         @relation("AdoptionGuardian")
-  adoptionsAsNgo      Adoption[]         @relation("AdoptionNgo")
-  occurrences         Occurrence[]       @relation("OccurrenceAuthor")
-  validatedOccurrences Occurrence[]      @relation("OccurrenceValidator")
-  occurrenceFollows   OccurrenceFollower[]
-  notifications       Notification[]
-  refreshTokens              RefreshToken[]
-  emailVerificationTokens    EmailVerificationToken[]
-  passwordResetTokens        PasswordResetToken[]
-  auditLogsAsActor           AuditLog[]               @relation("AuditActor")
-  occurrenceReports          OccurrenceReport[]       @relation("OccurrenceReportAuthor")
+  animalsAsNgo           Animal[]               @relation("AnimalNgo")
+  animalsAsGuardian      Animal[]               @relation("AnimalGuardian")
+  animalsAsClinic        Animal[]               @relation("AnimalClinic")
+  adoptionsAsGuardian    Adoption[]             @relation("AdoptionGuardian")
+  adoptionsAsNgo         Adoption[]             @relation("AdoptionNgo")
+  occurrences            Occurrence[]           @relation("OccurrenceAuthor")
+  validatedOccurrences   Occurrence[]           @relation("OccurrenceValidator")
+  occurrenceFollows      OccurrenceFollower[]
+  notifications          Notification[]
+  refreshTokens          RefreshToken[]
+  emailVerificationTokens EmailVerificationToken[]
+  passwordResetTokens    PasswordResetToken[]
+  auditLogsAsActor       AuditLog[]             @relation("AuditActor")
+  occurrenceReports      OccurrenceReport[]     @relation("OccurrenceReportAuthor")
+  devicePushTokens       DevicePushToken[]
 
+  @@index([deletedAt])
   @@map("users")
 }
 
 model GuardianProfile {
-  userId                 String           @id @map("user_id") @db.Uuid
-  availableSpace         AvailableSpace?  @map("available_space")
-  availableTime          AvailableTime?   @map("available_time")
-  hasPreviousExperience  Boolean          @default(false) @map("has_previous_experience")
-  hasOtherPets           Boolean          @default(false) @map("has_other_pets")
-  preferredSize          PreferredSize?   @map("preferred_size")
-  preferredSpecies       PreferredSpecies? @map("preferred_species")
-  isRescuer              Boolean          @default(false) @map("is_rescuer")
-  taxId                  String?          @map("tax_id")
+  userId                String            @id @map("user_id") @db.Uuid
+  availableSpace        AvailableSpace?   @map("available_space")
+  availableTime         AvailableTime?    @map("available_time")
+  hasPreviousExperience Boolean           @default(false) @map("has_previous_experience")
+  hasOtherPets          Boolean           @default(false) @map("has_other_pets")
+  preferredSize         PreferredSize?    @map("preferred_size")
+  preferredSpecies      PreferredSpecies? @map("preferred_species")
+  isRescuer             Boolean           @default(false) @map("is_rescuer")
+  taxId                 String?           @map("tax_id")
+  updatedAt             DateTime          @updatedAt @map("updated_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -162,12 +205,13 @@ model GuardianProfile {
 }
 
 model NgoProfile {
-  userId               String  @id @map("user_id") @db.Uuid
-  companyTaxId         String  @map("company_tax_id")
-  tradeName            String  @map("trade_name")
-  serviceAreaRadiusKm  Decimal? @map("service_area_radius_km") @db.Decimal(10, 2)
-  serviceCapacity      Int?    @map("service_capacity")
-  verified             Boolean @default(false)
+  userId              String   @id @map("user_id") @db.Uuid
+  companyTaxId        String   @map("company_tax_id")
+  tradeName           String   @map("trade_name")
+  serviceAreaRadiusKm Decimal? @map("service_area_radius_km") @db.Decimal(10, 2)
+  serviceCapacity     Int?     @map("service_capacity")
+  verified            Boolean  @default(false)
+  updatedAt           DateTime @updatedAt @map("updated_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -180,6 +224,7 @@ model ClinicProfile {
   servicesOffered String[] @default([]) @map("services_offered")
   businessHours   String?  @map("business_hours")
   verified        Boolean  @default(false)
+  updatedAt       DateTime @updatedAt @map("updated_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -187,45 +232,51 @@ model ClinicProfile {
 }
 
 model Animal {
-  id             String        @id @default(uuid()) @db.Uuid
-  ngoId          String?       @map("ngo_id") @db.Uuid
-  guardianId     String?       @map("guardian_id") @db.Uuid
-  clinicId       String?       @map("clinic_id") @db.Uuid
-  name           String
-  species        AnimalSpecies
-  breed          String?
-  estimatedAge   String?       @map("estimated_age")
-  size           AnimalSize?
-  temperament    String[]      @default([])
-  healthHistory  String?       @map("health_history")
-  photos         String[]      @default([])
-  status         AnimalStatus  @default(available)
-  createdAt      DateTime      @default(now()) @map("created_at")
+  id            String        @id @default(uuid()) @db.Uuid
+  ngoId         String?       @map("ngo_id") @db.Uuid
+  guardianId    String?       @map("guardian_id") @db.Uuid
+  clinicId      String?       @map("clinic_id") @db.Uuid
+  name          String
+  species       AnimalSpecies
+  breed         String?
+  estimatedAge  String?       @map("estimated_age")
+  size          AnimalSize?
+  temperament   String[]      @default([])
+  healthHistory String?       @map("health_history")
+  /// MVP: object-storage URLs. Promote to MediaAsset in a dedicated wave (see schema-evolution.md).
+  photos        String[]      @default([])
+  status        AnimalStatus  @default(available)
+  deletedAt     DateTime?     @map("deleted_at")
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
 
-  ngo      User? @relation("AnimalNgo", fields: [ngoId], references: [id])
-  guardian User? @relation("AnimalGuardian", fields: [guardianId], references: [id])
-  clinic   User? @relation("AnimalClinic", fields: [clinicId], references: [id])
+  ngo       User?      @relation("AnimalNgo", fields: [ngoId], references: [id])
+  guardian  User?      @relation("AnimalGuardian", fields: [guardianId], references: [id])
+  clinic    User?      @relation("AnimalClinic", fields: [clinicId], references: [id])
   adoptions Adoption[]
 
   @@index([status])
   @@index([species, size])
+  @@index([deletedAt])
   @@map("animals")
 }
 
 model Adoption {
-  id                  String         @id @default(uuid()) @db.Uuid
-  animalId            String         @map("animal_id") @db.Uuid
-  guardianId          String         @map("guardian_id") @db.Uuid
-  ngoId               String?        @map("ngo_id") @db.Uuid
-  compatibilityScore  Decimal?       @map("compatibility_score") @db.Decimal(5, 2)
-  status              AdoptionStatus @default(requested)
-  requestedAt         DateTime       @default(now()) @map("requested_at")
-  completedAt         DateTime?      @map("completed_at")
+  id                 String         @id @default(uuid()) @db.Uuid
+  animalId           String         @map("animal_id") @db.Uuid
+  guardianId         String         @map("guardian_id") @db.Uuid
+  ngoId              String?        @map("ngo_id") @db.Uuid
+  compatibilityScore Decimal?       @map("compatibility_score") @db.Decimal(5, 2)
+  status             AdoptionStatus @default(requested)
+  requestedAt        DateTime       @default(now()) @map("requested_at")
+  completedAt        DateTime?      @map("completed_at")
+  updatedAt          DateTime       @updatedAt @map("updated_at")
 
   animal   Animal @relation(fields: [animalId], references: [id])
   guardian User   @relation("AdoptionGuardian", fields: [guardianId], references: [id])
   ngo      User?  @relation("AdoptionNgo", fields: [ngoId], references: [id])
 
+  @@unique([animalId, guardianId])
   @@index([animalId, status])
   @@index([guardianId])
   @@map("adoptions")
@@ -242,9 +293,10 @@ model Occurrence {
   status      OccurrenceStatus @default(open)
   validatedBy String?          @map("validated_by") @db.Uuid
   createdAt   DateTime         @default(now()) @map("created_at")
+  updatedAt   DateTime         @updatedAt @map("updated_at")
 
-  author    User? @relation("OccurrenceAuthor", fields: [userId], references: [id])
-  validator User? @relation("OccurrenceValidator", fields: [validatedBy], references: [id])
+  author    User?                @relation("OccurrenceAuthor", fields: [userId], references: [id])
+  validator User?                @relation("OccurrenceValidator", fields: [validatedBy], references: [id])
   followers OccurrenceFollower[]
   reports   OccurrenceReport[]
 
@@ -266,12 +318,15 @@ model OccurrenceFollower {
 }
 
 model Notification {
-  id        String   @id @default(uuid()) @db.Uuid
-  userId    String   @map("user_id") @db.Uuid
-  type      String
+  id        String           @id @default(uuid()) @db.Uuid
+  userId    String           @map("user_id") @db.Uuid
+  type      NotificationType
   message   String
-  read      Boolean  @default(false)
-  createdAt DateTime @default(now()) @map("created_at")
+  /// Forward-compatible event data without new columns per notification shape.
+  payload   Json?
+  read      Boolean          @default(false)
+  createdAt DateTime         @default(now()) @map("created_at")
+  updatedAt DateTime         @updatedAt @map("updated_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -281,16 +336,20 @@ model Notification {
 
 /// Persist hash only — never plaintext tokens
 model RefreshToken {
-  id        String   @id @default(uuid()) @db.Uuid
-  userId    String   @map("user_id") @db.Uuid
-  tokenHash String   @unique @map("token_hash")
-  revoked   Boolean  @default(false)
-  expiresAt DateTime @map("expires_at")
-  createdAt DateTime @default(now()) @map("created_at")
+  id         String     @id @default(uuid()) @db.Uuid
+  userId     String     @map("user_id") @db.Uuid
+  tokenHash  String     @unique @map("token_hash")
+  clientType ClientType @default(unknown) @map("client_type")
+  deviceId   String?    @map("device_id")
+  userAgent  String?    @map("user_agent")
+  revokedAt  DateTime?  @map("revoked_at")
+  expiresAt  DateTime   @map("expires_at")
+  createdAt  DateTime   @default(now()) @map("created_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+  @@index([deviceId])
   @@map("refresh_tokens")
 }
 
@@ -320,6 +379,35 @@ model PasswordResetToken {
 
   @@index([userId])
   @@map("password_reset_tokens")
+}
+
+model DevicePushToken {
+  id         String       @id @default(uuid()) @db.Uuid
+  userId     String       @map("user_id") @db.Uuid
+  platform   PushPlatform
+  token      String       @unique
+  createdAt  DateTime     @default(now()) @map("created_at")
+  updatedAt  DateTime     @updatedAt @map("updated_at")
+  lastSeenAt DateTime     @default(now()) @map("last_seen_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("device_push_tokens")
+}
+
+model WaitlistEntry {
+  id              String              @id @default(uuid()) @db.Uuid
+  name            String
+  email           String              @unique
+  profileType     WaitlistProfileType @map("profile_type")
+  city            String?
+  state           String?
+  lgpdConsentAt   DateTime            @map("lgpd_consent_at")
+  createdAt       DateTime            @default(now()) @map("created_at")
+
+  @@index([createdAt])
+  @@map("waitlist_entries")
 }
 
 model AuditLog {

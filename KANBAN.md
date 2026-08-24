@@ -13,12 +13,12 @@ Board em Markdown para organizar a Fase 0 e a Fase 1. Fonte: [`ANIMAPS_Roadmap.m
 - [x] **E0.1 — Atualizar roadmap 0.4 / 0.6–0.7** (stack, monorepo, DDD, MVC)
 - [x] **E0.2 — Documentar bounded contexts** → [`docs/bounded-contexts.md`](docs/bounded-contexts.md)
 - [x] **E0.3 — Desenhar DER** → [`docs/der.dbml`](docs/der.dbml)
-- [x] **E0.4 — Dicionário de dados** → [`docs/dicionario-de-dados.md`](docs/dicionario-de-dados.md) · [`docs/schema.prisma`](docs/schema.prisma)
-- [x] **E0.5 — Matriz de permissões** → [`docs/matriz-permissoes.md`](docs/matriz-permissoes.md)
-- [x] **E0.6 — Checklist LGPD mínimo** → [`docs/lgpd-checklist.md`](docs/lgpd-checklist.md) · [`docs/politica-privacidade-rascunho.md`](docs/politica-privacidade-rascunho.md)
-- [x] **E0.7 — Convenções Git + CI** → [`docs/git-e-ci.md`](docs/git-e-ci.md)
+- [x] **E0.4 — Dicionário de dados** → [`docs/data-dictionary.md`](docs/data-dictionary.md) · [`docs/schema.prisma`](docs/schema.prisma)
+- [x] **E0.5 — Matriz de permissões** → [`docs/permissions-matrix.md`](docs/permissions-matrix.md)
+- [x] **E0.6 — Checklist LGPD mínimo** → [`docs/lgpd-checklist.md`](docs/lgpd-checklist.md) · [`docs/privacy-policy-draft.md`](docs/privacy-policy-draft.md)
+- [x] **E0.7 — Convenções Git + CI** → [`docs/git-and-ci.md`](docs/git-and-ci.md)
 - [x] **E0.8 — Escolher ferramenta Kanban + cadência** (board = este arquivo; Kanban contínuo + review semanal)
-- [x] **E0.9 — ONG piloto (processo)** → [`docs/ong-piloto.md`](docs/ong-piloto.md) *(parceira A DEFINIR)*
+- [x] **E0.9 — ONG piloto (processo)** → [`docs/pilot-ngo.md`](docs/pilot-ngo.md) *(parceira A DEFINIR)*
 - [x] **E1.1 — Estratégia da landing** (decisões) → [`docs/landing-content-brief.md`](docs/landing-content-brief.md)
 
 ### Doing
@@ -110,7 +110,7 @@ Board em Markdown para organizar a Fase 0 e a Fase 1. Fonte: [`ANIMAPS_Roadmap.m
 
 ### E0.4 — Dicionário de dados
 
-**Objetivo:** especificação canônica de cada campo (base do schema Prisma e de `packages/shared`). Artefatos: [`docs/dicionario-de-dados.md`](docs/dicionario-de-dados.md) · [`docs/schema.prisma`](docs/schema.prisma).
+**Objetivo:** especificação canônica de cada campo (base do schema Prisma e de `packages/shared`). Artefatos: [`docs/data-dictionary.md`](docs/data-dictionary.md) · [`docs/schema.prisma`](docs/schema.prisma).
 
 **Status:** Done
 
@@ -132,7 +132,7 @@ Board em Markdown para organizar a Fase 0 e a Fase 1. Fonte: [`ANIMAPS_Roadmap.m
 
 ### E0.5 — Matriz de permissões
 
-**Objetivo:** tabela perfil × ação antes da Fase 2 (authz). Artefato: [`docs/matriz-permissoes.md`](docs/matriz-permissoes.md).
+**Objetivo:** tabela perfil × ação antes da Fase 2 (authz). Artefato: [`docs/permissions-matrix.md`](docs/permissions-matrix.md).
 
 **Status:** Done
 
@@ -160,7 +160,7 @@ Board em Markdown para organizar a Fase 0 e a Fase 1. Fonte: [`ANIMAPS_Roadmap.m
 
 ### E0.6 — Checklist LGPD mínimo
 
-**Objetivo:** política mínima de privacidade antes de coletar dados reais. Artefatos: [`docs/lgpd-checklist.md`](docs/lgpd-checklist.md) · [`docs/politica-privacidade-rascunho.md`](docs/politica-privacidade-rascunho.md).
+**Objetivo:** política mínima de privacidade antes de coletar dados reais. Artefatos: [`docs/lgpd-checklist.md`](docs/lgpd-checklist.md) · [`docs/privacy-policy-draft.md`](docs/privacy-policy-draft.md).
 
 **Status:** Done (controlador permanece **A DEFINIR** até pré-lançamento)
 
@@ -181,7 +181,7 @@ Board em Markdown para organizar a Fase 0 e a Fase 1. Fonte: [`ANIMAPS_Roadmap.m
 
 ### E0.7 — Convenções Git + CI
 
-**Objetivo:** combinar fluxo de branches e pipeline **em documento** (scaffold de código fica para depois). Artefato: [`docs/git-e-ci.md`](docs/git-e-ci.md).
+**Objetivo:** combinar fluxo de branches e pipeline **em documento** (scaffold de código fica para depois). Artefato: [`docs/git-and-ci.md`](docs/git-and-ci.md).
 
 **Status:** Done
 
@@ -239,7 +239,7 @@ Board em Markdown para organizar a Fase 0 e a Fase 1. Fonte: [`ANIMAPS_Roadmap.m
 - [x] Fixar canal de feedback (call quinzenal + async)
 - [x] Template de mensagem de contato
 - [x] Checklist “antes de confirmar”
-- [x] Artefato [`docs/ong-piloto.md`](docs/ong-piloto.md) com placeholder A DEFINIR
+- [x] Artefato [`docs/pilot-ngo.md`](docs/pilot-ngo.md) com placeholder A DEFINIR
 - [ ] Preencher parceira real quando houver confirmação
 
 **Entregável deste ciclo:** processo documentado.  
@@ -289,7 +289,7 @@ Fonte: roadmap §1.1–1.7. Decisões iniciais consolidadas nos três briefs aba
 - Tom emocional com dados reais; termo **"Match ideal"**
 - Idiomas: PT + EN
 - Prova social: números projetados com transparência
-- Política: adaptar [`docs/politica-privacidade-rascunho.md`](docs/politica-privacidade-rascunho.md)
+- Política: adaptar [`docs/privacy-policy-draft.md`](docs/privacy-policy-draft.md)
 
 **Subtarefas**
 
@@ -448,7 +448,7 @@ A Fase 0 fecha quando:
 1. Arquitetura documentada (roadmap + bounded contexts) — feito  
 2. DER + dicionário de dados prontos — feito  
 3. Matriz de permissões + checklist LGPD — feito (controlador A DEFINIR no go-live)  
-4. Convenções Git/CI definidas — feito ([`docs/git-e-ci.md`](docs/git-e-ci.md); workflow no scaffold)  
+4. Convenções Git/CI definidas — feito ([`docs/git-and-ci.md`](docs/git-and-ci.md); workflow no scaffold)  
 5. Governança (ferramenta + cadência) definida — feito (`KANBAN.md` + review semanal)  
 6. ONG piloto identificada — **processo feito**; **nome A DEFINIR**
 
@@ -470,7 +470,7 @@ A Fase 0 fecha quando:
 **Ainda bloqueia “Fase 0 completa” / go-live / piloto real:**
 
 - Nomear **controlador LGPD**
-- **Confirmar ONG piloto** (preencher [`docs/ong-piloto.md`](docs/ong-piloto.md))
+- **Confirmar ONG piloto** (preencher [`docs/pilot-ngo.md`](docs/pilot-ngo.md))
 - Scaffold monorepo + CI YAML (execução; não era doc)
 - Agendamento clínico + `HealthReport` (Fases 3/6 — fora desta validação)
 

@@ -1,20 +1,21 @@
 # ANIMAPS — Personas
 
-Personas para orientar decisões de UX e regras de produto.  
-Fonte original: roadmap §0.3 (+ expansões da validação Fase 0).
+Personas for UX and product rules. Source: roadmap §0.3 (+ Phase 0 validation expansions).
+
+Related: [`permissions-matrix.md`](permissions-matrix.md) · [`bounded-contexts.md`](bounded-contexts.md).
 
 ---
 
-## 1. Ana — tutora de primeira viagem
+## 1. Ana — first-time adopter
 
 | | |
 |---|---|
-| **Perfil** | `guardian` |
-| **Contexto** | Mora em apartamento pequeno, pouco tempo livre, quer um animal de baixa manutenção |
-| **Objetivo** | Adotar com segurança, sem arrependimento |
-| **Frustração** | Anúncios em redes sociais sem filtro de compatibilidade; risco de devolução |
-| **O que a plataforma resolve** | Score de compatibilidade e alertas quando o animal exige mais espaço/energia do que ela tem |
-| **Implicação** | Matching com pesos altos em porte × espaço e energia × tempo; UX clara do “por quê” do score |
+| **Profile** | `guardian` |
+| **Context** | Small apartment, little free time, wants a low-maintenance animal |
+| **Goal** | Adopt safely, without regret |
+| **Pain** | Social-media listings with no compatibility filter; return risk |
+| **Platform value** | Compatibility score and alerts when the animal needs more space/energy than she has |
+| **Implication** | Matching weights size×space and energy×time; clear UX for “why” of the score |
 
 ---
 
@@ -22,88 +23,88 @@ Fonte original: roadmap §0.3 (+ expansões da validação Fase 0).
 
 | | |
 |---|---|
-| **Perfil** | `ngo` (precisa `verified`) |
-| **Contexto** | Equipe pequena, voluntários sem tempo para cadastros longos |
-| **Objetivo** | Colocar animais em lares responsáveis e gerir solicitações |
-| **Frustração** | Planilhas/grupos de WhatsApp; cadastros demorados; perda de follow-up |
-| **O que a plataforma resolve** | Cadastro rápido (obrigatórios mínimos), painel de solicitações, área de ocorrências |
-| **Implicação** | Formulário de animal enxuto; mobile-first; notificação de `AdoptionRequested` |
+| **Profile** | `ngo` (needs `verified`) |
+| **Context** | Small team; volunteers with no time for long forms |
+| **Goal** | Place animals in responsible homes; manage requests |
+| **Pain** | Spreadsheets/WhatsApp groups; slow signup; lost follow-up |
+| **Platform value** | Fast listing (minimum requireds), request panel, occurrence area |
+| **Implication** | Lean animal form; mobile-first; `AdoptionRequested` notification |
 
 ---
 
-## 3. Dr. Marcos — biólogo / pesquisador
+## 3. Dr. Marcos — biologist / researcher
 
 | | |
 |---|---|
-| **Perfil** | `biologist` |
-| **Contexto** | Precisa de dados agregados de fauna silvestre por região |
-| **Objetivo** | Relatórios ambientais, sazonalidade, hotspots |
-| **Frustração** | Dados espalhados e pessoais misturados a interesses de pesquisa |
-| **O que a plataforma resolve** | Dashboard agregado + export sem PII (bairro/cidade); validação de `wildlife_sighting` |
-| **Implicação** | Sem acesso a dados de tutors; foco em `wildlife_sighting` e analytics |
+| **Profile** | `biologist` |
+| **Context** | Needs aggregated wildlife data by region |
+| **Goal** | Environmental reports, seasonality, hotspots |
+| **Pain** | Scattered data; personal data mixed with research interest |
+| **Platform value** | Aggregate dashboard + export without PII (neighborhood/city); validate `wildlife_sighting` |
+| **Implication** | No guardian PII access; focus on `wildlife_sighting` + analytics |
 
 ---
 
-## 4. Dra. Helena — clínica veterinária parceira
+## 4. Dr. Helena — partner veterinary clinic
 
 | | |
 |---|---|
-| **Perfil** | `clinic` (precisa `verified`) |
-| **Contexto** | Clínica de bairro que atende castrações/vacinas e eventualmente resgata animais |
-| **Objetivo** | Divulgar serviços, cadastrar animais resgatados, emitir histórico de saúde confiável |
-| **Frustração** | Sem canal estruturado com ONGs/tutores; laudos perdidos em WhatsApp |
-| **O que a plataforma resolve** | Perfil de serviços, `RegisterAnimal` (quando verified), base para laudo na Fase 3 (`HealthReport`) |
-| **Implicação** | Fluxo de verificação institucional igual à NGO; UI de serviços claros |
+| **Profile** | `clinic` (needs `verified`) |
+| **Context** | Neighborhood clinic for neuter/vaccines; occasional rescues |
+| **Goal** | List services, register rescued animals, issue reliable health history |
+| **Pain** | No structured channel with NGOs/guardians; reports lost in WhatsApp |
+| **Platform value** | Services profile, `RegisterAnimal` when verified, base for Phase 3 `HealthReport` |
+| **Implication** | Same institutional verification flow as NGO; clear services UI |
 
 ---
 
-## 5. Ricardo — guardian resgatista independente
+## 5. Ricardo — independent rescuer guardian
 
 | | |
 |---|---|
-| **Perfil** | `guardian` com `isRescuer = true` |
-| **Contexto** | Resgata animais por conta própria, sem ONG formal |
-| **Objetivo** | Divulgar animais para adoção responsável sem burocracia de CNPJ |
-| **Frustração** | Plataformas só aceitam ONG; grupos informais sem rastreio de interesse |
-| **O que a plataforma resolve** | Flag `isRescuer` autoriza `CreateAnimal`; gerencia solicitações como origem |
-| **Implicação** | Onboarding claro sobre o que é “resgatista”; limites de confiança vs ONG verificada |
+| **Profile** | `guardian` with `isRescuer = true` |
+| **Context** | Rescues on his own, no formal NGO |
+| **Goal** | List animals for responsible adoption without CNPJ bureaucracy |
+| **Pain** | Platforms accept NGOs only; informal groups with no interest tracking |
+| **Platform value** | `isRescuer` allows `CreateAnimal`; manages requests as origin |
+| **Implication** | Clear rescuer onboarding; trust limits vs verified NGO |
 
 ---
 
-## 6. Carla — representante de órgão público
+## 6. Carla — public agency representative
 
 | | |
 |---|---|
-| **Perfil** | `public_agency` |
-| **Contexto** | Secretaria municipal / fiscalização de bem-estar animal |
-| **Objetivo** | Monitorar denúncias (maus-tratos, abandono), validar ocorrências, apoiar política pública |
-| **Frustração** | Denúncias só por telefone/email; sem mapa operacional; dados não anonimizados para compartilhar |
-| **O que a plataforma resolve** | Validar/seguir ocorrências; dashboard amplo; export agregado |
-| **Implicação** | Distinta do biólogo: prioriza denúncias operacionais e fiscalização, não só fauna silvestre |
+| **Profile** | `public_agency` |
+| **Context** | Municipal secretariat / animal-welfare enforcement |
+| **Goal** | Monitor reports (abuse, abandonment), validate occurrences, support public policy |
+| **Pain** | Phone/email-only reports; no operational map; data not anonymized for sharing |
+| **Platform value** | Validate/follow occurrences; wide dashboard; aggregate export |
+| **Implication** | Distinct from biologist: operational reports and enforcement, not only wildlife |
 
 ---
 
-## 7. João — cidadão anônimo que registra ocorrência
+## 7. João — anonymous occurrence reporter
 
 | | |
 |---|---|
-| **Perfil** | Anônimo (`occurrences.user_id` null) ou depois `ClaimOccurrence` |
-| **Contexto** | Vê animal atropelado/abandonado na rua e quer avisar rápido |
-| **Objetivo** | Registrar em menos de 1 minuto com foto + pin no mapa |
-| **Frustração** | Apps que exigem cadastro longo no momento da urgência |
-| **O que a plataforma resolve** | `RegisterOccurrence` sem login; rate limit por IP; opção de vincular conta depois |
-| **Implicação** | UX mobile-first extrema; consentimento geo/fotos no ato; sem PII obrigatória |
+| **Profile** | Anonymous (`occurrences.user_id` null) or later `ClaimOccurrence` |
+| **Context** | Sees hit/abandoned animal on the street; wants to report fast |
+| **Goal** | Register in under 1 minute with photo + map pin |
+| **Pain** | Apps that force long signup in an emergency |
+| **Platform value** | `RegisterOccurrence` without login; IP rate limit; optional claim later |
+| **Implication** | Extreme mobile-first UX; geo/photo consent at submit; no mandatory PII |
 
 ---
 
-## Mapa persona × perfil técnico
+## Persona × technical profile
 
 | Persona | Role / flag |
 |---|---|
 | Ana | `guardian` |
 | ONG Patas Unidas | `ngo` + `verified` |
 | Dr. Marcos | `biologist` |
-| Dra. Helena | `clinic` + `verified` |
+| Dr. Helena | `clinic` + `verified` |
 | Ricardo | `guardian` + `isRescuer` |
 | Carla | `public_agency` |
-| João | anônimo / optional claim |
+| João | anonymous / optional claim |

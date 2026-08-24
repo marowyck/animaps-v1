@@ -1,10 +1,10 @@
 <div align="center">
 
-# 🐾 ANIMAPS
+# ANIMAPS
 
-**Plataforma de adoção responsável e mapa de ocorrências animal.**
+**Responsible adoption platform and animal occurrence map.**
 
-Match ideal entre tutores e animais + denúncias georreferenciadas — tecnologia e cuidado no mesmo lugar.
+Ideal match between guardians and animals + georeferenced reports — care and technology in one place.
 
 [![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js&logoColor=white)](https://nextjs.org/)
 [![React](https://img.shields.io/badge/React-19-149ECA?logo=react&logoColor=white)](https://react.dev/)
@@ -13,75 +13,68 @@ Match ideal entre tutores e animais + denúncias georreferenciadas — tecnologi
 [![NestJS](https://img.shields.io/badge/NestJS-planned-E0234E?logo=nestjs&logoColor=white)](https://nestjs.com/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-%2B PostGIS-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![pnpm](https://img.shields.io/badge/pnpm-workspaces-F69220?logo=pnpm&logoColor=white)](https://pnpm.io/)
-[![License](https://img.shields.io/badge/license-TBD-lightgrey)](#licença)
+[![License](https://img.shields.io/badge/license-TBD-lightgrey)](#license)
 
 </div>
 
 ---
 
-## Índice
+## Contents
 
-- [Sobre o projeto](#sobre-o-projeto)
-- [Status atual](#status-atual)
-- [Arquitetura](#arquitetura)
-- [Stack técnica](#stack-técnica)
-- [Estrutura do repositório](#estrutura-do-repositório)
-- [Como começar](#como-começar)
+- [About](#about)
+- [Current status](#current-status)
+- [Architecture](#architecture)
+- [Tech stack](#tech-stack)
+- [Repository structure](#repository-structure)
+- [Getting started](#getting-started)
 - [Scripts](#scripts)
 - [Design system](#design-system)
-- [Documentação](#documentação)
-- [Convenções de contribuição](#convenções-de-contribuição)
-- [Licença](#licença)
+- [Documentation](#documentation)
+- [Contribution](#contribution)
+- [License](#license)
 
 ---
 
-## Sobre o projeto
+## About
 
-O **ANIMAPS** organiza o caminho até uma adoção consciente e dá visibilidade a denúncias de maus-tratos/abandono, conectando quem cuida:
+ANIMAPS connects people who care for animals:
 
-| Público | Papel na plataforma |
+| Audience | Role |
 |---|---|
-| 🧑‍🤝‍🧑 **Tutores / adotantes** | Perfil + **Match ideal** — compatibilidade real com animais disponíveis |
-| 🐾 **ONGs** | Cadastro de animais e gestão de solicitações sem planilha nem WhatsApp |
-| 🏥 **Clínicas** | Parceria verificada no fluxo de adoção responsável |
-| 🏛️ **Órgãos públicos / pesquisa** | Indicadores agregados e menção institucional |
-| 🌍 **Comunidade** | Mapa de ocorrências georreferenciadas, com ou sem conta |
+| **Guardians / adopters** | Profile + **ideal match** with available animals |
+| **NGOs** | Animal listings and adoption requests without spreadsheets |
+| **Clinics** | Verified partners in responsible adoption |
+| **Public agencies / research** | Aggregated indicators |
+| **Community** | Georeferenced occurrence map (with or without an account) |
 
-**Diferenciais**
-
-- 🎯 Match ideal — não é feed infinito, é compatibilidade com a rotina do tutor
-- 🗺️ Mapa de ocorrências para denúncias, com apoio a denúncia anônima
-- ✅ Perfis verificados para ONGs e clínicas
-- 🔒 LGPD e consentimento desde o design
+**Differentiators:** ideal match (not an infinite feed), anonymous-capable occurrence map, verified NGO/clinic profiles, LGPD consent by design.
 
 ---
 
-## Status atual
+## Current status
 
-Projeto em construção por fases, do institucional ao produto completo:
-
-| Fase | Escopo | Status |
+| Phase | Scope | Status |
 |---|---|---|
-| **Fase 0** | Arquitetura, modelagem de dados, permissões, LGPD, governança | ✅ Concluída |
-| **Fase 1** | Landing page institucional + lista de espera (`apps/web`) | 🚧 Em andamento |
-| **Fase 2** | API NestJS (DDD) + autenticação + persistência real | ⏳ Planejada |
-| **Fase 3** | Produto web completo (matching, mapa, painéis) | ⏳ Planejada |
-| **Fase 4** | Apps mobile (Android/iOS) consumindo a mesma API | ⏳ Planejada |
+| **Phase 0** | Architecture, data model, permissions, LGPD, governance | Done |
+| **Phase 1** | Institutional landing + waitlist (`apps/web`) | In progress |
+| **Phase 2** | NestJS API (DDD) + auth + real persistence | Planned |
+| **Phase 3** | Full web product (matching, map, dashboards) | Planned |
+| **Phase 4** | Mobile apps (Android/iOS) on the same API | Planned |
 
 ---
 
-## Arquitetura
+## Architecture
 
-Backend em **DDD** (Domain-Driven Design), frontend em **MVC** na camada de View, monorepo com **pnpm workspaces**. Web primeiro; mobile depois, reaproveitando a mesma API.
+DDD backend (planned), MVC on the web view layer, **pnpm** monorepo. Web first; mobile later on the same API.
 
 ```mermaid
 flowchart LR
-    subgraph clients ["Clientes"]
+    subgraph clients ["Clients"]
         web["apps/web (Next.js)"]
-        mobile["Mobile — Android/iOS (futuro)"]
+        mobile["Mobile — Android/iOS (future)"]
     end
 
-    subgraph api ["apps/api — NestJS (DDD, futuro)"]
+    subgraph api ["apps/api — NestJS (DDD, future)"]
         identity["identity"]
         adoption["adoption"]
         occurrence["occurrence"]
@@ -100,182 +93,157 @@ flowchart LR
     analytics --> db
 ```
 
-Bounded contexts detalhados em [`docs/bounded-contexts.md`](docs/bounded-contexts.md). Modelo de dados em [`docs/der.dbml`](docs/der.dbml) e [`docs/schema.prisma`](docs/schema.prisma).
+Details: [`docs/bounded-contexts.md`](docs/bounded-contexts.md) · data model: [`docs/der.dbml`](docs/der.dbml), [`docs/schema.prisma`](docs/schema.prisma) · evolution: [`docs/schema-evolution.md`](docs/schema-evolution.md).
 
-**Convenção de nomenclatura:** inglês em todo o sistema e banco (`camelCase` na API / `snake_case` no banco); UI em português com i18n (PT + EN) planejado.
+**Naming:** English in code and DB (`camelCase` API / `snake_case` DB); UI Portuguese with i18n (PT + EN) planned.
 
 ---
 
-## Stack técnica
+## Tech stack
 
 ### Frontend (`apps/web`)
 
-| Categoria | Tecnologia |
+| Area | Tech |
 |---|---|
 | Framework | [Next.js](https://nextjs.org/) 16 (App Router) |
-| Linguagem | [TypeScript](https://www.typescriptlang.org/) 5 |
+| Language | [TypeScript](https://www.typescriptlang.org/) 5 |
 | UI | [React](https://react.dev/) 19 |
-| Estilo | [Tailwind CSS](https://tailwindcss.com/) 4 (design tokens via `@theme`) |
-| Animação | [GSAP](https://gsap.com/) + [`@gsap/react`](https://gsap.com/resources/React) (`ScrollTrigger`) |
-| Smooth scroll | [Lenis](https://github.com/darkroomengineering/lenis) |
-| Ícones | [lucide-react](https://lucide.dev/) |
-| Lint | ESLint (`eslint-config-next`) |
+| Style | [Tailwind CSS](https://tailwindcss.com/) 4 |
+| Motion | [GSAP](https://gsap.com/) + Lenis |
+| Icons | [lucide-react](https://lucide.dev/) |
 
-### Backend & dados (planejado)
+### Backend & data (planned)
 
-| Categoria | Tecnologia |
+| Area | Tech |
 |---|---|
-| Framework | [NestJS](https://nestjs.com/) (arquitetura DDD) |
+| Framework | [NestJS](https://nestjs.com/) (DDD) |
 | ORM | [Prisma](https://www.prisma.io/) |
-| Banco | [PostgreSQL](https://www.postgresql.org/) + [PostGIS](https://postgis.net/) (dados geoespaciais) |
-| Auth | JWT + refresh token (na própria API) |
+| DB | [PostgreSQL](https://www.postgresql.org/) + [PostGIS](https://postgis.net/) |
+| Auth | JWT + hashed refresh tokens |
 
-### Infraestrutura
+### Infra
 
-| Categoria | Tecnologia |
+| Area | Tech |
 |---|---|
-| Monorepo | [pnpm](https://pnpm.io/) workspaces |
-| Deploy web | [Vercel](https://vercel.com/) |
-| CI | GitHub Actions (lint · typecheck · test · build) |
-| Analytics | Google Analytics 4 (pós-consentimento de cookies) |
+| Monorepo | [pnpm](https://pnpm.io/) workspaces (`apps/*`) |
+| Web deploy | [Vercel](https://vercel.com/) |
+| CI | GitHub Actions (planned) |
+| Analytics | GA4 after cookie consent |
 
 ---
 
-## Estrutura do repositório
+## Repository structure
 
 ```text
 animaps/
 ├── apps/
 │   └── web/                         # @animaps/web — Next.js
-│       ├── src/
-│       │   ├── app/                 # App Router (pages, layout, API routes)
-│       │   │   └── api/waitlist/    # Route Handler da lista de espera
-│       │   ├── features/
-│       │   │   ├── landing/         # Seções de marketing
-│       │   │   ├── waitlist/        # Formulário + validação + submit
-│       │   │   └── consent/         # Cookie banner + storage LGPD
-│       │   ├── components/ui/       # Design system (Button, Input, Select…)
-│       │   └── providers/           # SmoothScrollProvider (Lenis + GSAP)
-│       └── public/
-├── packages/                        # (futuro) tipos e utilitários compartilhados
-├── docs/                            # Documentação de domínio, design, LGPD e processo
-├── package.json                     # Scripts do monorepo
-└── pnpm-workspace.yaml
+│       └── src/
+│           ├── app/                 # routes, layout, providers, API routes
+│           │   └── api/waitlist/    # temporary; moves to apps/api in Wave 2
+│           ├── features/
+│           │   ├── landing/
+│           │   ├── waitlist/
+│           │   └── consent/
+│           └── components/          # shared UI primitives
+├── docs/
+├── package.json
+└── pnpm-workspace.yaml              # apps/* (packages/ when 2+ consumers need them)
 ```
 
 ---
 
-## Como começar
+## Getting started
 
-### Pré-requisitos
-
-- [Node.js](https://nodejs.org/) 20+
-- [pnpm](https://pnpm.io/installation) 10+ (`corepack enable` ativa a versão do `package.json`)
-
-### Instalação
+**Prerequisites:** Node.js 20+, pnpm 10+ (`corepack enable`).
 
 ```bash
-git clone <url-do-repositorio>
+git clone <repo-url>
 cd animaps
 pnpm install
-```
-
-### Ambiente de desenvolvimento
-
-```bash
 pnpm dev
 ```
 
-App disponível em [http://localhost:3000](http://localhost:3000).
+App: [http://localhost:3000](http://localhost:3000).
 
-### Variáveis de ambiente
-
-Nenhuma variável obrigatória na Fase 1 (waitlist roda com placeholder de persistência). Quando a API/GA4 forem plugados, `apps/web/.env.local` receberá as chaves necessárias — ver [`docs/landing-tech-plan.md`](docs/landing-tech-plan.md).
+No required env vars in Phase 1 (waitlist persistence is a placeholder). See [`apps/web/.env.example`](apps/web/.env.example). DB/JWT secrets belong only to future `apps/api`.
 
 ---
 
 ## Scripts
 
-Executados a partir da **raiz** do monorepo:
-
-| Comando | Descrição |
+| Command | Description |
 |---|---|
-| `pnpm dev` | Inicia `@animaps/web` em modo desenvolvimento |
-| `pnpm build` | Build de produção de `@animaps/web` |
-| `pnpm lint` | Executa o ESLint |
-| `pnpm typecheck` | Verifica tipos com `tsc --noEmit` |
+| `pnpm dev` | Start `@animaps/web` |
+| `pnpm build` | Production build |
+| `pnpm lint` | ESLint |
+| `pnpm typecheck` | Recursive typecheck |
 
 ---
 
 ## Design system
 
-Primitivas reutilizáveis em `apps/web/src/components/ui/`, pensadas para reaparecer em outras telas do produto (não só na landing):
+Shared primitives in `apps/web/src/components/`: `Button`, `Input`, `Select`, `Checkbox`, `AccordionItem`.
 
-| Componente | Descrição |
-|---|---|
-| `Button` | CTA em pílula, variantes de cor, efeito magnético opcional |
-| `Input` | Campo de texto com label e slot de erro integrados |
-| `Select` | Dropdown totalmente customizado (painel animado, teclado, acessível) |
-| `Checkbox` | Caixa de seleção customizada com animação de check |
-| `AccordionItem` | Disclosure reutilizável (base do FAQ) |
-
-Tokens de cor, tipografia, raios e scrollbar customizado: [`apps/web/src/app/globals.css`](apps/web/src/app/globals.css). Racional visual completo: [`docs/landing-design-brief.md`](docs/landing-design-brief.md).
+Tokens: [`apps/web/src/app/globals.css`](apps/web/src/app/globals.css). Visual brief: [`docs/landing-design-brief.md`](docs/landing-design-brief.md).
 
 ---
 
-## Documentação
+## Documentation
 
-Toda a documentação de produto, domínio e processo vive em [`docs/`](docs/).
+All product, domain, and process docs live in [`docs/`](docs/).
 
 <details>
-<summary><strong>Domínio e dados</strong></summary>
+<summary><strong>Domain & data</strong></summary>
 
-| Documento | Conteúdo |
+| Doc | Content |
 |---|---|
-| [bounded-contexts.md](docs/bounded-contexts.md) | Contextos DDD (`identity`, `adoption`, `occurrence`, `notifications`, `analytics`) |
-| [der.dbml](docs/der.dbml) | Diagrama entidade-relacionamento ([dbdiagram.io](https://dbdiagram.io)) |
-| [dicionario-de-dados.md](docs/dicionario-de-dados.md) | Especificação de campos, tipos e regras |
-| [schema.prisma](docs/schema.prisma) | Schema Prisma de referência |
-| [matriz-permissoes.md](docs/matriz-permissoes.md) | Papéis e permissões por contexto |
-| [personas.md](docs/personas.md) | Personas do produto |
+| [architecture.md](docs/architecture.md) | Monorepo boundaries, web/mobile/API roadmap |
+| [bounded-contexts.md](docs/bounded-contexts.md) | DDD contexts |
+| [schema-evolution.md](docs/schema-evolution.md) | How to change the DB safely |
+| [der.dbml](docs/der.dbml) | ER diagram — paste into [dbdiagram.io](https://dbdiagram.io) (not Prisma) |
+| [data-dictionary.md](docs/data-dictionary.md) | Fields, types, rules |
+| [schema.prisma](docs/schema.prisma) | Prisma draft (docs only until API) |
+| [permissions-matrix.md](docs/permissions-matrix.md) | Roles and actions |
+| [personas.md](docs/personas.md) | Product personas |
 
 </details>
 
 <details>
-<summary><strong>Landing page (Fase 1)</strong></summary>
+<summary><strong>Landing (Phase 1)</strong></summary>
 
-| Documento | Conteúdo |
+| Doc | Content |
 |---|---|
-| [landing-content-brief.md](docs/landing-content-brief.md) | Objetivo, públicos, tom de voz, estrutura de seções |
-| [landing-design-brief.md](docs/landing-design-brief.md) | Paleta, tipografia, motion, design system |
-| [landing-tech-plan.md](docs/landing-tech-plan.md) | Stack, formulário/persistência, SEO, deploy |
+| [landing-content-brief.md](docs/landing-content-brief.md) | Goals, audiences, tone, sections |
+| [landing-design-brief.md](docs/landing-design-brief.md) | Palette, type, motion, UI |
+| [landing-tech-plan.md](docs/landing-tech-plan.md) | Stack, form, SEO, deploy |
 
 </details>
 
 <details>
-<summary><strong>LGPD e processo</strong></summary>
+<summary><strong>Privacy & process</strong></summary>
 
-| Documento | Conteúdo |
+| Doc | Content |
 |---|---|
-| [lgpd-checklist.md](docs/lgpd-checklist.md) | Checklist LGPD mínimo para o MVP |
-| [politica-privacidade-rascunho.md](docs/politica-privacidade-rascunho.md) | Rascunho de política de privacidade |
-| [git-e-ci.md](docs/git-e-ci.md) | Branches, Conventional Commits, pipeline de CI |
-| [ong-piloto.md](docs/ong-piloto.md) | Processo de seleção/onboarding da ONG piloto |
+| [lgpd-checklist.md](docs/lgpd-checklist.md) | Minimum LGPD checklist for MVP |
+| [privacy-policy-draft.md](docs/privacy-policy-draft.md) | Internal privacy draft (consumer PT copy may follow) |
+| [git-and-ci.md](docs/git-and-ci.md) | Branches, Conventional Commits, CI |
+| [pilot-ngo.md](docs/pilot-ngo.md) | Pilot NGO selection/onboarding |
 
 </details>
 
-> Planejamento operacional (roadmap detalhado e board Kanban) é mantido localmente e não faz parte deste repositório.
+> Detailed roadmap and Kanban are kept locally and are not part of this repository.
 
 ---
 
-## Convenções de contribuição
+## Contribution
 
-Resumo — detalhes completos em [`docs/git-e-ci.md`](docs/git-e-ci.md):
+See [`docs/git-and-ci.md`](docs/git-and-ci.md):
 
-- **Branches:** `main` (produção) · `develop` (staging) · `feature/<slug>` · `hotfix/<slug>`
-- **Commits:** [Conventional Commits](https://www.conventionalcommits.org/) — `feat`, `fix`, `docs`, `chore`, `refactor`, `test`, `ci`
-- **Package manager:** apenas `pnpm` (não commitar lockfiles de npm/yarn)
-- **CI:** PR só integra com `lint` + `typecheck` + `build` verdes
+- **Branches:** `main` · `develop` · `feature/<slug>` · `hotfix/<slug>`
+- **Commits:** [Conventional Commits](https://www.conventionalcommits.org/)
+- **Package manager:** `pnpm` only
+- **CI:** PR needs green `lint` + `typecheck` + `build`
 
 ```text
 feat(adoption): add RequestAdoption use case
@@ -285,6 +253,6 @@ docs: update LGPD checklist
 
 ---
 
-## Licença
+## License
 
-Projeto privado — licença a definir.
+Private project — license TBD.

@@ -1,151 +1,151 @@
-# Landing Page — Content Brief (Fase 1)
+# Landing Page — Content Brief (Phase 1)
 
-Brief de conteúdo e estratégia da landing institucional do ANIMAPS.  
-Fonte: decisões das 30 perguntas de alinhamento da Fase 1 + [`ANIMAPS_Roadmap.md`](../ANIMAPS_Roadmap.md) §1.1–1.2 + [`docs/personas.md`](personas.md).
+Content and strategy for the ANIMAPS institutional landing.  
+Sources: Phase 1 alignment decisions + [`ANIMAPS_Roadmap.md`](../ANIMAPS_Roadmap.md) §1.1–1.2 + [`personas.md`](personas.md).
 
-**Status:** decisões fechadas (execução da copy ainda pendente).
-
----
-
-## 1. Objetivo primário
-
-**Captação de lista de espera** focada em tutores/adotantes (`guardian`), com comunicação **equilibrada** para ONGs (`ngo`).
-
-- CTA principal do Hero: **"Entrar na lista de espera"**
-- Não é prioridade nesta fase: patrocínio, tráfego pago ou Meta Pixel
-- Escopo geográfico da mensagem: **nacional** (não amarrar a uma cidade-piloto na copy)
+**Status:** decisions closed (copy execution still pending).
 
 ---
 
-## 2. Métrica de sucesso
+## 1. Primary goal
 
-| Ordem | Métrica | Como medir |
+**Waitlist capture** focused on guardians/adopters (`guardian`), with **balanced** messaging for NGOs (`ngo`).
+
+- Hero primary CTA: **"Join the waitlist"**
+- Out of scope this phase: sponsorship, paid traffic, Meta Pixel
+- Geographic framing: **national** (do not lock copy to a pilot city)
+
+---
+
+## 2. Success metric
+
+| Order | Metric | How to measure |
 |---|---|---|
-| Primária | Conversão visitante → cadastro na lista de espera | Evento GA4 `waitlist_submit` / formulário enviado |
-| Secundárias (acompanhar) | Mix de perfis (tutor / ONG / clínica / outro); taxa de bounce; scroll depth até o CTA final | GA4 + campos do formulário |
+| Primary | Visitor → waitlist signup | GA4 `waitlist_submit` / form submit |
+| Secondary | Profile mix (guardian / NGO / clinic / other); bounce; scroll depth to final CTA | GA4 + form fields |
 
-Prazo de acompanhamento pós-lançamento: **2 semanas** (ver roadmap §1.7).
+Post-launch review window: **2 weeks** (roadmap §1.7).
 
 ---
 
-## 3. Públicos e hierarquia
+## 3. Audiences and hierarchy
 
-| Prioridade | Público | Persona | Papel na landing |
+| Priority | Audience | Persona | Role on landing |
 |---|---|---|---|
-| 1 (primário CTA) | Tutores / adotantes | Ana, Ricardo | Hero + fluxo “Como funciona” + formulário |
-| 1 (paridade de voz) | ONGs | Patas Unidas | Card em “Para quem é” + CTA secundário no formulário |
-| 2 | Clínicas | Dra. Helena | **Seção/card dedicada** |
-| 3 | Órgãos públicos / pesquisadores | Carla, Dr. Marcos | **Menção institucional breve** (não CTA forte) |
-| Contexto | Denunciante anônimo | João | Pode aparecer na dor do Problema / mapa de ocorrências |
+| 1 (primary CTA) | Guardians / adopters | Ana, Ricardo | Hero + “How it works” + form |
+| 1 (voice parity) | NGOs | Patas Unidas | Card in “Who it’s for” + secondary form CTA |
+| 2 | Clinics | Dr. Helena | **Dedicated section/card** |
+| 3 | Public agencies / researchers | Carla, Dr. Marcos | **Brief institutional mention** (no strong CTA) |
+| Context | Anonymous reporter | João | May appear in Problem pain / occurrence map |
 
 ---
 
-## 4. Tom de voz
+## 4. Tone of voice
 
-- **Emocional com dados reais**, sem apelação.
-- Direto, humano, responsável — evita jargão técnico.
-- Termo canônico para o matching: **"Match ideal"** (não “algoritmo”, não “compatibilidade inteligente” na copy externa).
-- Idiomas: **português + inglês** desde o lançamento (i18n de strings; PT como default).
-
----
-
-## 5. Estatísticas e prova social
-
-### Estatísticas de abandono
-
-- Incluir **números citados com fonte** na seção “O Problema”.
-- Status: **fontes a pesquisar e validar antes de publicar** (não inventar).
-- Preferir fontes citáveis (IBGE, OMSA/OIE, ministérios, estudos acadêmicos, relatórios de proteção animal).
-
-### Prova social
-
-- Ainda **sem depoimentos reais** garantidos.
-- Usar **números projetados com transparência** (ex.: “Meta do piloto”, “Em construção”) — nunca apresentar como resultado comprovado.
-- Quando houver ONG piloto confirmada ([`docs/ong-piloto.md`](ong-piloto.md)), atualizar esta seção.
+- **Emotional with real data**, not melodramatic.
+- Direct, human, responsible — avoid tech jargon.
+- Canonical matching term: **"Ideal Match"** (not “algorithm”, not “smart compatibility” in external copy).
+- Languages: **Portuguese + English** from launch (i18n strings; PT default).
 
 ---
 
-## 6. Estrutura de seções
+## 5. Statistics and social proof
 
-Ordem canônica:
+### Abandonment stats
 
-1. **Hero** — frase de impacto + CTA “Entrar na lista de espera” + imagem (foto real; **sem vídeo**).
-2. **O Problema** — abandono, informação dispersa (redes sociais), dificuldade das ONGs; dados com fonte.
-3. **A Solução** — Match ideal + mapa de ocorrências; linguagem simples.
-4. **Como funciona** — passo a passo visual (ex.: 1. Crie perfil → 2. Veja o Match ideal → 3. Adote com responsabilidade).
-5. **Para quem é** — cards:
-   - Tutor / adotante
-   - ONG
-   - **Clínica** (seção dedicada / card de primeiro nível)
-   - Órgão público / pesquisa (**menção institucional**, card leve ou texto curto)
-6. **Diferenciais** — o que muda vs. grupos de Facebook/Instagram/WhatsApp.
-7. **Prova social** — números projetados com transparência / espaço para futuros parceiros.
-8. **FAQ** — dúvidas frequentes (lançamento, grátis, Match ideal, ONGs/clínicas, urgência/mapa, LGPD, cobertura, app mobile).
-9. **CTA final** — formulário reforçado + link para privacidade.
+- Include **cited numbers with sources** in “The Problem”.
+- Status: **research and validate sources before publish** (do not invent).
+- Prefer citable sources (IBGE, WOAH/OIE, ministries, academic studies, animal-protection reports).
 
-Footer: links institucionais, privacidade, termos, idioma (PT/EN).
+### Social proof
+
+- No guaranteed real testimonials yet.
+- Use **projected numbers with transparency** (e.g. “Pilot goal”, “In progress”) — never as proven results.
+- When pilot NGO is confirmed ([`pilot-ngo.md`](pilot-ngo.md)), update this section.
 
 ---
 
-## 7. Formulário (microcopy)
+## 6. Section structure
 
-### Campos
+Canonical order:
 
-| Campo | Obrigatório | Notas |
+1. **Hero** — impact line + CTA “Join the waitlist” + image (real photo; **no video**).
+2. **The Problem** — abandonment, scattered info (social networks), NGO friction; sourced data.
+3. **The Solution** — Ideal Match + occurrence map; plain language.
+4. **How it works** — visual steps (e.g. 1. Create profile → 2. See Ideal Match → 3. Adopt responsibly).
+5. **Who it’s for** — cards:
+   - Guardian / adopter
+   - NGO
+   - **Clinic** (dedicated / first-class card)
+   - Public agency / research (**institutional mention**, light card or short text)
+6. **Differentiators** — vs Facebook/Instagram/WhatsApp groups.
+7. **Social proof** — transparent projected numbers / space for future partners.
+8. **FAQ** — launch, free?, Ideal Match, NGOs/clinics, urgency/map, LGPD, coverage, mobile app.
+9. **Final CTA** — reinforced form + privacy link.
+
+Footer: institutional links, privacy, terms, language (PT/EN).
+
+---
+
+## 7. Form (microcopy)
+
+### Fields
+
+| Field | Required | Notes |
 |---|---|---|
-| Nome | Sim | |
-| E-mail | Sim | Validação de formato |
-| Tipo de perfil | Sim | `guardian` (tutor) / `ngo` / `clinic` / `other` |
-| Cidade / Estado | Opcional recomendado | Ajuda segmentação nacional |
-| Consentimento LGPD | Sim | Checkbox + link para política |
+| Name | Yes | |
+| Email | Yes | Format validation |
+| Profile type | Yes | `guardian` / `ngo` / `clinic` / `other` |
+| City / State | Optional (recommended) | Helps national segmentation |
+| LGPD consent | Yes | Checkbox + link to policy |
 
-### Microcopy (diretrizes)
+### Microcopy guidelines
 
-- Labels claros em linguagem do usuário (“Sou tutor / Quero adotar”, “Sou uma ONG”, etc.).
-- Erros: específicos e acionáveis (“Informe um e-mail válido”).
-- Sucesso: confirmação imediata (“Você entrou na lista. Em breve falamos com você.”).
-- Não pedir senha nem documentos (`taxId`) nesta fase — só interesse.
-
----
-
-## 8. Política de privacidade e termos
-
-- Adaptar o rascunho existente: [`docs/politica-privacidade-rascunho.md`](politica-privacidade-rascunho.md).
-- Na landing, publicar versão **mínima** cobrindo: o que coletamos no waitlist (nome, e-mail, tipo de perfil, cidade), base de consentimento, retenção, direitos LGPD.
-- Controlador permanece **A DEFINIR** até pré-lançamento (ver [`docs/lgpd-checklist.md`](lgpd-checklist.md)).
-- Termos de uso mínimos para captação (uso do site / lista de espera).
+- User-language labels (“I’m a guardian / Want to adopt”, “I’m an NGO”, etc.).
+- Errors: specific and actionable (“Enter a valid email”).
+- Success: immediate confirmation (“You’re on the list. We’ll be in touch soon.”).
+- No password or documents (`taxId`) this phase — interest only.
 
 ---
 
-## 9. Canais de divulgação (ainda a mapear)
+## 8. Privacy policy and terms
 
-Decidido: **só orgânico** no início (sem ads).
-
-Pendências de execução (§1.7):
-
-- [ ] Listar Instagrams / comunidades de proteção animal alvo
-- [ ] Grupos de WhatsApp/Telegram de ONGs
-- [ ] Contatos diretos de ONGs conhecidas (alinhar com kit [`docs/ong-piloto.md`](ong-piloto.md))
-- [ ] Plano de posts de lançamento (PT; EN se houver canal)
+- Adapt draft: [`privacy-policy-draft.md`](privacy-policy-draft.md). Final BR consumer copy may later need PT.
+- Publish a **minimum** landing version covering: waitlist fields (name, email, profile type, city), consent basis, retention, LGPD rights.
+- Controller remains **TBD** until pre-launch ([`lgpd-checklist.md`](lgpd-checklist.md)).
+- Minimum terms for site use / waitlist capture.
 
 ---
 
-## 10. Checklist de copy antes do go-live
+## 9. Distribution channels (still to map)
 
-- [ ] Headline + subheadline do Hero (PT e EN)
-- [ ] Texto de cada seção com “Match ideal” consistente
-- [ ] Estatísticas com fonte validada
-- [ ] Microcopy do formulário (labels, erros, sucesso) PT e EN
-- [ ] Política de privacidade adaptada + termos mínimos
-- [ ] Disclaimer transparente nos números projetados
-- [ ] Revisão de tom (emocional ≠ apelação)
+Decision: **organic only** at start (no ads).
+
+Execution backlog (§1.7):
+
+- [ ] List target animal-protection Instagrams / communities
+- [ ] NGO WhatsApp/Telegram groups
+- [ ] Direct NGO contacts (align with [`pilot-ngo.md`](pilot-ngo.md))
+- [ ] Launch post plan (PT; EN if channel exists)
 
 ---
 
-## Referências
+## 10. Copy checklist before go-live
+
+- [ ] Hero headline + subheadline (PT and EN)
+- [ ] Section copy with consistent “Ideal Match”
+- [ ] Stats with validated sources
+- [ ] Form microcopy (labels, errors, success) PT and EN
+- [ ] Adapted privacy policy + minimum terms
+- [ ] Transparent disclaimer on projected numbers
+- [ ] Tone review (emotional ≠ melodramatic)
+
+---
+
+## References
 
 - Roadmap §1.1–1.2, §1.7
-- [`docs/personas.md`](personas.md)
-- [`docs/politica-privacidade-rascunho.md`](politica-privacidade-rascunho.md)
-- [`docs/landing-design-brief.md`](landing-design-brief.md)
-- [`docs/landing-tech-plan.md`](landing-tech-plan.md)
+- [`personas.md`](personas.md)
+- [`privacy-policy-draft.md`](privacy-policy-draft.md)
+- [`landing-design-brief.md`](landing-design-brief.md)
+- [`landing-tech-plan.md`](landing-tech-plan.md)

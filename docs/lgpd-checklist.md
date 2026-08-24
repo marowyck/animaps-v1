@@ -1,155 +1,156 @@
-# ANIMAPS — Checklist LGPD (mínimo)
+# ANIMAPS — LGPD checklist (minimum)
 
-Artefato da Fase 0. Cruzar com [`dicionario-de-dados.md`](dicionario-de-dados.md) e [`politica-privacidade-rascunho.md`](politica-privacidade-rascunho.md).
+Phase 0 artifact. Cross-check [`data-dictionary.md`](data-dictionary.md) and [`privacy-policy-draft.md`](privacy-policy-draft.md).
 
-**Status:** decisões de produto fechadas; **controlador ainda não nomeado** (bloqueante para lançamento público).
+**Status:** product decisions closed; **controller not yet named** (blocking for public launch).
 
 ---
 
-## 1. Controlador / responsável pelo tratamento
+## 1. Controller / data controller
 
-| Campo | Valor |
+| Field | Value |
 |---|---|
-| Controlador | **A DEFINIR** |
-| Nome / razão social | A DEFINIR |
-| E-mail de contato (titulares) | A DEFINIR |
-| Encarregado (DPO) se houver | A DEFINIR (pode ser a mesma pessoa no início) |
+| Controller | **TBD** |
+| Legal name | TBD |
+| Contact email (data subjects) | TBD |
+| DPO (if any) | TBD (may be same person initially) |
 
-- [ ] Preencher antes do go-live (landing com coleta de e-mail ou cadastro real)
-- [ ] Publicar contato na política de privacidade
+- [ ] Fill before go-live (landing email capture or real signup)
+- [ ] Publish contact in privacy policy
 
 ---
 
-## 2. Inventário de dados pessoais (PII)
+## 2. Personal data inventory (PII)
 
-| Dado | Onde | Sensível? | Notas |
+| Data | Where | Sensitive? | Notes |
 |---|---|---|---|
-| `name` | `users` | sim | |
-| `email` | `users` | sim | único; login |
-| `passwordHash` | `users` | sim | nunca expor na API |
-| `phone` | `users` | sim | |
-| `taxId` | `guardian_profiles` | sim | obrigatório só em adoção |
-| `companyTaxId` | `ngo_profiles` / `clinic_profiles` | sim | |
-| `location` (lat/lng) | `occurrences` | sim* | *geo precisa — não exportar cru |
-| Fotos (URL + EXIF) | object storage + refs | sim se identificáveis | strip EXIF no upload (Fase 4) |
-| IP / user-agent | logs rate-limit ocorrência anônima | sim | retenção curta de logs |
-| Preferências do guardian | `guardian_profiles` | sim | perfil comportamental leve |
+| `name` | `users` | yes | |
+| `email` | `users` | yes | unique; login |
+| `passwordHash` | `users` | yes | never expose via API |
+| `phone` | `users` | yes | |
+| `taxId` | `guardian_profiles` | yes | required only for adoption |
+| `companyTaxId` | `ngo_profiles` / `clinic_profiles` | yes | |
+| `location` (lat/lng) | `occurrences` | yes* | *geo needed — do not export raw |
+| Photos (URL + EXIF) | object storage + refs | yes if identifiable | strip EXIF on upload (Phase 4) |
+| IP / user-agent | anon occurrence rate-limit logs | yes | short log retention |
+| Guardian preferences | `guardian_profiles` | yes | light behavioral profile |
+| Waitlist lead | `WaitlistEntry` | yes | name, email, profile type, city |
 
-Campos **não** pessoais em si: species, status de animal, contagens agregadas por bairro.
+Not personal by themselves: species, animal status, neighborhood aggregates.
 
 ---
 
-## 3. Finalidades × base legal (hipótese de produto)
+## 3. Purposes × legal basis (product hypothesis)
 
-| Finalidade | Dados | Base (hipótese) | Validar com jurídico? |
+| Purpose | Data | Basis (hypothesis) | Legal review? |
 |---|---|---|---|
-| Conta e autenticação | identity | Execução de contrato / procedimentos preliminares + `lgpdConsent` | sim |
-| Matching de adoção | preferências + animal | Execução de contrato | sim |
-| Ocorrências geo + fotos | location, photos, description | **Consentimento explícito** no registro | sim |
-| Notificações operacionais | email / inbox | Legítimo interesse ou contrato | sim |
-| Analytics / export agregados | só agregados bairro/cidade | Interesse público / legítimo interesse (hipótese) | **sim — obrigatório** |
-| Verificação NGO/clinic | documentos institucionais | Contrato / obrigação legal (quando couber) | sim |
+| Account & auth | identity | Contract / pre-contract + `lgpdConsent` | yes |
+| Adoption matching | preferences + animal | Contract | yes |
+| Geo occurrences + photos | location, photos, description | **Explicit consent** on submit | yes |
+| Operational notifications | email / inbox | Legitimate interest or contract | yes |
+| Analytics / aggregate export | neighborhood/city aggregates only | Public interest / legitimate interest (hypothesis) | **yes — required** |
+| NGO/clinic verification | institutional docs | Contract / legal duty when applicable | yes |
+| Waitlist | `WaitlistEntry` | Consent | yes |
 
 ---
 
-## 4. Consentimento
+## 4. Consent
 
-Campos: `users.lgpdConsent` (boolean) + `users.lgpdConsentAt` (timestamp).
+Fields: `users.lgpdConsent` (boolean) + `users.lgpdConsentAt` (timestamp). Waitlist: consent + timestamp on `WaitlistEntry`.
 
-**Cadastro (microcopy mínima sugerida):**
+**Signup (suggested microcopy):**
 
-> Ao criar sua conta, você concorda com o tratamento dos seus dados para operar o ANIMAPS (conta, adoção e, se usar, registro de ocorrências), conforme a Política de Privacidade.
+> By creating your account, you agree to processing of your data to operate ANIMAPS (account, adoption, and occurrence reports if you use them), per the Privacy Policy.
 
-**Registro de ocorrência (microcopy mínima sugerida):**
+**Occurrence submit (suggested microcopy):**
 
-> Ao enviar esta ocorrência, você autoriza o uso da localização e das fotos para atendimento e visualização no mapa. Fotos podem permanecer públicas de forma anonimizada se a ocorrência for de interesse coletivo.
+> By submitting this occurrence, you authorize use of location and photos for response and map display. Photos may remain public in anonymized form if the occurrence is of collective interest.
 
-- [ ] Exigir checkbox no cadastro (`lgpdConsent = true`)
-- [ ] Exibir consentimento específico no formulário de ocorrência (geo + fotos)
-- [ ] Guardar versão/data da política aceita (evolução futura; MVP: timestamp)
+- [ ] Require checkbox on signup (`lgpdConsent = true`)
+- [ ] Specific consent on occurrence form (geo + photos)
+- [ ] Store accepted policy version/date (future; MVP: timestamp)
 
 ---
 
-## 5. Retenção
+## 5. Retention
 
-| Situação | Política |
+| Situation | Policy |
 |---|---|
-| Conta ativa | Dados mantidos enquanto a conta existir |
-| Após `DeleteAccount` | **90 dias** para purge completo de PII em banco + backups |
-| Backups | Retenção alinhada: após 90 dias, backups não devem permitir restauração trivial de PII do titular excluído |
-| Logs de rate-limit / IP | Retenção curta (ex.: 30 dias) — detalhar na implementação |
+| Active account | Keep while account exists |
+| After `DeleteAccount` | **90 days** to full PII purge in DB + backups |
+| Backups | Aligned: after 90 days, backups must not trivially restore deleted subject PII |
+| Rate-limit / IP logs | Short (e.g. 30 days) — detail in implementation |
+| Soft delete | Immediate `User.deletedAt` (account inaccessible); hard purge at T+90d |
 
 ---
 
-## 6. Direito ao esquecimento (`DeleteAccount`)
+## 6. Right to be forgotten (`DeleteAccount`)
 
-### Remover / anonimizar (PII)
+### Remove / anonymize (PII)
 
-- Conta: e-mail, nome, telefone, `passwordHash`, tokens de refresh
-- Perfis: `taxId`, `companyTaxId`, preferências identificáveis
-- Notificações do usuário
-- Vínculos: `occurrences.user_id` → `null` se a ocorrência permanecer
-- Sessões / refresh tokens revogados na hora
+- Account: email, name, phone, `passwordHash`, refresh tokens, `DevicePushToken`
+- Profiles: `taxId`, `companyTaxId`, identifiable preferences
+- User notifications
+- Links: `occurrences.user_id` → `null` if occurrence remains
+- Sessions / refresh tokens revoked immediately
 
-### Podem permanecer (interesse público / operação)
+### May remain (public interest / operations)
 
-- `Animal` e `Adoption` históricos necessários à operação da plataforma (sem expor PII do guardian excluído nas listagens)
-- `Occurrence` de interesse coletivo: registro + fotos no object storage
-  - **Manter fotos** se a ocorrência/animal ainda for relevante
-  - **Remover metadados do autor** e EXIF identificável; não listar nome/e-mail do autor
+- Historical `Animal` / `Adoption` needed for platform ops (no deleted guardian PII in listings)
+- Collective-interest `Occurrence`: record + photos in object storage
+  - **Keep photos** if still relevant
+  - **Strip author metadata** and identifiable EXIF; never list author name/email
 
-### Job de purge (Fase 2+)
+### Purge job (Phase 2+)
 
-- Soft-delete imediato (conta inacessível)
-- Hard purge PII em T+90 dias
-
----
-
-## 7. Anonimização em export / analytics / dados abertos
-
-**Regra fechada:** exportações e dashboards públicos usam **apenas agregação por bairro ou cidade** (e tipo/período).
-
-- Nunca exportar `location` (lat/lng) cru
-- Nunca combinar geo precisa + horário + identidade
-- Pesquisadores (`public_agency` / `biologist`): mesmos agregados no MVP (sem coordenadas arredondadas neste ciclo)
+- Soft-delete immediately (inaccessible)
+- Hard purge PII at T+90 days
 
 ---
 
-## 8. Logs de auditoria (mínimo)
+## 7. Anonymization in export / analytics / open data
 
-Registrar (quem, quando, o quê), com retenção definida na implementação:
+**Closed rule:** public exports and dashboards use **neighborhood or city aggregation only** (plus type/period).
 
-| Evento | Motivo |
+- Never export raw `location` (lat/lng)
+- Never combine precise geo + time + identity
+- Researchers (`public_agency` / `biologist`): same aggregates in MVP
+
+---
+
+## 8. Audit logs (minimum)
+
+| Event | Why |
 |---|---|
-| `VerifyNgo` / `VerifyClinic` | Decisão institucional |
-| Mudança de `role` / flags `verified` / `isRescuer` | Autorização |
-| `DeleteAccount` | Direitos do titular |
-| `ExportAnonymizedData` | Rastreio de saídas de dados |
-| `ValidateOccurrence` | Moderação |
+| `VerifyNgo` / `VerifyClinic` | Institutional decision |
+| Role / `verified` / `isRescuer` changes | Authorization |
+| `DeleteAccount` | Data-subject rights |
+| `ExportAnonymizedData` | Data egress trail |
+| `ValidateOccurrence` | Moderation |
 
-Evitar logar corpo de senha, tokens ou conteúdo completo de documentos de verificação após o processamento.
-
----
-
-## 9. Checklist go-live (bloqueantes)
-
-- [ ] Controlador e contato **nomeados** (substituir A DEFINIR)
-- [ ] Política de privacidade publicada e linkada no cadastro
-- [ ] Checkbox de consentimento LGPD no cadastro
-- [ ] Consentimento geo/fotos no fluxo de ocorrência
-- [ ] Endpoint/fluxo `DeleteAccount` testado
-- [ ] Job/processo de purge em 90 dias documentado ou implementado
-- [ ] Export/analytics sem lat/lng (só bairro/cidade)
-- [ ] Strip de EXIF no upload de imagens (Fase 4 — no mínimo checklist de segurança)
-- [ ] Revisão jurídica do rascunho (recomendado antes de escala)
+Do not log password bodies, tokens, or full verification documents after processing.
 
 ---
 
-## 10. Decisões fechadas (E0.6)
+## 9. Go-live blockers
 
-| Tema | Decisão |
+- [ ] Controller and contact **named** (replace TBD)
+- [ ] Privacy policy published and linked at signup / waitlist
+- [ ] LGPD consent checkbox on signup
+- [ ] Geo/photo consent on occurrence flow
+- [ ] `DeleteAccount` flow tested
+- [ ] 90-day purge job documented or implemented
+- [ ] Export/analytics without lat/lng (neighborhood/city only)
+- [ ] EXIF strip on image upload (Phase 4 — at least security checklist)
+- [ ] Legal review of draft (recommended before scale)
+
+---
+
+## 10. Closed decisions (E0.6)
+
+| Topic | Decision |
 |---|---|
-| Controlador | Placeholder até pré-lançamento |
-| Retenção pós-exclusão | 90 dias |
-| Geo em export | Agregado bairro/cidade apenas |
-| Fotos pós-exclusão | Mantidas se interesse público; sem metadados do autor |
+| Controller | Placeholder until pre-launch |
+| Post-deletion retention | 90 days |
+| Geo in export | Neighborhood/city aggregate only |
+| Photos after deletion | Kept if public interest; no author metadata |

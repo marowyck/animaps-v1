@@ -1,44 +1,43 @@
 # ANIMAPS — Bounded Contexts
 
-Documento de domínio da API NestJS (monolito modular DDD).  
-Fonte de entidades: [`ANIMAPS_Roadmap.md`](../ANIMAPS_Roadmap.md) §0.5. DER: [`der.dbml`](der.dbml).
+NestJS modular monolith (DDD). Entities: [`ANIMAPS_Roadmap.md`](../ANIMAPS_Roadmap.md) §0.5. DER: [`der.dbml`](der.dbml). Dictionary: [`data-dictionary.md`](data-dictionary.md). Evolution: [`schema-evolution.md`](schema-evolution.md). Permissions: [`permissions-matrix.md`](permissions-matrix.md).
 
-**Convenção:** identificadores de código/schema em inglês; prosa deste documento em português.
-
-**Pastas alvo:** `apps/api/src/modules/<context>/` com `domain/`, `application/`, `infrastructure/`, `interfaces/http/`.
+**Target folders:** `apps/api/src/modules/<context>/` with `domain/`, `application/`, `infrastructure/`, `interfaces/http/`.
 
 ---
 
-## Decisões de domínio (fechadas)
+## Closed domain decisions
 
-| Decisão | Detalhe |
+| Decision | Detail |
 |---|---|
-| Integração entre contextos | Eventos de domínio **in-process** (pub/sub NestJS). BullMQ fica para depois (filas reais). |
-| Quem cadastra `Animal` | `ngo` **verificada**, `clinic` **verificada**, ou `guardian` com `isRescuer = true` |
-| Registro de `Occurrence` | Permite **anônimo** (`userId` nullable). Use case `ClaimOccurrence` vincula a uma conta depois. Rate limit por IP na infra (Fase 4). |
-| Validar Occurrence | NGO verified / `public_agency`; `biologist` só para `wildlife_sighting` |
-| Adoption paralelo | Várias solicitações no mesmo animal; origem escolhe; `in_process` no 1º `approved` |
-| `taxId` guardian | Opcional no cadastro; obrigatório em `RequestAdoption` |
+| Cross-context integration | In-process domain events (NestJS pub/sub). BullMQ later. |
+| Who creates `Animal` | Verified `ngo`, verified `clinic`, or `guardian` with `isRescuer = true` |
+| `Occurrence` registration | Anonymous allowed (`userId` nullable). `ClaimOccurrence` links later. IP rate limit (Phase 4). |
+| Validate Occurrence | NGO verified / `public_agency`; `biologist` only for `wildlife_sighting` |
+| Parallel adoption | Many requests per animal; origin chooses; `in_process` on first `approved` |
+| Guardian `taxId` | Optional at signup; required for `RequestAdoption` |
+| Soft delete | `User.deletedAt`, `Animal.deletedAt` — see [`schema-evolution.md`](schema-evolution.md) |
 
 ---
 
-## Mapa dos contextos
+## Context map
 
-| Contexto | Pasta | Entidades | Papel |
+| Context | Folder | Entities | Role |
 |---|---|---|---|
-| `identity` | `modules/identity/` | `User`, `GuardianProfile`, `NgoProfile`, `ClinicProfile`, `RefreshToken`, `EmailVerificationToken`, `PasswordResetToken` | Contas, perfis, auth, verificação institucional |
-| `adoption` | `modules/adoption/` | `Animal`, `Adoption` | Cadastro de animais, matching, fluxo de adoção |
-| `occurrence` | `modules/occurrence/` | `Occurrence`, `OccurrenceFollower`, `OccurrenceReport` | Ocorrências geo, moderação, claim, denúncias |
-| `notifications` | `modules/notifications/` | `Notification` | Preferências, disparo e histórico |
-| `analytics` | `modules/analytics/` | (somente leituras/agregações no MVP) | Indicadores e exportação anonimizada |
+| `identity` | `modules/identity/` | `User`, `GuardianProfile`, `NgoProfile`, `ClinicProfile`, `RefreshToken`, `EmailVerificationToken`, `PasswordResetToken`, `DevicePushToken` | Accounts, profiles, auth, institutional verification, push tokens |
+| `adoption` | `modules/adoption/` | `Animal`, `Adoption` | Animal listing, matching, adoption flow |
+| `occurrence` | `modules/occurrence/` | `Occurrence`, `OccurrenceFollower`, `OccurrenceReport` | Geo occurrences, moderation, claim, reports |
+| `notifications` | `modules/notifications/` | `Notification` | Preferences, delivery, history |
+| `analytics` | `modules/analytics/` | (reads/aggregations only in MVP) | KPIs, anonymized export |
+| `marketing` | `modules/marketing/` (Wave 2) | `WaitlistEntry` | Landing waitlist (today: Next `/api/waitlist`) |
 
-`AuditLog` é **cross-cutting** (port compartilhado): escrito por `identity`, `occurrence` e `analytics` em ações sensíveis — não forma um bounded context próprio no MVP.
+`AuditLog` is **cross-cutting** (shared port): written by `identity`, `occurrence`, `analytics` on sensitive actions — not its own bounded context in the MVP.
 
-`identity` é a **fonte de verdade** de usuários e perfis. Os demais contextos referenciam `userId` / `ngoId` / `guardianId` / `clinicId` **sem** duplicar dados de perfil.
+`identity` is the **source of truth** for users and profiles. Other contexts reference `userId` / `ngoId` / `guardianId` / `clinicId` **without** duplicating profile data.
 
 ---
 
-## Integração entre contextos (eventos in-process)
+## Integration (in-process events)
 
 ```mermaid
 flowchart LR
@@ -49,265 +48,269 @@ flowchart LR
   occurrence -->|"OccurrenceResolved"| analytics
 ```
 
-| Evento | Publicado por | Consumido por |
+| Event | Published by | Consumed by |
 |---|---|---|
 | `UserRegistered` | `identity` | `notifications` |
 | `NgoVerified` | `identity` | `notifications` |
 | `ClinicVerified` | `identity` | `notifications` |
 | `AdoptionRequested` | `adoption` | `notifications` |
 | `AdoptionCompleted` | `adoption` | `notifications`, `analytics` |
-| `AnimalRegisteredForMatching` | `adoption` | `notifications` (pode emitir `NewCompatibleAnimalAvailable` aos guardians compatíveis — lógica de matching na Fase 3) |
+| `AnimalRegisteredForMatching` | `adoption` | `notifications` (may emit `NewCompatibleAnimalAvailable` — matching detail Phase 3) |
 | `OccurrenceCreated` | `occurrence` | `notifications` |
 | `OccurrenceStatusChanged` | `occurrence` | `notifications` |
 | `OccurrenceResolved` | `occurrence` | `analytics` |
 
-`notifications` e `analytics` **só consomem** eventos no MVP — não publicam eventos de escrita de domínio.
+`notifications` and `analytics` **only consume** in the MVP — they do not publish write-side domain events.
 
-Regra: um contexto **não** importa classes de domínio de outro. Comunicação = eventos ou leitura de IDs + ports (ex.: “este `userId` é NGO verificada?” via query/port de `identity`).
+Rule: a context **must not** import another context’s domain classes. Communicate via events or ID reads + ports (e.g. “is this `userId` a verified NGO?” via an `identity` query/port).
 
 ---
 
 ## 1. `identity`
 
-### Objetivo
+### Goal
 
-Gerenciar identidade, autenticação, autorização de perfil e verificação institucional.
+Identity, auth, profile authorization, institutional verification.
 
-### Linguagem ubíqua
+### Ubiquitous language
 
-- **User** — conta autenticável com um `role`
-- **Guardian** — pessoa que adota / cuida; pode ser **rescuer** (`isRescuer`)
-- **NGO** — organização; precisa estar **verified** para ações privilegiadas
-- **Clinic** — clínica veterinária parceira
-- **Public agency / Biologist** — papéis de validação e dados agregados
+- **User** — authenticable account with a `role`
+- **Guardian** — adopter/caretaker; may be **rescuer** (`isRescuer`)
+- **NGO** — organization; needs **verified** for privileged actions
+- **Clinic** — partner veterinary clinic
+- **Public agency / Biologist** — validation and aggregated-data roles
 
-### Entidades
+### Entities
 
-- `User`
-- `GuardianProfile` (inclui `isRescuer: boolean`)
-- `NgoProfile` (inclui `verified: boolean`)
-- `ClinicProfile` (inclui `verified: boolean`)
-- `RefreshToken` (hash only)
-- `EmailVerificationToken` (hash only)
-- `PasswordResetToken` (hash only)
+- `User` (soft delete via `deletedAt`)
+- `GuardianProfile` (`isRescuer`)
+- `NgoProfile` / `ClinicProfile` (`verified`)
+- `RefreshToken`, `EmailVerificationToken`, `PasswordResetToken` (hash only)
+- `DevicePushToken` (APNs/FCM — mobile Wave 3)
 
-### Use cases principais
+### Main use cases
 
-| Use case | Descrição |
+| Use case | Description |
 |---|---|
-| `RegisterUser` | Cadastro com `role` e consentimento LGPD |
-| `LoginUser` | Emite access + refresh token |
-| `RefreshAccessToken` | Rotaciona access via refresh válido |
-| `RevokeRefreshToken` / `LogoutUser` | Revoga refresh (blacklist) |
-| `VerifyEmail` | Consome `EmailVerificationToken` |
-| `RequestPasswordReset` / `ResetPassword` | Fluxo com `PasswordResetToken` |
-| `UpdateGuardianProfile` | Preferências + flag `isRescuer` |
-| `UpdateNgoProfile` / `SubmitNgoDocuments` | Dados institucionais |
-| `VerifyNgo` | Aprovação manual → emite `NgoVerified` + `AuditLog` |
-| `UpdateClinicProfile` | Serviços e horários |
-| `SubmitClinicDocuments` / `VerifyClinic` | Aprovação manual → emite `ClinicVerified` + `AuditLog` |
-| `DeleteAccount` | Exclusão / direito ao esquecimento + `AuditLog` |
+| `RegisterUser` | Signup with `role` + LGPD consent |
+| `LoginUser` | Issues access + refresh |
+| `RefreshAccessToken` | Rotates access via valid refresh |
+| `RevokeRefreshToken` / `LogoutUser` | Revokes refresh |
+| `VerifyEmail` | Consumes `EmailVerificationToken` |
+| `RequestPasswordReset` / `ResetPassword` | `PasswordResetToken` flow |
+| `UpdateGuardianProfile` | Preferences + `isRescuer` |
+| `UpdateNgoProfile` / `SubmitNgoDocuments` | Institutional data |
+| `VerifyNgo` | Manual approval → `NgoVerified` + `AuditLog` |
+| `UpdateClinicProfile` | Services and hours |
+| `SubmitClinicDocuments` / `VerifyClinic` | Manual approval → `ClinicVerified` + `AuditLog` |
+| `DeleteAccount` | Soft-delete + right to be forgotten + `AuditLog` (hard purge PII at T+90d) |
+| `RegisterDevicePushToken` | Upsert `DevicePushToken` (Wave 3) |
 
-### Anti-limites
+### Anti-boundaries
 
-- Não calcula score de compatibilidade
-- Não gerencia ciclo de vida de `Animal` / `Adoption` / `Occurrence`
-- Não envia e-mail diretamente (emite evento; infra/notificação despacha)
+- No compatibility scoring
+- No lifecycle of `Animal` / `Adoption` / `Occurrence`
+- No direct email send (emits event; infra/notifications dispatches)
 
-### Dependências
+### Dependencies
 
-- **Publica:** `UserRegistered`, `NgoVerified`, `ClinicVerified`
-- **Consome:** nenhum (raiz)
+- **Publishes:** `UserRegistered`, `NgoVerified`, `ClinicVerified`
+- **Consumes:** none (root)
 
 ---
 
 ## 2. `adoption`
 
-### Objetivo
+### Goal
 
-Cadastro de animais disponíveis, algoritmo de compatibilidade e fluxo de solicitação/aprovação de adoção.
+Available animals, compatibility matching, adoption request/approval.
 
-### Linguagem ubíqua
+### Ubiquitous language
 
-- **Animal** — indivíduo cadastrado para adoção
-- **Adoption** — processo entre guardian e origem do animal
-- **Compatibility score** — pontuação 0–100 no momento da solicitação
-- **Rescuer** — guardian autorizado a cadastrar animal
+- **Animal** — individual listed for adoption (soft delete via `deletedAt`)
+- **Adoption** — process between guardian and animal origin
+- **Compatibility score** — 0–100 at request time
+- **Rescuer** — guardian allowed to register animals
 
-### Entidades
+### Entities
 
-- `Animal` (origem: `ngoId` e/ou `guardianId` e/ou `clinicId`)
+- `Animal` (origin: `ngoId` and/or `guardianId` and/or `clinicId`)
 - `Adoption`
 
-### Quem pode criar `Animal`
+### Who may create `Animal`
 
-| Ator | Condição |
+| Actor | Condition |
 |---|---|
 | `ngo` | `NgoProfile.verified = true` |
 | `clinic` | `ClinicProfile.verified = true` |
 | `guardian` | `GuardianProfile.isRescuer = true` |
 
-**Solicitações paralelas:** várias `Adoption` em `requested` / `under_review` no mesmo animal são permitidas; a origem escolhe. O animal só muda para `in_process` no primeiro `approved` (não no `requested`).
+**Parallel requests:** multiple `Adoption` in `requested` / `under_review` allowed; origin chooses. Animal → `in_process` on first `approved` (not on `requested`).
 
-**`RequestAdoption`:** exige guardian autenticado com `taxId` preenchido.
+**`RequestAdoption`:** authenticated guardian with `taxId` set.
 
-### Use cases principais
+### Main use cases
 
-| Use case | Descrição |
+| Use case | Description |
 |---|---|
-| `RegisterAnimal` | CRUD inicial + fotos (URLs); emite `AnimalRegisteredForMatching` |
-| `UpdateAnimal` / `ArchiveAnimal` | Edição; só dono do recurso |
-| `ListAvailableAnimals` | Filtros; exclui `in_process` / `adopted` das buscas novas |
-| `CalculateCompatibility` | MatchingService (regras ponderadas) |
-| `RequestAdoption` | Cria `Adoption` + score → `AdoptionRequested` |
-| `ReviewAdoption` | Aprovar / recusar / pedir mais info |
-| `CompleteAdoption` | Status final + animal `adopted` → `AdoptionCompleted` |
-| `CancelAdoption` | Cancelamento por parte interessada |
+| `RegisterAnimal` | Initial CRUD + photo URLs → `AnimalRegisteredForMatching` |
+| `UpdateAnimal` / `ArchiveAnimal` | Edit; owner only |
+| `ListAvailableAnimals` | Filters; exclude `in_process` / `adopted` from new search |
+| `CalculateCompatibility` | MatchingService (weighted rules) |
+| `RequestAdoption` | Creates `Adoption` + score → `AdoptionRequested` |
+| `ReviewAdoption` | Approve / refuse / request more info |
+| `CompleteAdoption` | Final status + animal `adopted` → `AdoptionCompleted` |
+| `CancelAdoption` | Cancel by interested party |
 
-### Anti-limites
+### Anti-boundaries
 
-- Não autentica usuários (consulta `identity` via port/guard)
-- Não registra ocorrências geográficas
-- Não persiste preferências de notificação
+- Does not authenticate (queries `identity` via port/guard)
+- Does not record geo occurrences
+- Does not persist notification preferences
 
-### Dependências
+### Dependencies
 
-- **Lê:** `identity` (role, `verified`, `isRescuer`, preferências do guardian para matching)
-- **Publica:** `AdoptionRequested`, `AdoptionCompleted`, `AnimalRegisteredForMatching`
-- **Consome:** nenhum obrigatório no MVP
+- **Reads:** `identity` (role, `verified`, `isRescuer`, guardian prefs for matching)
+- **Publishes:** `AdoptionRequested`, `AdoptionCompleted`, `AnimalRegisteredForMatching`
+- **Consumes:** none required in MVP
 
 ---
 
 ## 3. `occurrence`
 
-### Objetivo
+### Goal
 
-Registro e acompanhamento territorial de situações envolvendo fauna (doméstica e silvestre).
+Territorial tracking of fauna situations (domestic and wildlife).
 
-### Linguagem ubíqua
+### Ubiquitous language
 
-- **Occurrence** — registro georreferenciado
-- **Anonymous report** — ocorrência sem `userId`
-- **Claim** — vincular ocorrência anônima a um `User` autenticado
-- **Validation** — selo de veracidade por NGO / public agency
-- **Follower** — órgão/usuário que acompanha a ocorrência (N:N)
+- **Occurrence** — georeferenced record
+- **Anonymous report** — occurrence without `userId`
+- **Claim** — link anonymous occurrence to authenticated `User`
+- **Validation** — truth seal by NGO / public agency
+- **Follower** — org/user following the occurrence (N:N)
 
-### Entidades
+### Entities
 
 - `Occurrence` (`userId` **nullable**)
-- `OccurrenceFollower` (junção N:N)
-- `OccurrenceReport` (denúncia de spam/duplicidade/fraude)
+- `OccurrenceFollower`
+- `OccurrenceReport` (spam / duplicate / fraud)
 
-### Use cases principais
+### Main use cases
 
-| Use case | Descrição |
+| Use case | Description |
 |---|---|
-| `RegisterOccurrence` | Cria com GPS ou pin no mapa; `userId` opcional |
-| `ClaimOccurrence` | Associa `userId` a ocorrência anônima (dono/claim) |
+| `RegisterOccurrence` | GPS or map pin; optional `userId` |
+| `ClaimOccurrence` | Attach `userId` to anonymous occurrence |
 | `UpdateOccurrenceStatus` | `open` → `in_progress` → `resolved` / `invalid` |
-| `ValidateOccurrence` | Define `validatedBy` — NGO verified / public_agency; biologist só se `wildlife_sighting` → `AuditLog` |
-| `FollowOccurrence` | Adiciona follower (NGO verified / public_agency; biologist só wildlife) |
-| `ListOccurrencesNearby` | Query espacial (`ST_DWithin`) — via infra/PostGIS |
-| `ReportFalseOccurrence` | Cria `OccurrenceReport` (spam, duplicate, false_information, inappropriate_content) |
+| `ValidateOccurrence` | Sets `validatedBy` — NGO verified / public_agency; biologist only if `wildlife_sighting` → `AuditLog` |
+| `FollowOccurrence` | Add follower (same role rules as validate for wildlife) |
+| `ListOccurrencesNearby` | Spatial query (`ST_DWithin`) via PostGIS |
+| `ReportFalseOccurrence` | Creates `OccurrenceReport` |
 
-### Anti-limites
+### Anti-boundaries
 
-- Não faz matching de adoção
-- Não agrega KPIs (deixa para `analytics`)
-- Rate limiting e EXIF são preocupação de **infraestrutura**, não regra de domínio pura
+- No adoption matching
+- No KPI aggregation (`analytics`)
+- Rate limiting and EXIF are **infrastructure**, not pure domain
 
-### Dependências
+### Dependencies
 
-- **Lê:** `identity` (para validar papéis de quem valida/segue)
-- **Publica:** `OccurrenceCreated`, `OccurrenceStatusChanged`, `OccurrenceResolved`
-- **Consome:** nenhum obrigatório no MVP
+- **Reads:** `identity` (validator/follower roles)
+- **Publishes:** `OccurrenceCreated`, `OccurrenceStatusChanged`, `OccurrenceResolved`
+- **Consumes:** none required in MVP
 
 ---
 
 ## 4. `notifications`
 
-### Objetivo
+### Goal
 
-Preferências, disparo e histórico de notificações in-app (e, depois, e-mail/push).
+Preferences, dispatch, and in-app notification history (email/push later).
 
-### Linguagem ubíqua
-
-- **Notification** — mensagem endereçada a um `userId`
-- **Preference** — o que o usuário aceita receber (detalhe na Fase 6; MVP pode ser mínimo)
-
-### Entidades
+### Entities
 
 - `Notification`
+- Push delivery uses `identity.DevicePushToken` (Wave 3)
 
-### Use cases principais
+### Main use cases
 
-| Use case | Descrição |
+| Use case | Description |
 |---|---|
-| `CreateNotification` | Persistência a partir de handler de evento |
+| `CreateNotification` | Persist from event handler |
 | `ListUserNotifications` | Inbox |
-| `MarkNotificationRead` | Marcar lida |
-| `UpdateNotificationPreferences` | (MVP enxuto / Fase 6) |
+| `MarkNotificationRead` | Mark read |
+| `UpdateNotificationPreferences` | Lean MVP / Phase 6 |
 
-### Handlers de evento (consumidores)
+### Event handlers
 
-- `UserRegistered` → boas-vindas / verificar e-mail
-- `NgoVerified` / `ClinicVerified` → instituição liberada
-- `AdoptionRequested` → notificar NGO/origem
-- `AdoptionCompleted` → notificar partes
-- `AnimalRegisteredForMatching` → avaliar guardians compatíveis e criar notificação `NewCompatibleAnimalAvailable` (algoritmo detalhado na Fase 3)
-- `OccurrenceCreated` → notificar NGOs/órgãos na área (quando área estiver modelada)
-- `OccurrenceStatusChanged` → notificar autor (se houver `userId`)
+| Event | Action |
+|---|---|
+| `UserRegistered` | Welcome / verify email |
+| `NgoVerified` / `ClinicVerified` | Institution unlocked |
+| `AdoptionRequested` | Notify NGO/origin |
+| `AdoptionCompleted` | Notify parties |
+| `AnimalRegisteredForMatching` | Compatible guardians → `NewCompatibleAnimalAvailable` (Phase 3) |
+| `OccurrenceCreated` | Notify NGOs/agencies in area (when area modeled) |
+| `OccurrenceStatusChanged` | Notify author if `userId` present |
 
-### Anti-limites
+### Anti-boundaries
 
-- Não altera status de adoção ou ocorrência
-- Não calcula indicadores
+- Does not change adoption/occurrence status
+- Does not compute KPIs
 
-### Dependências
+### Dependencies
 
-- **Publica:** nenhum (MVP)
-- **Consome:** eventos listados acima
+- **Publishes:** none (MVP)
+- **Consumes:** events above
 
 ---
 
 ## 5. `analytics`
 
-### Objetivo
+### Goal
 
-Indicadores agregados e exportação anonimizada para NGOs, pesquisadores e poder público.
+Aggregated KPIs and anonymized export for NGOs, researchers, public sector.
 
-### Linguagem ubíqua
+### MVP entities
 
-- **KPI** — métrica agregada (adoções, ocorrências, hotspots)
-- **Anonymized export** — dados sem PII / geo generalizada
+No write-side domain table. Reads via queries/materialized views over `adoption` and `occurrence`.
 
-### Entidades (MVP)
+### Main use cases
 
-Sem tabela de escrita de domínio própria no MVP. Leituras via queries/materialized views sobre dados de `adoption` e `occurrence` (infra).
-
-### Use cases principais
-
-| Use case | Descrição |
+| Use case | Description |
 |---|---|
-| `GetAdoptionKpis` | Contagens, tempo médio, score médio |
-| `GetOccurrenceKpis` | Por tipo/região/período |
-| `GetRegionalHeatmapData` | Agregados para mapa de calor |
-| `ExportAnonymizedDataset` | CSV/JSON sem PII → `AuditLog` (`data_exported`) |
+| `GetAdoptionKpis` | Counts, avg time, avg score |
+| `GetOccurrenceKpis` | By type/region/period |
+| `GetRegionalHeatmapData` | Aggregates for heat map |
+| `ExportAnonymizedDataset` | CSV/JSON without PII → `AuditLog` (`data_exported`) |
 
-### Anti-limites
+### Anti-boundaries
 
-- Não cria adoções/ocorrências
-- Não envia notificações
-- Nunca expõe coordenada exata + identidade juntos
+- Does not create adoptions/occurrences
+- Does not send notifications
+- Never exposes exact coordinates + identity together
 
-### Dependências
+### Dependencies
 
-- **Publica:** nenhum
-- **Consome:** `AdoptionCompleted`, `OccurrenceResolved` (para invalidar cache / disparar recálculo; ou job periódico — detalhe na Fase 5)
+- **Publishes:** none
+- **Consumes:** `AdoptionCompleted`, `OccurrenceResolved` (cache invalidate / recalc — or periodic job, Phase 5)
 
 ---
 
-## Dependências entre contextos (resumo)
+## 6. `marketing` (Wave 2)
+
+### Goal
+
+Landing waitlist leads (`WaitlistEntry`). Today owned by Next Route Handler; moves to Nest `marketing` in Wave 2.
+
+### Entity
+
+- `WaitlistEntry` — name, email, profile type, optional city/state, LGPD consent timestamp
+
+---
+
+## Cross-context dependencies (summary)
 
 ```
 identity ──(IDs / ports)──► adoption
@@ -317,16 +320,18 @@ occurrence ─(events)──────► notifications, analytics
 identity ──(events)───────► notifications
 ```
 
-Evitar dependência cíclica: `notifications` e `analytics` nunca são importados por `identity` / `adoption` / `occurrence` no domínio.
+Avoid cycles: `notifications` and `analytics` are never imported by `identity` / `adoption` / `occurrence` in the domain layer.
 
 ---
 
-## Checklist de alinhamento com o código futuro
+## Alignment checklist (future code)
 
-- [x] Nomenclatura em inglês (entidades, use cases, eventos)
-- [x] Pastas = nomes dos contextos
-- [x] `isRescuer` documentado
-- [x] Occurrence anônima + `ClaimOccurrence`
-- [x] Eventos in-process como padrão de integração
-- [x] Tokens (refresh / email / password reset) + `AuditLog` + `OccurrenceReport`
-- [x] Contrato de evento `AnimalRegisteredForMatching` → notificação de compatibilidade
+- [x] English naming (entities, use cases, events)
+- [x] Folders = context names
+- [x] `isRescuer` documented
+- [x] Anonymous Occurrence + `ClaimOccurrence`
+- [x] In-process events as integration default
+- [x] Tokens + `AuditLog` + `OccurrenceReport` + `DevicePushToken`
+- [x] Soft delete on `User` / `Animal`
+- [x] `WaitlistEntry` under marketing (Wave 2)
+- [x] `AnimalRegisteredForMatching` → compatibility notification contract

@@ -1,32 +1,34 @@
-# ANIMAPS — Matriz de permissões
+# ANIMAPS — Permissions matrix
 
-Artefato da Fase 0 (base dos guards NestJS na Fase 2).  
-Perfis: `guardian`, `ngo`, `clinic`, `public_agency`, `biologist`.  
+Phase 0 artifact (basis for NestJS guards in Phase 2).  
+Roles: `guardian`, `ngo`, `clinic`, `public_agency`, `biologist`.  
 Flags: `verified` (NGO/clinic), `isRescuer` (guardian).
 
-**Valores:** `allow` · `deny` · `cond` (ver condição).
+**Values:** `allow` · `deny` · `cond` (see condition).
 
-**Auth:** `anon` = sem login · `auth` = qualquer usuário autenticado · `own` = dono do recurso.
+**Auth:** `anon` = no login · `auth` = any authenticated user · `own` = resource owner.
+
+Related: [`bounded-contexts.md`](bounded-contexts.md) · [`data-dictionary.md`](data-dictionary.md).
 
 ---
 
-## Decisões fechadas
+## Closed decisions
 
-| Tema | Regra |
+| Topic | Rule |
 |---|---|
-| Criar `Animal` | NGO `verified` **OU** clinic `verified` **OU** guardian `isRescuer` |
-| `RequestAdoption` | Guardian autenticado + `taxId` preenchido |
-| Solicitações paralelas | Várias no mesmo animal; origem escolhe |
-| Animal → `in_process` | No primeiro `approved` (não no request) |
-| Criar `Occurrence` | Anônimo ou autenticado |
-| Validar `Occurrence` | NGO verified / `public_agency`; `biologist` só se `wildlife_sighting` |
-| Laudo clínico | Só clinic `verified` |
+| Create `Animal` | NGO `verified` **OR** clinic `verified` **OR** guardian `isRescuer` |
+| `RequestAdoption` | Authenticated guardian + `taxId` set |
+| Parallel requests | Many on same animal; origin chooses |
+| Animal → `in_process` | On first `approved` (not on request) |
+| Create `Occurrence` | Anonymous or authenticated |
+| Validate `Occurrence` | NGO verified / `public_agency`; `biologist` only if `wildlife_sighting` |
+| Clinical report | Verified clinic only |
 
 ---
 
-## Conta / identity
+## Account / identity
 
-| Ação | anon | guardian | ngo | clinic | public_agency | biologist |
+| Action | anon | guardian | ngo | clinic | public_agency | biologist |
 |---|---|---|---|---|---|---|
 | `RegisterUser` | allow | deny* | deny* | deny* | deny* | deny* |
 | `EditOwnProfile` | deny | allow | allow | allow | allow | allow |
@@ -34,14 +36,14 @@ Flags: `verified` (NGO/clinic), `isRescuer` (guardian).
 | `VerifyNgo` (admin) | deny | deny | deny | deny | cond¹ | deny |
 | `VerifyClinic` (admin) | deny | deny | deny | deny | cond¹ | deny |
 
-\* Já autenticado não “re-registra” o mesmo role no MVP (fluxo separado se precisar).  
-¹ MVP: `public_agency` pode verificar instituições; ou processo manual interno — documentar operador.
+\* Already authenticated does not re-register the same role in MVP (separate flow if needed).  
+¹ MVP: `public_agency` may verify institutions; or internal manual process — document operator.
 
 ---
 
 ## Animal / adoption
 
-| Ação | anon | guardian | ngo | clinic | public_agency | biologist |
+| Action | anon | guardian | ngo | clinic | public_agency | biologist |
 |---|---|---|---|---|---|---|
 | `ListAvailableAnimals` | allow | allow | allow | allow | allow | allow |
 | `GetAnimalPublic` | allow | allow | allow | allow | allow | allow |
@@ -57,17 +59,17 @@ Flags: `verified` (NGO/clinic), `isRescuer` (guardian).
 ² `isRescuer = true`  
 ³ `verified = true`  
 ⁴ `verified = true`  
-⁵ É origem do animal (`ngoId` / `guardianId` / `clinicId` = self)  
-⁶ Role guardian + `taxId` preenchido + animal `available` (ou ainda aceitando requests)  
-⁷ É origem do animal ligado à adoção  
-⁸ Solicitante (guardian da adoption) **ou** origem do animal  
-⁹ Próprio score vs animal; origem vê scores dos candidatos
+⁵ Is animal origin (`ngoId` / `guardianId` / `clinicId` = self)  
+⁶ Role guardian + `taxId` set + animal `available` (or still accepting requests)  
+⁷ Is origin of the animal linked to the adoption  
+⁸ Adoption requester (guardian) **or** animal origin  
+⁹ Own score vs animal; origin sees candidate scores
 
 ---
 
 ## Occurrence
 
-| Ação | anon | guardian | ngo | clinic | public_agency | biologist |
+| Action | anon | guardian | ngo | clinic | public_agency | biologist |
 |---|---|---|---|---|---|---|
 | `ListOccurrencesNearby` | allow* | allow* | allow* | allow* | allow* | allow* |
 | `GetOccurrencePublic` | allow* | allow* | allow* | allow* | allow* | allow* |
@@ -78,17 +80,17 @@ Flags: `verified` (NGO/clinic), `isRescuer` (guardian).
 | `FollowOccurrence` | deny | deny | cond³ | deny | allow | cond¹³ |
 | `ReportFalseOccurrence` | deny | allow | allow | allow | allow | allow |
 
-\* Sem PII do autor; geo pode ser aproximada em listagens públicas (detalhe LGPD E0.6).  
-¹⁰ Só se `userId` ainda null  
-¹¹ NGO verified ou public_agency (e follower/origem do atendimento)  
-¹² Só `wildlife_sighting` (status operacional limitado)  
-¹³ Só se `type = wildlife_sighting`
+\* No author PII; geo may be approximate in public listings (LGPD E0.6).  
+¹⁰ Only if `userId` still null  
+¹¹ NGO verified or public_agency (and follower/care origin)  
+¹² `wildlife_sighting` only (limited operational status)  
+¹³ Only if `type = wildlife_sighting`
 
 ---
 
 ## Clinic / analytics / admin
 
-| Ação | anon | guardian | ngo | clinic | public_agency | biologist |
+| Action | anon | guardian | ngo | clinic | public_agency | biologist |
 |---|---|---|---|---|---|---|
 | `UpdateOwnClinicServices` | deny | deny | deny | allow | deny | deny |
 | `IssueHealthReport` | deny | deny | deny | cond⁴ | deny | deny |
@@ -99,7 +101,7 @@ Flags: `verified` (NGO/clinic), `isRescuer` (guardian).
 
 ---
 
-## Resumo de condições (código futuro)
+## Condition summary (future code)
 
 ```text
 canCreateAnimal(user) =
@@ -121,8 +123,8 @@ canReviewAdoption(user, adoption) =
 
 ---
 
-## Notas para implementação (Fase 2)
+## Implementation notes (Phase 2)
 
-- Guards NestJS: `RolesGuard` + `ResourceOwnerGuard` + checks de `verified` / `isRescuer`
-- Rate limit em `CreateOccurrence` (anon por IP) — infraestrutura, Fase 4
-- Listagens públicas nunca retornam `email`, `phone`, `taxId`, `passwordHash`
+- NestJS guards: `RolesGuard` + `ResourceOwnerGuard` + `verified` / `isRescuer` checks
+- Rate limit on `CreateOccurrence` (anon by IP) — infrastructure, Phase 4
+- Public listings never return `email`, `phone`, `taxId`, `passwordHash`

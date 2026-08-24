@@ -1,191 +1,191 @@
-# Landing Page — Design Brief (Fase 1)
+# Landing Page — Design Brief (Phase 1)
 
-Brief de identidade visual e UX da landing institucional do ANIMAPS.  
-Fonte: decisões das 30 perguntas da Fase 1 + rodada de design visual + **pivot pós-feedback** (base: projeto `animaps-web/src`) + [`ANIMAPS_Roadmap.md`](../ANIMAPS_Roadmap.md) §1.3 + [`docs/landing-content-brief.md`](landing-content-brief.md).
+Visual identity and UX for the ANIMAPS institutional landing.  
+Sources: Phase 1 decisions + visual design round + **post-feedback pivot** (base: `animaps-web/src`) + [`ANIMAPS_Roadmap.md`](../ANIMAPS_Roadmap.md) §1.3 + [`landing-content-brief.md`](landing-content-brief.md).
 
-**Status:** direção **amigável / orgânica / multi-pastel** implementada em `apps/web` (sem Figma).
+**Status:** **friendly / organic / multi-pastel** direction implemented in `apps/web` (no Figma).
 
 ---
 
-## Pivot — direção amigável/orgânica (pós-feedback)
+## Pivot — friendly/organic direction (post-feedback)
 
-**Motivo:** a primeira implementação (editorial + Fraunces serifada) foi percebida como “newspaper” demais. Feedback do usuário: amigável, cores pastéis, mais animações, mais modernidade — usar como base o projeto em `animaps-web/src`.
+**Why:** First implementation (editorial + Fraunces serif) felt too “newspaper”. Feedback: friendly, pastels, more animation, more modern — use `animaps-web/src` as base.
 
-| Antes (editorial) | Depois (amigável — referência `animaps-web`) |
+| Before (editorial) | After (friendly — `animaps-web` ref) |
 |---|---|
-| Fraunces + DM Sans | **Sour Gummy** (corpo) + **Oi** (display) |
-| Pastel único terracota | Paleta **multi-pastel** (laranja, azul, amarelo, verde, roxo) + versões saturadas para CTA/texto |
-| Header sticky minimalista | **BubbleMenu** (logo pill + botão redondo + painel bolha) |
-| Split-text sóbrio | Timelines GSAP com `elastic.out` / `back.out` |
-| Divisores diagonais | **Waves** SVG orgânicas |
-| Ícones de linha exclusivos | **`lucide-react`** em badges coloridos (composição customizada — não genérico solto) |
-| Grain/noise | Padrão SVG sutil temático (traços/pontos a 3%) |
+| Fraunces + DM Sans | **Sour Gummy** (body) + **Oi** (display) |
+| Single terracotta pastel | **Multi-pastel** palette (orange, blue, yellow, green, purple) + saturated CTAs/text |
+| Sticky minimal header | **BubbleMenu** (logo pill + round button + bubble panel) |
+| Sober split-text | GSAP timelines with `elastic.out` / `back.out` |
+| Diagonal dividers | Organic SVG **Waves** |
+| Line icons only | **`lucide-react`** in colored badges (custom composition — not loose generic) |
+| Grain/noise | Subtle thematic SVG pattern (strokes/dots at 3%) |
 
-**Personalidade atualizada:** acolhedora / humana + divertida / moderna (mantém confiável, perde o tom “jornal”).
-
----
-
-## 1. Objetivo visual
-
-Transmitir **confiança, acolhimento e leveza** — moderno, redondo e colorido em pastel; humano sem ser infantil; sem parecer site gerado por IA.
-
-**Direção geral:** **amigável-orgânica** — tipografia arredondada (Sour Gummy + Oi), blobs via `border-radius`, waves, multi-pastel, motion bounce/elastic.
-
-Público principal: tutores e ONGs (comunicação equilibrada). Clínicas com card dedicado; órgãos públicos em menção leve.
-
-**Referência direta de implementação:** projeto `animaps-web/src` (layout, motion, BubbleMenu, waves).
+**Personality:** welcoming / human + playful / modern (trustworthy; drop “newspaper” tone).
 
 ---
 
-## 2. Identidade visual
+## 1. Visual goal
 
-Logo final ainda **não existe**. Tokens em [`apps/web/src/app/globals.css`](../apps/web/src/app/globals.css).
+Convey **trust, warmth, and lightness** — modern, rounded, pastel-colored; human without childish; not AI-generic.
 
-### Diretrizes de paleta
+**Direction:** **friendly-organic** — rounded type (Sour Gummy + Oi), blob `border-radius`, waves, multi-pastel, bounce/elastic motion.
 
-| Papel | Tokens | Uso |
+Primary audience: guardians and NGOs (balanced voice). Clinics get a dedicated card; public agencies a light mention.
+
+**Implementation reference:** `animaps-web/src` (layout, motion, BubbleMenu, waves).
+
+---
+
+## 2. Visual identity
+
+Final logo **does not exist yet**. Tokens in [`apps/web/src/app/globals.css`](../apps/web/src/app/globals.css).
+
+### Palette guidelines
+
+| Role | Tokens | Use |
 |---|---|---|
-| Neutro | `#F4F4F4` (`gray-soft`), `#333` (`ink`) | Fundo geral, tipografia |
-| Brand saturado | orange `#F89D1C`, blue `#00A0E3`, yellow `#FFD400`, green `#68BC45`, purple `#92278F` | CTAs, ícones, texto de destaque |
-| Pastel (tints) | `pastel-orange/blue/yellow/green/purple/sky` | Blobs, badges, fundos de seção/cards |
-| Escuro (ritmo) | `#333` / `#1a1a1a` | Problem / SocialProof / Footer |
+| Neutral | `#F4F4F4` (`gray-soft`), `#333` (`ink`) | Page background, type |
+| Saturated brand | orange `#F89D1C`, blue `#00A0E3`, yellow `#FFD400`, green `#68BC45`, purple `#92278F` | CTAs, icons, emphasis text |
+| Pastel tints | `pastel-orange/blue/yellow/green/purple/sky` | Blobs, badges, section/card backgrounds |
+| Dark (rhythm) | `#333` / `#1a1a1a` | Problem / SocialProof / Footer |
 
-**Contraste AA:** saturado em texto/CTA; pastel só em superfície. Sem dark mode toggle.
+**AA contrast:** saturated on text/CTA; pastel on surfaces only. No dark-mode toggle.
 
-### Tipografia
+### Typography
 
-| Uso | Fonte | Notas |
+| Use | Font | Notes |
 |---|---|---|
-| Display / títulos de seção | **Oi** (`--font-display`) | **Somente** em `h1`/`h2` de seção — nunca em perguntas FAQ, labels, cards ou números |
-| Corpo / UI / FAQ / stats | **Sour Gummy** (`--font-sour-gummy`) | Pesos 100–900; família única amigável e legível |
+| Display / section titles | **Oi** (`--font-display`) | **Only** section `h1`/`h2` — never FAQ questions, labels, cards, or stats |
+| Body / UI / FAQ / stats | **Sour Gummy** (`--font-sour-gummy`) | Weights 100–900; single friendly readable family |
 
 ### Logo
 
-- [ ] Conceito (ANIMAPS + símbolo mapa/animal — sem literalidade excessiva de pata isolada; preferir interação humano+animal quando ilustrar)
-- [ ] Variantes: horizontal (header pill), ícone (favicon / OG)
-- Sem dark mode nesta fase
+- [ ] Concept (ANIMAPS + map/animal symbol — avoid isolated paw cliché; prefer human+animal interaction when illustrating)
+- [ ] Variants: horizontal (header pill), icon (favicon / OG)
+- No dark mode this phase
 
 ---
 
-## 3. Estilo e imagery
+## 3. Style and imagery
 
-| Decisão | Escolha |
+| Decision | Choice |
 |---|---|
-| Estilo geral | Amigável-orgânico (redondo, colorido, bounce) |
-| Imagery | Fotos reais (stock); moldura **blob** (`border-radius` orgânico + borda branca + sombra) |
-| Vídeo no Hero | Não |
-| Sombras | Suaves em cards/CTAs (não flat puro) |
-| Border-radius | `2rem`–`3rem` em cards; pills em botões |
-| Textura de fundo | SVG sutil (não grain) |
-| Elementos decorativos | Blobs pastel sólidos (blur/mix-blend no Hero) |
-| Divisores | **Wave** SVG (padrão) |
-| Iconografia | `lucide-react` em círculos/badges coloridos |
+| Overall style | Friendly-organic (rounded, colorful, bounce) |
+| Imagery | Real photos (stock); **blob** frame (organic `border-radius` + white border + soft shadow) |
+| Hero video | No |
+| Shadows | Soft on cards/CTAs (not pure flat) |
+| Border-radius | `2rem`–`3rem` on cards; pills on buttons |
+| Background texture | Subtle SVG (not grain) |
+| Decor | Solid pastel blobs (blur/mix-blend on Hero) |
+| Dividers | SVG **Wave** (default) |
+| Iconography | `lucide-react` in colored circles/badges |
 
 ---
 
-## 4. Layout e fluxo (mobile-first)
+## 4. Layout and flow (mobile-first)
 
-Sem Figma. Fonte de verdade: este brief + código em `apps/web`.
+No Figma. Source of truth: this brief + code in `apps/web`.
 
 ### Header (BubbleMenu)
 
-- Logo em pill flutuante + botão redondo (menu/X)
-- Painel bolha com links grandes, rotação leve, hover troca cor pastel
+- Floating logo pill + round button (menu/X)
+- Bubble panel with large links, slight rotation, pastel hover colors
 
 ### Footer
 
-- Escuro + wave no topo; newsletter; colunas de link em cores pastel distintas
+- Dark + wave on top; newsletter; link columns in distinct pastels
 
 ---
 
-## 5. Componentes visuais
+## 5. Visual components
 
-### Design system (`apps/web/src/components/ui/`)
+### Design system (`apps/web/src/components/`)
 
-Primitivas reutilizáveis em toda a plataforma (não só na landing):
+Reusable primitives for the whole platform (not landing-only):
 
-| Componente | Papel |
+| Component | Role |
 |---|---|
-| `Button` | CTA pill; variantes `orange`/`blue`/`green`/`white`; prop `magnetic` (default `true`) |
-| `Input` | Campo pill (`rounded-full`, borda soft, foco brand-orange) + label |
-| `Select` | Dropdown **customizado** (trigger + painel flutuante GSAP `back.out`, opções pastel, check, teclado/a11y) |
-| `Checkbox` | Caixa customizada (borda → preenchimento brand-orange + ícone Check animado); input nativo `sr-only` |
-| `AccordionItem` | Disclosure reutilizável (FAQ / ajuda futura) |
+| `Button` | Pill CTA; variants `orange`/`blue`/`green`/`white`; prop `magnetic` (default `true`) |
+| `Input` | Pill field (`rounded-full`, soft border, brand-orange focus) + label |
+| `Select` | **Custom** dropdown (trigger + floating GSAP `back.out` panel, pastel options, check, keyboard/a11y) |
+| `Checkbox` | Custom box (border → brand-orange fill + animated Check); native input `sr-only` |
+| `AccordionItem` | Reusable disclosure (FAQ / future help) |
 
-### Páginas / marketing (`apps/web/src/features/landing/`)
+### Marketing (`apps/web/src/features/landing/`)
 
 `Header` (BubbleMenu), `Hero`, `ProblemSection`, `SolutionSection`, `HowItWorks`, `AudienceCards`, `Differentials`, `SocialProofCarousel`, `FAQ`, `WaitlistForm`, `CookieBanner`, `Footer`, `OrganicBlob`, `SectionDivider` (wave).
 
-### Padrões de formulário
+### Form patterns
 
-- **Dropdown:** nunca usar `<select>` nativo estilizado como UI final — usar `ui/Select` (listbox customizado, animações alinhadas ao BubbleMenu).
-- **Checkbox:** nunca `accent-*` nativo sozinho — usar `ui/Checkbox`.
-- **Botões:** sempre `ui/Button`; `magnetic={false}` em contextos compactos (cookie banner, submit de form).
+- **Dropdown:** never styled native `<select>` as final UI — use `Select`.
+- **Checkbox:** never native `accent-*` alone — use `Checkbox`.
+- **Buttons:** always `Button`; `magnetic={false}` in compact contexts (cookie banner, form submit).
 
 ### Scrollbar
 
-- Global: thumb `brand-orange`, track `gray-soft`, fino (`scrollbar-width: thin` + webkit).
-- Utilitário `.scrollbar-clean` para overflow horizontal (ex.: carrossel de prova social).
-- `scroll-padding-top: 6rem` no `html` para compensar o BubbleMenu fixo em âncoras.
+- Global: thumb `brand-orange`, track `gray-soft`, thin (`scrollbar-width: thin` + webkit).
+- Utility `.scrollbar-clean` for horizontal overflow (e.g. social-proof carousel).
+- `scroll-padding-top: 6rem` on `html` for fixed BubbleMenu anchors.
 
 ---
 
 ## 6. Motion system
 
-Intensidade: **expressiva e divertida** (easings `back.out` / `elastic.out`), sem competir com a leitura. Cursor: padrão do navegador. Lenis mantido.
+Intensity: **expressive and playful** (`back.out` / `elastic.out`), without competing with reading. Cursor: browser default. Lenis kept.
 
-| Efeito | Onde | Ferramenta |
+| Effect | Where | Tool |
 |---|---|---|
-| Timeline entrada | Hero (texto, blob pop, foto, CTA) | GSAP |
+| Entry timeline | Hero (text, blob pop, photo, CTA) | GSAP |
 | Bubble menu open/close | Header | GSAP `back.out` |
 | Scroll-in bounce | Cards / steps / stats / FAQ | ScrollTrigger + `back.out` |
-| Select open/close | `ui/Select` painel | GSAP `back.out` |
-| Accordion height | `ui/AccordionItem` / FAQ | GSAP height |
-| Hover lift / scale | Cards, botões menu | CSS + GSAP |
-| Parallax leve | Blob do Hero | ScrollTrigger scrub |
-| Magnetic CTA | `ui/Button` (quando `magnetic`) | transform no pointer |
+| Select open/close | `Select` panel | GSAP `back.out` |
+| Accordion height | `AccordionItem` / FAQ | GSAP height |
+| Hover lift / scale | Cards, menu buttons | CSS + GSAP |
+| Light parallax | Hero blob | ScrollTrigger scrub |
+| Magnetic CTA | `Button` when `magnetic` | pointer transform |
 
-Obrigatório: `prefers-reduced-motion` (Lenis off + timelines skip).
-
----
-
-## 7. Checklist do que evitar (anti “genérico de IA”)
-
-- [ ] Não usar blobs de **gradiente** roxo/azul clichê SaaS — blobs em cor **sólida** pastel da paleta
-- [ ] Não usar ilustrações 3D genéricas
-- [ ] Não usar Inter/Roboto como face principal
-- [ ] Não repetir cards brancos flutuantes idênticos sem hierarquia / cor
-- [ ] Lucide ok **desde que** em badges coloridos e composição própria (não ícone cinza solto)
+Required: `prefers-reduced-motion` (Lenis off + timelines skip).
 
 ---
 
-## 8. Acessibilidade mínima (obrigatória no MVP)
+## 7. Anti “AI-generic” checklist
 
-- [ ] Contraste WCAG AA (saturado em texto/CTA)
-- [ ] `alt` em fotos; foco visível; labels em inputs
+- [ ] No cliché purple/blue **gradient** SaaS blobs — **solid** pastel palette colors
+- [ ] No generic 3D illustrations
+- [ ] No Inter/Roboto as primary face
+- [ ] No identical floating white cards without hierarchy/color
+- [ ] Lucide OK **if** in colored badges with custom composition (not loose gray icons)
+
+---
+
+## 8. Minimum a11y (MVP required)
+
+- [ ] WCAG AA contrast (saturated on text/CTA)
+- [ ] Photo `alt`; visible focus; input labels
 - [ ] `prefers-reduced-motion`
-- [ ] `lang` correto; target de toque ≥44px
+- [ ] Correct `lang`; touch targets ≥44px
 
 ---
 
-## 9. Entregáveis de design
+## 9. Design deliverables
 
-| Artefato | Status |
+| Artifact | Status |
 |---|---|
-| Pivot amigável + referência `animaps-web` | Feito |
-| Paleta multi-pastel + tipografia Sour Gummy/Oi | Feito em código |
-| Motion bounce/elastic + BubbleMenu + waves | Feito em código |
-| Design system `ui/` (Button, Input, Select, Checkbox, Accordion) | Feito |
-| FAQ + scrollbar customizado + scroll-padding âncoras | Feito |
-| Logo + favicon | Pendente |
-| Fotos stock | Pendente (placeholder no Hero) |
-| Protótipo Figma | Cancelado |
+| Friendly pivot + `animaps-web` reference | Done |
+| Multi-pastel palette + Sour Gummy/Oi | Done in code |
+| Bounce/elastic motion + BubbleMenu + waves | Done in code |
+| Design system (`Button`, `Input`, `Select`, `Checkbox`, `Accordion`) | Done |
+| FAQ + custom scrollbar + anchor scroll-padding | Done |
+| Logo + favicon | Pending |
+| Stock photos | Pending (Hero placeholder) |
+| Figma prototype | Cancelled |
 
 ---
 
-## Referências
+## References
 
-- Projeto base: `animaps-web/src`
-- [`docs/landing-content-brief.md`](landing-content-brief.md)
-- [`docs/landing-tech-plan.md`](landing-tech-plan.md)
-- [`docs/personas.md`](personas.md)
+- Base project: `animaps-web/src`
+- [`landing-content-brief.md`](landing-content-brief.md)
+- [`landing-tech-plan.md`](landing-tech-plan.md)
+- [`personas.md`](personas.md)

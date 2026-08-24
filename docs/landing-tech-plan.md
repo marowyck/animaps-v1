@@ -1,83 +1,84 @@
-# Landing Page — Tech Plan (Fase 1)
+# Landing Page — Tech Plan (Phase 1)
 
-Plano técnico da landing institucional do ANIMAPS.  
-Fonte: decisões das 30 perguntas da Fase 1 + rodada de design visual + [`ANIMAPS_Roadmap.md`](../ANIMAPS_Roadmap.md) §1.4–1.6 + briefs de conteúdo/design.
+Technical plan for the ANIMAPS institutional landing.  
+Sources: Phase 1 decisions + visual design round + [`ANIMAPS_Roadmap.md`](../ANIMAPS_Roadmap.md) §1.4–1.6 + content/design briefs.
 
-**Status:** pivot visual amigável aplicado em [`apps/web`](../apps/web) (Sour Gummy + Oi, BubbleMenu, waves, multi-pastel, GSAP bounce). Waitlist ainda placeholder (sem Postgres).
+**Status:** Friendly visual pivot applied in [`apps/web`](../apps/web) (Sour Gummy + Oi, BubbleMenu, waves, multi-pastel, GSAP bounce). Waitlist still placeholder (no Postgres).
 
 ---
 
 ## 1. Stack
 
-| Camada | Escolha |
+| Layer | Choice |
 |---|---|
 | Framework | **Next.js** (App Router) + **TypeScript** |
-| Estilo | **Tailwind CSS v4** (tokens em `app/globals.css` via `@theme`) — paleta **multi-pastel** |
-| Smooth scroll | **`lenis`** (`lenis/react`) — `autoRaf: false` + sync no `gsap.ticker` |
-| Animações | **GSAP** + `@gsap/react` + `ScrollTrigger` — easings `back.out` / `elastic.out` |
-| Ícones | **`lucide-react`** (badges coloridos; brand icons sociais removidos na v1.25 — usar Share2/Globe/etc.) |
-| UI bits | **React Bits** (copy-paste seletivo — ainda não plugado; motion coberto por GSAP) |
-| Fontes | **Sour Gummy** (corpo) + **Oi** (display) via `next/font/google` |
-| App no monorepo | `apps/web` (`@animaps/web`) |
-| Hospedagem | **Vercel** |
-| Analytics | **Google Analytics 4** (pós cookie consent — a ligar) |
-| Ads pixel | **Não** |
+| Style | **Tailwind CSS v4** (tokens in `app/globals.css` via `@theme`) — **multi-pastel** palette |
+| Smooth scroll | **`lenis`** (`lenis/react`) — `autoRaf: false` + sync on `gsap.ticker` |
+| Animation | **GSAP** + `@gsap/react` + `ScrollTrigger` — easings `back.out` / `elastic.out` |
+| Icons | **`lucide-react`** (colored badges; social brand icons removed in v1.25 — use Share2/Globe/etc.) |
+| UI bits | **React Bits** (selective copy-paste — not plugged yet; motion covered by GSAP) |
+| Fonts | **Sour Gummy** (body) + **Oi** (display) via `next/font/google` |
+| Monorepo app | `apps/web` (`@animaps/web`) |
+| Hosting | **Vercel** |
+| Analytics | **Google Analytics 4** (after cookie consent — to wire) |
+| Ads pixel | **No** |
 
-Dark mode: fora de escopo.  
-Cursor customizado: fora de escopo.
+Dark mode: out of scope.  
+Custom cursor: out of scope.
 
-**Referência visual/código:** projeto `animaps-web/src` (BubbleMenu, waves, timeline Hero).
+**Visual/code reference:** `animaps-web/src` (BubbleMenu, waves, Hero timeline).
 
-### Lenis + GSAP (padrão confirmado)
+### Lenis + GSAP (confirmed pattern)
 
-- Pacote: `lenis` → `import { ReactLenis, useLenis } from "lenis/react"`
-- Opções: `autoRaf: false`, `syncTouch: true`
+- Package: `lenis` → `import { ReactLenis, useLenis } from "lenis/react"`
+- Options: `autoRaf: false`, `syncTouch: true`
 - Sync: `lenis.on("scroll", ScrollTrigger.update)` + `gsap.ticker.add((t) => lenis.raf(t * 1000))`
-- Implementação: [`apps/web/src/providers/SmoothScrollProvider.tsx`](../apps/web/src/providers/SmoothScrollProvider.tsx)
-- Se `prefers-reduced-motion: reduce` → **não** inicializa Lenis (scroll nativo)
+- Implementation: [`apps/web/src/app/providers.tsx`](../apps/web/src/app/providers.tsx)
+- If `prefers-reduced-motion: reduce` → **do not** init Lenis (native scroll)
 
-### GSAP — plugins / padrões
+### GSAP — plugins / patterns
 
-| Item | Uso |
+| Item | Use |
 |---|---|
-| `ScrollTrigger` | Entrada bounce de cards/steps/stats; parallax leve no Hero; sync Lenis |
-| Timeline Hero | Texto + blob `elastic.out` + foto `back.out` + CTAs |
-| BubbleMenu | Open/close com `back.out`; hover de cor nos links |
+| `ScrollTrigger` | Bounce entry for cards/steps/stats; light Hero parallax; Lenis sync |
+| Hero timeline | Text + blob `elastic.out` + photo `back.out` + CTAs |
+| BubbleMenu | Open/close with `back.out`; pastel link hover |
 
 ### React Bits
 
-React Bits **não** é um pacote npm monolítico — é **copy-paste**. Incluir componente a componente conforme uso, com parcimônia. Nesta iteração o motion está coberto por GSAP/Lenis.
+React Bits is **not** a monolithic npm package — **copy-paste**. Add components sparingly. This iteration covers motion with GSAP/Lenis.
 
-Sempre atrás de `prefers-reduced-motion`.
+Always behind `prefers-reduced-motion`.
 
 ---
 
-## 2. Arquitetura frontend (MVC na View)
+## 2. Frontend architecture (MVC on the View)
 
-Alinhar com o roadmap §0.6 (MVC no web):
+Align with roadmap §0.6 (MVC on web):
 
-| Camada | Responsabilidade na landing |
+| Layer | Landing responsibility |
 |---|---|
-| **View** | Componentes React (`Hero`, cards, formulário, footer) + Tailwind |
-| **Controller** | Server Actions / Route Handlers do Next.js (submit do waitlist, i18n routing) |
-| **Model** | Tipos TypeScript do waitlist + client HTTP mínimo até a API |
+| **View** | React components (`Hero`, cards, form, footer) + Tailwind |
+| **Controller** | Next.js Server Actions / Route Handlers (waitlist submit, i18n routing) |
+| **Model** | Waitlist TypeScript types + minimal HTTP client until API |
 
-Componentização obrigatória desde o dia 1 (reaproveitamento na plataforma).
+Mandatory componentization from day 1 (reuse across platform).
 
-### Componentes (`apps/web/src`)
+### Components (`apps/web/src`)
 
 ```
-components/ui/                 # design system (reuso em todo o app)
+components/                    # design system (app-wide reuse)
   Button.tsx
   Input.tsx
-  Select.tsx                   # dropdown custom (não <select> nativo)
+  Select.tsx                   # custom dropdown (not native <select>)
   Checkbox.tsx
   AccordionItem.tsx
 
-providers/
-  SmoothScrollProvider.tsx     # Lenis + GSAP
+app/
+  providers.tsx                # Lenis + GSAP (SmoothScrollProvider)
+  api/waitlist/                # temporary Route Handler → Nest marketing Wave 2
 
-features/landing/components/   # seções de marketing
+features/landing/components/   # marketing sections
   Header.tsx                   # BubbleMenu
   Hero.tsx
   ProblemSection.tsx
@@ -87,150 +88,152 @@ features/landing/components/   # seções de marketing
   Differentials.tsx
   SocialProofCarousel.tsx
   FAQ.tsx
-  WaitlistSection.tsx          # chrome da seção + WaitlistForm
+  WaitlistSection.tsx          # section chrome + WaitlistForm
   Footer.tsx
   OrganicBlob.tsx
   SectionDivider.tsx           # wave SVG
 
-features/waitlist/             # formulário, tipos, validação, submit
+features/waitlist/             # form, types, validation, submit
 features/consent/              # CookieBanner + localStorage LGPD
 ```
 
-Specs visuais: [`docs/landing-design-brief.md`](landing-design-brief.md).
+Visual specs: [`landing-design-brief.md`](landing-design-brief.md).
 
-### Motion e performance
+### Motion and performance
 
-Intensidade: **expressiva e divertida** (`back.out` / `elastic.out`), sem competir com a leitura.
+Intensity: **expressive and playful** (`back.out` / `elastic.out`), without competing with reading.
 
-- Preferir animações `transform` / `opacity` (compositor-friendly)
-- Checar `prefers-reduced-motion` em **todos** os efeitos: Hero, BubbleMenu, Select, Accordion, Lenis
-- Parallax leve no Hero
-- Smooth scroll Lenis: desabilitar se `prefers-reduced-motion`
-- Scrollbar customizado global + `.scrollbar-clean`; `scroll-padding-top` para âncoras
+- Prefer `transform` / `opacity` animations (compositor-friendly)
+- Check `prefers-reduced-motion` on **all** effects: Hero, BubbleMenu, Select, Accordion, Lenis
+- Light Hero parallax
+- Disable Lenis if `prefers-reduced-motion`
+- Global custom scrollbar + `.scrollbar-clean`; `scroll-padding-top` for anchors
+
 ---
 
-## 3. Formulário e persistência
+## 3. Form and persistence
 
-### Campos (alinhados ao content brief)
+### Fields (aligned with content brief)
 
 - `name` (string, required)
-- `email` (string, required, validado)
+- `email` (string, required, validated)
 - `profileType` (enum: `guardian` | `ngo` | `clinic` | `other`, required)
-- `city` / `state` (opcional)
+- `city` / `state` (optional)
 - `lgpdConsent` (boolean, required = true)
 
-### Persistência
+### Persistence
 
-**Endpoint próprio** (não Mailchimp/Typeform no MVP):
+**Own endpoint** (no Mailchimp/Typeform in MVP):
 
-Opções aceitáveis nesta fase (escolher na implementação):
+Acceptable options this phase:
 
-1. **Route Handler em `apps/web`** + tabela leve `waitlist_entries` (Postgres) — preferível se o monorepo/API já existir.
-2. **Endpoint mínimo em `apps/api`** (NestJS) no módulo `identity` ou um módulo `marketing`/`waitlist` temporário — melhor se já estiver scaffoldando a API.
+1. **Route Handler in `apps/web`** + light `waitlist_entries` / `WaitlistEntry` (Postgres) — preferred if API not ready.
+2. **Minimal Nest endpoint in `apps/api`** (`marketing` / temporary waitlist module) — better once API is scaffolded.
 
-Requisitos:
+Requirements:
 
-- Validação server-side
-- Rate limit básico (reusar espírito do roadmap: limitar abusos)
-- Não criar conta `User` completa ainda — só lead da lista de espera
-- Consentimento LGPD registrado com timestamp
+- Server-side validation
+- Basic rate limit (abuse control)
+- Do not create full `User` yet — waitlist lead only (`WaitlistEntry`)
+- LGPD consent stored with timestamp
 
-Nomes de campos/código: **inglês** (`camelCase` API / `snake_case` DB), UI em PT/EN.
-
----
-
-## 4. Internacionalização (PT + EN)
-
-- Default: **português**
-- Seletor no header/footer
-- Strings da landing em dicionários (`pt`, `en`) — Next.js i18n (App Router) ou lib leve
-- Rotas ou locale prefix: a definir na implementação (`/`, `/en` ou cookie/header)
+Field/code names: **English** (`camelCase` API / `snake_case` DB); UI in PT/EN.
 
 ---
 
-## 5. Analytics e consentimento
+## 4. Internationalization (PT + EN)
 
-| Item | Decisão |
+- Default: **Portuguese**
+- Selector in header/footer
+- Landing strings in dictionaries (`pt`, `en`) — Next.js App Router i18n or light lib
+- Routes or locale prefix: decide in implementation (`/`, `/en` or cookie/header)
+
+---
+
+## 5. Analytics and consent
+
+| Item | Decision |
 |---|---|
-| GA4 | **Sim** — medir origem e conversão |
-| Meta Pixel | **Não** |
-| Eventos mínimos | `cta_click`, `waitlist_submit`, (opcional) `scroll_depth` |
-| Cookie banner | **Sim**, banner simples (aceitar / recusar não essenciais) |
-| GA4 | Carregar **após** consentimento quando cookies não essenciais |
+| GA4 | **Yes** — measure origin and conversion |
+| Meta Pixel | **No** |
+| Minimum events | `cta_click`, `waitlist_submit`, (optional) `scroll_depth` |
+| Cookie banner | **Yes**, simple (accept / reject non-essential) |
+| GA4 load | **After** consent for non-essential cookies |
 
 ---
 
-## 6. SEO e performance
+## 6. SEO and performance
 
-Obrigatório no lançamento:
+Required at launch:
 
-- [ ] `title` + `description` otimizados (termos: adoção responsável, abandono de animais, ONGs, mapear ocorrências)
-- [ ] Open Graph + Twitter cards (imagem de preview atrativa)
+- [ ] Optimized `title` + `description` (responsible adoption, animal abandonment, NGOs, map occurrences)
+- [ ] Open Graph + Twitter cards (attractive preview image)
 - [ ] `sitemap.xml` + `robots.txt`
-- [ ] Imagens WebP + `next/image` + lazy loading
-- [ ] Lighthouse / PageSpeed: mirar **> 90** (Performance, Accessibility, Best Practices, SEO)
-- [ ] HTML semântico + headings corretos (h1 único no Hero)
-- [ ] Motion não deve derrubar Lighthouse (bundle GSAP/Lenis sob demanda se possível; `prefers-reduced-motion`)
+- [ ] WebP images + `next/image` + lazy loading
+- [ ] Lighthouse / PageSpeed target **> 90** (Performance, Accessibility, Best Practices, SEO)
+- [ ] Semantic HTML + correct headings (single h1 in Hero)
+- [ ] Motion must not tank Lighthouse (lazy GSAP/Lenis if possible; `prefers-reduced-motion`)
 
 ---
 
-## 7. Domínio, HTTPS e publicação
+## 7. Domain, HTTPS, and publish
 
 | Item | Status |
 |---|---|
-| Registrar domínio próprio | **Pendente** (a registrar) |
-| Deploy Vercel + HTTPS | Previsto |
-| Ambiente staging | Preferir branch `develop` → preview Vercel (ver [`docs/git-e-ci.md`](git-e-ci.md)) |
-| Produção | Branch `main` |
+| Own domain | **Pending** |
+| Vercel deploy + HTTPS | Planned |
+| Staging | Prefer `develop` → Vercel preview (see [`git-and-ci.md`](git-and-ci.md)) |
+| Production | Branch `main` |
 
 ---
 
-## 8. Testes antes do go-live (§1.6)
+## 8. Pre–go-live tests (§1.6)
 
 - [ ] Cross-browser: Chrome, Safari, Firefox
-- [ ] Dispositivos móveis reais (não só emulador)
-- [ ] Submit do formulário (sucesso, validação, rate limit)
-- [ ] Troca PT ↔ EN
-- [ ] Cookie banner + GA4 só pós-consentimento
-- [ ] Smoke de pico leve (rede social) — garantir que Vercel/edge aguenta burst
-- [ ] `prefers-reduced-motion`: página usável sem animações
-- [ ] Checklist anti-genérico-IA do design brief (review visual)
+- [ ] Real mobile devices (not emulator only)
+- [ ] Form submit (success, validation, rate limit)
+- [ ] PT ↔ EN switch
+- [ ] Cookie banner + GA4 only post-consent
+- [ ] Light peak smoke (social share) — Vercel/edge burst
+- [ ] `prefers-reduced-motion`: usable without animation
+- [ ] Design-brief anti-generic checklist (visual review)
 
 ---
 
-## 9. Ordem técnica sugerida de implementação
+## 9. Suggested implementation order
 
-1. ~~Scaffold monorepo (`pnpm`, `apps/web`)~~ — **feito** (`pnpm-workspace.yaml` + `@animaps/web`)
-2. ~~Tokens de design + fontes Fraunces/DM Sans + `SmoothScrollProvider`~~ — **feito**
-3. ~~Header + Hero com motion~~ — **feito**
-4. ~~Esqueleto das demais seções + WaitlistForm + `/api/waitlist` placeholder~~ — **feito**
-5. Copy final PT/EN + assets (logo, fotos stock com máscara)
-6. Persistência real da waitlist (Postgres) + i18n
-7. Cookie banner → GA4 pós-consentimento + eventos
+1. ~~Scaffold monorepo (`pnpm`, `apps/web`)~~ — **done** (`pnpm-workspace.yaml` + `@animaps/web`)
+2. ~~Design tokens + fonts + `SmoothScrollProvider`~~ — **done** (Sour Gummy/Oi after pivot)
+3. ~~Header + Hero with motion~~ — **done**
+4. ~~Other sections skeleton + WaitlistForm + `/api/waitlist` placeholder~~ — **done**
+5. Final PT/EN copy + assets (logo, stock photos with mask)
+6. Real waitlist persistence (Postgres / `WaitlistEntry`) + i18n
+7. Cookie banner → GA4 post-consent + events
 8. SEO (OG, sitemap, robots) + Lighthouse >90
-9. Domínio + deploy Vercel produção
+9. Domain + Vercel production deploy
 
-**Rodar localmente:** na raiz, `pnpm dev` (filtra `@animaps/web`).
+**Run locally:** from root, `pnpm dev` (filters `@animaps/web`).
 
 ---
 
-## 10. Fora de escopo (Fase 1)
+## 10. Out of scope (Phase 1)
 
-- Auth completa / JWT / perfis (Fase 2)
-- Mapa PostGIS / ocorrências reais (Fases posteriores)
-- Meta Pixel / ads pagos
+- Full auth / JWT / profiles (Phase 2)
+- PostGIS map / real occurrences (later phases)
+- Meta Pixel / paid ads
 - Dark mode
-- Cursor customizado
-- Protótipo Figma (design direto no código)
-- App mobile
+- Custom cursor
+- Figma prototype (design in code)
+- Mobile app
 
 ---
 
-## Referências
+## References
 
 - Roadmap §1.4–1.6
-- [`docs/landing-content-brief.md`](landing-content-brief.md)
-- [`docs/landing-design-brief.md`](landing-design-brief.md)
-- [`docs/git-e-ci.md`](git-e-ci.md)
-- [`docs/lgpd-checklist.md`](lgpd-checklist.md)
-- [`docs/politica-privacidade-rascunho.md`](politica-privacidade-rascunho.md)
+- [`landing-content-brief.md`](landing-content-brief.md)
+- [`landing-design-brief.md`](landing-design-brief.md)
+- [`git-and-ci.md`](git-and-ci.md)
+- [`lgpd-checklist.md`](lgpd-checklist.md)
+- [`privacy-policy-draft.md`](privacy-policy-draft.md)
+- [`architecture.md`](architecture.md)
