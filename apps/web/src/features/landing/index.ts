@@ -1,0 +1,12 @@
+export { Header } from "./components/Header";
+export { Hero } from "./components/Hero";
+export { ProblemSection } from "./components/ProblemSection";
+export { SolutionSection } from "./components/SolutionSection";
+export { HowItWorks } from "./components/HowItWorks";
+export { AudienceCards } from "./components/AudienceCards";
+export { Differentials } from "./components/Differentials";
+export { SocialProofCarousel } from "./components/SocialProofCarousel";
+export { FAQ } from "./components/FAQ";
+export { WaitlistForm } from "./components/WaitlistForm";
+export { CookieBanner } from "./components/CookieBanner";
+export { Footer } from "./components/Footer";
