@@ -7,6 +7,6 @@ export { AudienceCards } from "./components/AudienceCards";
 export { Differentials } from "./components/Differentials";
 export { SocialProofCarousel } from "./components/SocialProofCarousel";
 export { FAQ } from "./components/FAQ";
-export { WaitlistForm } from "./components/WaitlistForm";
+export { WaitlistSection } from "./components/WaitlistSection";
 export { CookieBanner } from "./components/CookieBanner";
 export { Footer } from "./components/Footer";

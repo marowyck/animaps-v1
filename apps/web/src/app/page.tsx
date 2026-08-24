@@ -8,7 +8,7 @@ import {
   Differentials,
   SocialProofCarousel,
   FAQ,
-  WaitlistForm,
+  WaitlistSection,
   CookieBanner,
   Footer,
 } from "@/features/landing";
@@ -26,7 +26,7 @@ export default function HomePage() {
         <Differentials />
         <SocialProofCarousel />
         <FAQ />
-        <WaitlistForm />
+        <WaitlistSection />
       </main>
       <Footer />
       <CookieBanner />

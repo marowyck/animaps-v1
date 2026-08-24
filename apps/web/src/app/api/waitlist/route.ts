@@ -1,15 +1,5 @@
 import { NextResponse } from "next/server";
-
-type WaitlistBody = {
-  name?: string;
-  email?: string;
-  profileType?: string;
-  city?: string;
-  state?: string;
-  lgpdConsent?: boolean;
-};
-
-const PROFILE_TYPES = new Set(["guardian", "ngo", "clinic", "other"]);
+import { parseWaitlistBody, type WaitlistBody } from "@/features/waitlist";
 
 export async function POST(request: Request) {
   let body: WaitlistBody;
@@ -19,40 +9,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: "JSON inválido." }, { status: 400 });
   }
 
-  const name = body.name?.trim() ?? "";
-  const email = body.email?.trim().toLowerCase() ?? "";
-  const profileType = body.profileType ?? "";
-
-  if (!name || !email || !PROFILE_TYPES.has(profileType)) {
+  const result = parseWaitlistBody(body);
+  if (!result.ok) {
     return NextResponse.json(
-      { message: "Campos obrigatórios inválidos." },
-      { status: 400 },
-    );
-  }
-
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    return NextResponse.json(
-      { message: "Informe um e-mail válido." },
-      { status: 400 },
-    );
-  }
-
-  if (!body.lgpdConsent) {
-    return NextResponse.json(
-      { message: "Consentimento LGPD obrigatório." },
-      { status: 400 },
+      { message: result.message },
+      { status: result.status },
     );
   }
 
   // TODO: persist to waitlist_entries (Postgres) — Phase 1 follow-up
-  console.info("[waitlist] lead received", {
-    name,
-    email,
-    profileType,
-    city: body.city ?? null,
-    state: body.state ?? null,
-    lgpdConsentAt: new Date().toISOString(),
-  });
+  console.info("[waitlist] lead received", result.lead);
 
   return NextResponse.json({ ok: true }, { status: 201 });
 }
