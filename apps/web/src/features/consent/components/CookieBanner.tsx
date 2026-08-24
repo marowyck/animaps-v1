@@ -2,27 +2,22 @@
 
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/Button";
-
-const STORAGE_KEY = "animaps_cookie_consent";
+import {
+  readCookieConsent,
+  writeCookieConsent,
+  type CookieConsentValue,
+} from "../storage";
 
 export function CookieBanner() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (!stored) setVisible(true);
-    } catch {
-      setVisible(true);
-    }
+    const stored = readCookieConsent();
+    if (!stored) setVisible(true);
   }, []);
 
-  function choose(value: "accepted" | "rejected") {
-    try {
-      localStorage.setItem(STORAGE_KEY, value);
-    } catch {
-      /* ignore */
-    }
+  function choose(value: CookieConsentValue) {
+    writeCookieConsent(value);
     setVisible(false);
   }
 

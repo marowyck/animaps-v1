@@ -9,9 +9,9 @@ import {
   SocialProofCarousel,
   FAQ,
   WaitlistSection,
-  CookieBanner,
   Footer,
 } from "@/features/landing";
+import { CookieBanner } from "@/features/consent";
 
 export default function HomePage() {
   return (
