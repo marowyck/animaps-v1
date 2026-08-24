@@ -146,17 +146,20 @@ Bounded contexts detalhados em [`docs/bounded-contexts.md`](docs/bounded-context
 ```text
 animaps/
 ├── apps/
-│   └── web/                    # @animaps/web — Next.js
-│       ├── app/                 # App Router: pages, layout, API routes
-│       │   └── api/waitlist/    # Route Handler da lista de espera
-│       ├── components/
-│       │   ├── landing/         # Seções da landing (Hero, FAQ, Footer…)
-│       │   ├── ui/               # Design system (Button, Input, Select…)
-│       │   └── providers/        # SmoothScrollProvider (Lenis + GSAP)
+│   └── web/                         # @animaps/web — Next.js
+│       ├── src/
+│       │   ├── app/                 # App Router (pages, layout, API routes)
+│       │   │   └── api/waitlist/    # Route Handler da lista de espera
+│       │   ├── features/
+│       │   │   ├── landing/         # Seções de marketing
+│       │   │   ├── waitlist/        # Formulário + validação + submit
+│       │   │   └── consent/         # Cookie banner + storage LGPD
+│       │   ├── components/ui/       # Design system (Button, Input, Select…)
+│       │   └── providers/           # SmoothScrollProvider (Lenis + GSAP)
 │       └── public/
-├── packages/                    # (futuro) tipos e utilitários compartilhados
-├── docs/                        # Documentação de domínio, design, LGPD e processo
-├── package.json                 # Scripts do monorepo
+├── packages/                        # (futuro) tipos e utilitários compartilhados
+├── docs/                            # Documentação de domínio, design, LGPD e processo
+├── package.json                     # Scripts do monorepo
 └── pnpm-workspace.yaml
 ```
 
@@ -206,7 +209,7 @@ Executados a partir da **raiz** do monorepo:
 
 ## Design system
 
-Primitivas reutilizáveis em `apps/web/components/ui/`, pensadas para reaparecer em outras telas do produto (não só na landing):
+Primitivas reutilizáveis em `apps/web/src/components/ui/`, pensadas para reaparecer em outras telas do produto (não só na landing):
 
 | Componente | Descrição |
 |---|---|
@@ -216,7 +219,7 @@ Primitivas reutilizáveis em `apps/web/components/ui/`, pensadas para reaparecer
 | `Checkbox` | Caixa de seleção customizada com animação de check |
 | `AccordionItem` | Disclosure reutilizável (base do FAQ) |
 
-Tokens de cor, tipografia, raios e scrollbar customizado: [`apps/web/app/globals.css`](apps/web/app/globals.css). Racional visual completo: [`docs/landing-design-brief.md`](docs/landing-design-brief.md).
+Tokens de cor, tipografia, raios e scrollbar customizado: [`apps/web/src/app/globals.css`](apps/web/src/app/globals.css). Racional visual completo: [`docs/landing-design-brief.md`](docs/landing-design-brief.md).
 
 ---
 

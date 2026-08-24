@@ -33,7 +33,7 @@ Cursor customizado: fora de escopo.
 - Pacote: `lenis` → `import { ReactLenis, useLenis } from "lenis/react"`
 - Opções: `autoRaf: false`, `syncTouch: true`
 - Sync: `lenis.on("scroll", ScrollTrigger.update)` + `gsap.ticker.add((t) => lenis.raf(t * 1000))`
-- Implementação: [`apps/web/components/providers/SmoothScrollProvider.tsx`](../apps/web/components/providers/SmoothScrollProvider.tsx)
+- Implementação: [`apps/web/src/providers/SmoothScrollProvider.tsx`](../apps/web/src/providers/SmoothScrollProvider.tsx)
 - Se `prefers-reduced-motion: reduce` → **não** inicializa Lenis (scroll nativo)
 
 ### GSAP — plugins / padrões
@@ -64,18 +64,21 @@ Alinhar com o roadmap §0.6 (MVC no web):
 
 Componentização obrigatória desde o dia 1 (reaproveitamento na plataforma).
 
-### Componentes (`apps/web`)
+### Componentes (`apps/web/src`)
 
 ```
-components/ui/          # design system (reuso em todo o app)
+components/ui/                 # design system (reuso em todo o app)
   Button.tsx
   Input.tsx
-  Select.tsx            # dropdown custom (não <select> nativo)
+  Select.tsx                   # dropdown custom (não <select> nativo)
   Checkbox.tsx
   AccordionItem.tsx
 
-components/landing/     # seções de marketing
-  Header.tsx            # BubbleMenu
+providers/
+  SmoothScrollProvider.tsx     # Lenis + GSAP
+
+features/landing/components/   # seções de marketing
+  Header.tsx                   # BubbleMenu
   Hero.tsx
   ProblemSection.tsx
   SolutionSection.tsx
@@ -84,11 +87,13 @@ components/landing/     # seções de marketing
   Differentials.tsx
   SocialProofCarousel.tsx
   FAQ.tsx
-  WaitlistForm.tsx
-  CookieBanner.tsx
+  WaitlistSection.tsx          # chrome da seção + WaitlistForm
   Footer.tsx
   OrganicBlob.tsx
-  SectionDivider.tsx    # wave SVG
+  SectionDivider.tsx           # wave SVG
+
+features/waitlist/             # formulário, tipos, validação, submit
+features/consent/              # CookieBanner + localStorage LGPD
 ```
 
 Specs visuais: [`docs/landing-design-brief.md`](landing-design-brief.md).

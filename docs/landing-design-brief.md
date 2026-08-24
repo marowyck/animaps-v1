@@ -39,7 +39,7 @@ Público principal: tutores e ONGs (comunicação equilibrada). Clínicas com ca
 
 ## 2. Identidade visual
 
-Logo final ainda **não existe**. Tokens em [`apps/web/app/globals.css`](../apps/web/app/globals.css).
+Logo final ainda **não existe**. Tokens em [`apps/web/src/app/globals.css`](../apps/web/src/app/globals.css).
 
 ### Diretrizes de paleta
 
@@ -100,7 +100,7 @@ Sem Figma. Fonte de verdade: este brief + código em `apps/web`.
 
 ## 5. Componentes visuais
 
-### Design system (`apps/web/components/ui/`)
+### Design system (`apps/web/src/components/ui/`)
 
 Primitivas reutilizáveis em toda a plataforma (não só na landing):
 
@@ -112,7 +112,7 @@ Primitivas reutilizáveis em toda a plataforma (não só na landing):
 | `Checkbox` | Caixa customizada (borda → preenchimento brand-orange + ícone Check animado); input nativo `sr-only` |
 | `AccordionItem` | Disclosure reutilizável (FAQ / ajuda futura) |
 
-### Páginas / marketing (`apps/web/components/landing/`)
+### Páginas / marketing (`apps/web/src/features/landing/`)
 
 `Header` (BubbleMenu), `Hero`, `ProblemSection`, `SolutionSection`, `HowItWorks`, `AudienceCards`, `Differentials`, `SocialProofCarousel`, `FAQ`, `WaitlistForm`, `CookieBanner`, `Footer`, `OrganicBlob`, `SectionDivider` (wave).
 
