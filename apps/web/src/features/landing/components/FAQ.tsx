@@ -5,7 +5,7 @@ import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { HelpCircle } from "lucide-react";
-import { AccordionItem } from "@/components/ui/AccordionItem";
+import { AccordionItem } from "@/components/AccordionItem";
 import { SectionDivider } from "./SectionDivider";
 
 gsap.registerPlugin(ScrollTrigger);

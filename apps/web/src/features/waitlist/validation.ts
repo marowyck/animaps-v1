@@ -1,12 +1,12 @@
-import type { ProfileType, WaitlistFormState, WaitlistLead } from "./types";
+import {
+  PROFILE_TYPE_VALUES,
+  type ProfileType,
+  type WaitlistBody,
+  type WaitlistFormState,
+  type WaitlistLead,
+} from "./types";
 
-export const PROFILE_TYPES = new Set<string>([
-  "guardian",
-  "ngo",
-  "clinic",
-  "other",
-]);
-
+/** Portuguese select labels — presentation only. */
 export const PROFILE_OPTIONS = [
   { value: "guardian", label: "Tutor / quero adotar" },
   { value: "ngo", label: "ONG" },
@@ -14,22 +14,7 @@ export const PROFILE_OPTIONS = [
   { value: "other", label: "Outro" },
 ] as const;
 
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-export type WaitlistBody = {
-  name?: string;
-  email?: string;
-  profileType?: string;
-  city?: string;
-  state?: string;
-  lgpdConsent?: boolean;
-};
-
-export type ParseWaitlistResult =
-  | { ok: true; lead: WaitlistLead }
-  | { ok: false; message: string; status: number };
-
-/** Client-side form checks — same messages as before the refactor. */
+/** Client-side form checks. */
 export function validateWaitlistFormClient(
   form: WaitlistFormState,
 ): string | null {
@@ -42,7 +27,17 @@ export function validateWaitlistFormClient(
   return null;
 }
 
-/** Server-side payload validation for the waitlist route handler. */
+const PROFILE_TYPES = new Set<string>(PROFILE_TYPE_VALUES);
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+export type ParseWaitlistResult =
+  | { ok: true; lead: WaitlistLead }
+  | { ok: false; message: string; status: number };
+
+/**
+ * Server-side waitlist payload validation.
+ * Preserves existing API error messages and status codes.
+ */
 export function parseWaitlistBody(body: WaitlistBody): ParseWaitlistResult {
   const name = body.name?.trim() ?? "";
   const email = body.email?.trim().toLowerCase() ?? "";

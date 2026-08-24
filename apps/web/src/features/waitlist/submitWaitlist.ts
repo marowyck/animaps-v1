@@ -1,4 +1,4 @@
-import type { WaitlistFormState } from "../types";
+import type { WaitlistFormState } from "./types";
 
 export async function submitWaitlist(form: WaitlistFormState): Promise<void> {
   const res = await fetch("/api/waitlist", {

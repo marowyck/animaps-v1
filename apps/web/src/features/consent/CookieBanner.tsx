@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/Button";
 import {
   readCookieConsent,
   writeCookieConsent,
   type CookieConsentValue,
-} from "../storage";
+} from "./storage";
 
 export function CookieBanner() {
   const [visible, setVisible] = useState(false);

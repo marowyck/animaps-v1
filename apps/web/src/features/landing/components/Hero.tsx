@@ -5,7 +5,7 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import { Heart, PawPrint, ArrowDown } from "lucide-react";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/Button";
 import { OrganicBlob } from "./OrganicBlob";
 
 gsap.registerPlugin(ScrollTrigger);

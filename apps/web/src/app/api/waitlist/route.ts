@@ -17,7 +17,7 @@ export async function POST(request: Request) {
     );
   }
 
-  // TODO: persist to waitlist_entries (Postgres) — Phase 1 follow-up
+  // TODO: persist via apps/api marketing module — Wave 2
   console.info("[waitlist] lead received", result.lead);
 
   return NextResponse.json({ ok: true }, { status: 201 });

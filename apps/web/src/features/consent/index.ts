@@ -1,4 +1,4 @@
-export { CookieBanner } from "./components/CookieBanner";
+export { CookieBanner } from "./CookieBanner";
 export {
   COOKIE_CONSENT_KEY,
   readCookieConsent,

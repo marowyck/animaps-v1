@@ -1,16 +1,16 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
-import { Select } from "@/components/ui/Select";
-import { Checkbox } from "@/components/ui/Checkbox";
-import { submitWaitlist } from "../services/submitWaitlist";
-import type { ProfileType, WaitlistFormState } from "../types";
+import { Button } from "@/components/Button";
+import { Input } from "@/components/Input";
+import { Select } from "@/components/Select";
+import { Checkbox } from "@/components/Checkbox";
+import { submitWaitlist } from "./submitWaitlist";
+import type { ProfileType, WaitlistFormState } from "./types";
 import {
   PROFILE_OPTIONS,
   validateWaitlistFormClient,
-} from "../validation";
+} from "./validation";
 
 const INITIAL: WaitlistFormState = {
   name: "",

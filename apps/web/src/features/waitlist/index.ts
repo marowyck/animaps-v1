@@ -1,9 +1,13 @@
-export { WaitlistForm } from "./components/WaitlistForm";
-export type { ProfileType, WaitlistFormState, WaitlistLead } from "./types";
+export { WaitlistForm } from "./WaitlistForm";
+export type {
+  WaitlistFormState,
+  ProfileType,
+  WaitlistBody,
+  WaitlistLead,
+} from "./types";
 export {
-  parseWaitlistBody,
-  validateWaitlistFormClient,
   PROFILE_OPTIONS,
-  PROFILE_TYPES,
+  validateWaitlistFormClient,
+  parseWaitlistBody,
 } from "./validation";
-export type { WaitlistBody, ParseWaitlistResult } from "./validation";
+export type { ParseWaitlistResult } from "./validation";
