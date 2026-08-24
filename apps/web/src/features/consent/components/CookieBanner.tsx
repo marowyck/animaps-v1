@@ -12,8 +12,9 @@ export function CookieBanner() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    const stored = readCookieConsent();
-    if (!stored) setVisible(true);
+    // Client-only: localStorage is unavailable during SSR.
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- hydrate consent visibility after mount
+    if (!readCookieConsent()) setVisible(true);
   }, []);
 
   function choose(value: CookieConsentValue) {

@@ -147,10 +147,12 @@ export function Select({
   useEffect(() => {
     if (open) {
       const idx = options.findIndex((o) => o.value === value);
+      /* eslint-disable react-hooks/set-state-in-effect -- sync keyboard highlight when panel opens */
       setHighlight(idx >= 0 ? idx : 0);
     } else {
       setHighlight(-1);
     }
+    /* eslint-enable react-hooks/set-state-in-effect */
   }, [open, options, value]);
 
   const selectOption = useCallback(

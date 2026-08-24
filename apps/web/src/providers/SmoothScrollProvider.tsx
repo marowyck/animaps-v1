@@ -41,8 +41,11 @@ export function SmoothScrollProvider({ children }: { children: ReactNode }) {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
+    // Client-only: matchMedia is unavailable during SSR.
+    /* eslint-disable react-hooks/set-state-in-effect -- hydrate motion preference after mount */
     setReduced(prefersReducedMotion());
     setReady(true);
+    /* eslint-enable react-hooks/set-state-in-effect */
   }, []);
 
   if (!ready) {
