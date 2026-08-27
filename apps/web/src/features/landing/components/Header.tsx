@@ -10,42 +10,35 @@ const NAV = [
     label: "Início",
     href: "#topo",
     rotation: -3,
-    hoverBg: "#F89D1C",
+    hoverBg: "#E07A96",
     hoverText: "#ffffff",
   },
   {
-    label: "Problema",
-    href: "#problema",
-    rotation: 3,
-    hoverBg: "#FFD400",
-    hoverText: "#333333",
-  },
-  {
-    label: "Solução",
+    label: "Benefícios",
     href: "#solucao",
     rotation: -3,
-    hoverBg: "#00A0E3",
+    hoverBg: "#5FAF6A",
     hoverText: "#ffffff",
   },
   {
-    label: "Como funciona",
+    label: "Como começar",
     href: "#como-funciona",
     rotation: 3,
-    hoverBg: "#68BC45",
+    hoverBg: "#E07A96",
     hoverText: "#ffffff",
   },
   {
     label: "FAQ",
     href: "#faq",
     rotation: -2,
-    hoverBg: "#FFD400",
-    hoverText: "#333333",
+    hoverBg: "#5FAF6A",
+    hoverText: "#ffffff",
   },
   {
-    label: "Lista",
+    label: "Criar conta",
     href: "#lista",
     rotation: 2,
-    hoverBg: "#92278F",
+    hoverBg: "#E07A96",
     hoverText: "#ffffff",
   },
 ];
@@ -96,7 +89,7 @@ export function Header() {
     gsap.to(itemsRef.current[index], {
       backgroundColor: bg,
       color: text,
-      scale: 1.1,
+      scale: 1.05,
       duration: 0.3,
       ease: "power2.out",
     });
@@ -105,7 +98,7 @@ export function Header() {
   function handleMouseLeave(index: number) {
     gsap.to(itemsRef.current[index], {
       backgroundColor: "transparent",
-      color: "#111111",
+      color: "#243028",
       scale: 1,
       duration: 0.3,
       ease: "power2.out",
@@ -115,38 +108,42 @@ export function Header() {
   return (
     <div
       ref={containerRef}
-      className="pointer-events-none fixed inset-x-0 top-0 z-50 flex items-start justify-between p-5 md:p-6"
+      className="pointer-events-none fixed inset-x-0 top-0 z-50 flex items-start justify-between gap-3 p-5 md:p-6"
     >
       <a
         href="#topo"
-        className="pointer-events-auto flex items-center gap-2 rounded-full bg-white/90 p-3 text-xl font-bold text-ink shadow-sm backdrop-blur-sm"
+        className="pointer-events-auto flex items-center gap-2 rounded-full bg-white/90 px-3 py-2 text-lg font-semibold text-ink shadow-sm backdrop-blur-sm"
       >
-        <PawPrint
-          size={24}
-          className="text-brand-orange"
-          fill="currentColor"
-        />
-        <span className="tracking-tight">ANIMAPS</span>
+        <PawPrint size={20} className="text-brand-pink" fill="currentColor" />
+        <span className="font-display tracking-tight">ANIMAPS</span>
       </a>
 
-      <button
-        type="button"
-        onClick={() => setIsOpen((v) => !v)}
-        className="pointer-events-auto z-50 rounded-full bg-white p-4 text-ink shadow-lg transition-transform hover:scale-110 active:scale-95"
-        aria-expanded={isOpen}
-        aria-controls="bubble-menu"
-        aria-label={isOpen ? "Fechar menu" : "Abrir menu"}
-      >
-        {isOpen ? <X size={24} /> : <Menu size={24} />}
-      </button>
+      <div className="pointer-events-auto flex items-center gap-3">
+        <a
+          href="#lista"
+          className="hidden min-h-11 items-center rounded-full bg-brand-pink px-5 py-2.5 text-sm font-semibold text-white shadow-md transition-colors hover:bg-brand-pink-hover sm:inline-flex"
+        >
+          Criar conta
+        </a>
+        <button
+          type="button"
+          onClick={() => setIsOpen((v) => !v)}
+          className="z-50 rounded-full bg-white p-3 text-ink shadow-md transition-transform hover:scale-105 active:scale-95"
+          aria-expanded={isOpen}
+          aria-controls="bubble-menu"
+          aria-label={isOpen ? "Fechar menu" : "Abrir menu"}
+        >
+          {isOpen ? <X size={20} /> : <Menu size={20} />}
+        </button>
+      </div>
 
       <div
         id="bubble-menu"
         ref={menuRef}
-        className="pointer-events-auto fixed top-4 right-4 flex min-w-[220px] origin-top-right flex-col items-center gap-3 rounded-[2.5rem] border border-border-soft bg-white/95 p-8 opacity-0 scale-90 shadow-2xl backdrop-blur-xl"
+        className="pointer-events-auto fixed top-4 right-4 flex min-w-[200px] origin-top-right scale-90 flex-col items-stretch gap-1 rounded-3xl border border-border-soft bg-white/95 p-5 opacity-0 shadow-xl backdrop-blur-xl"
         aria-hidden={!isOpen}
       >
-        <div className="mb-2 text-xs font-bold uppercase tracking-widest text-ink-muted">
+        <div className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-ink-muted">
           Menu
         </div>
         {NAV.map((item, index) => (
@@ -156,7 +153,7 @@ export function Header() {
             ref={(el) => {
               itemsRef.current[index] = el;
             }}
-            className="block rounded-full px-6 py-2 text-center text-3xl font-extrabold tracking-tight text-ink md:text-4xl"
+            className="block rounded-full px-4 py-2.5 text-left text-base font-semibold tracking-tight text-ink"
             onMouseEnter={() =>
               handleMouseEnter(index, item.hoverBg, item.hoverText)
             }

@@ -1,101 +1,137 @@
 "use client";
 
-import { useRef } from "react";
-import { gsap } from "gsap";
-import { useGSAP } from "@gsap/react";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { Sparkles, MapPinned, BadgeCheck, Shield } from "lucide-react";
+import {
+  Sparkles,
+  Building2,
+  Users,
+  Stethoscope,
+  Leaf,
+  AlertTriangle,
+  TreePine,
+  MapPinned,
+  Landmark,
+  HeartHandshake,
+  UserPlus,
+} from "lucide-react";
+import { Button } from "@/components/Button";
+import { AnimatedContent, ScrollReveal } from "@/components/bits";
 import { SectionDivider } from "./SectionDivider";
 
-gsap.registerPlugin(ScrollTrigger);
-
-const ITEMS = [
+const FEATURES = [
   {
     icon: Sparkles,
-    title: "Match ideal",
-    text: "Não é feed infinito — é compatibilidade com a sua rotina.",
-    color: "bg-pastel-orange text-brand-orange",
-    tone: "bg-pastel-orange/50",
+    title: "Match inteligente",
+    body: "Compatibilidade real entre você e o animal — rotina, espaço e experiência.",
+    tone: "bg-pastel-pink text-brand-pink",
+  },
+  {
+    icon: Building2,
+    title: "Cadastro de ONGs",
+    body: "Organizações verificadas no mesmo fluxo da adoção responsável.",
+    tone: "bg-pastel-green text-brand-green",
+  },
+  {
+    icon: HeartHandshake,
+    title: "Gestão de animais",
+    body: "Cadastre, acompanhe solicitações e feche adoções sem planilha.",
+    tone: "bg-pastel-pink text-brand-pink",
+  },
+  {
+    icon: Users,
+    title: "Comunidade pós-adoção",
+    body: "Apoio contínuo depois que o match vira lar.",
+    tone: "bg-pastel-green text-brand-green",
+  },
+  {
+    icon: Stethoscope,
+    title: "Marketplace de veterinários",
+    body: "Profissionais no caminho do cuidado — quando você precisar.",
+    tone: "bg-pastel-pink text-brand-pink",
+  },
+  {
+    icon: Leaf,
+    title: "Rede de biólogos",
+    body: "Especialistas conectados à proteção da fauna.",
+    tone: "bg-pastel-green text-brand-green",
+  },
+  {
+    icon: AlertTriangle,
+    title: "Registro de abandono e maus-tratos",
+    body: "Denúncias organizadas para quem precisa de ajuda agora.",
+    tone: "bg-pastel-pink text-brand-pink",
+  },
+  {
+    icon: TreePine,
+    title: "Registro de fauna silvestre",
+    body: "Registro responsável de ocorrências com fauna silvestre.",
+    tone: "bg-pastel-green text-brand-green",
   },
   {
     icon: MapPinned,
-    title: "Mapa de ocorrências",
-    text: "Denúncias georreferenciadas, com ou sem conta.",
-    color: "bg-white text-brand-blue",
-    tone: "bg-pastel-blue",
+    title: "Mapa georreferenciado",
+    body: "Ocorrências no mapa — contexto real, ação mais rápida.",
+    tone: "bg-pastel-pink text-brand-pink",
   },
   {
-    icon: BadgeCheck,
-    title: "Perfis verificados",
-    text: "ONGs e clínicas no mesmo fluxo, com confiança.",
-    color: "bg-white text-brand-green",
-    tone: "bg-pastel-green",
-  },
-  {
-    icon: Shield,
-    title: "LGPD desde o início",
-    text: "Consentimento claro — dados com responsabilidade.",
-    color: "bg-white text-brand-purple",
-    tone: "bg-pastel-purple",
+    icon: Landmark,
+    title: "Apoio a órgãos públicos",
+    body: "Indicadores e fluxo pensados para políticas de proteção animal.",
+    tone: "bg-pastel-green text-brand-green",
   },
 ];
 
 export function Differentials() {
-  const container = useRef<HTMLElement>(null);
-
-  useGSAP(
-    () => {
-      gsap.from(".diff-card", {
-        scrollTrigger: { trigger: container.current, start: "top 75%" },
-        y: 36,
-        opacity: 0,
-        duration: 0.7,
-        stagger: 0.1,
-        ease: "back.out(1.5)",
-      });
-    },
-    { scope: container },
-  );
-
   return (
     <section
-      ref={container}
-      className="relative z-10 bg-white px-4 py-24 md:py-28"
+      id="diferenciais"
+      className="relative z-10 bg-white px-4 py-20 md:py-24"
     >
       <SectionDivider fill="var(--gray-soft)" position="top" />
 
-      <div className="relative z-10 mx-auto max-w-6xl pt-12 md:pt-16">
-        <div className="mb-12 max-w-2xl">
-          <p className="mb-3 text-sm font-black uppercase tracking-wider text-brand-green">
-            Por que o ANIMAPS
+      <div className="relative z-10 mx-auto max-w-6xl pt-10 md:pt-12">
+        <div className="mb-10 max-w-2xl">
+          <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-brand-green">
+            O que o ANIMAPS traz
           </p>
-          <h2 className="font-display text-4xl text-ink md:text-5xl">
-            Diferenciais
-          </h2>
-          <p className="mt-4 text-lg font-bold text-ink-muted">
-            O que muda em relação a grupos de redes sociais e planilhas soltas.
+          <ScrollReveal>
+            <h2 className="font-display text-3xl tracking-tight text-ink md:text-4xl">
+              Tudo o que você precisa em{" "}
+              <span className="text-brand-pink">uma conta.</span>
+            </h2>
+          </ScrollReveal>
+          <p className="mt-3 text-base leading-relaxed text-ink-muted md:text-lg">
+            Do match ao mapa — recursos pensados para adotantes, ONGs e quem
+            protege animais.
           </p>
         </div>
 
-        <div className="grid gap-5 sm:grid-cols-2">
-          {ITEMS.map((item) => (
-            <article
-              key={item.title}
-              className={`diff-card flex gap-4 rounded-[2rem] p-6 transition-transform hover:-translate-y-1 ${item.tone}`}
-            >
-              <span
-                className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full shadow-sm ${item.color}`}
-              >
-                <item.icon size={24} strokeWidth={2.5} />
-              </span>
-              <div>
-                <h3 className="text-lg font-black text-ink">{item.title}</h3>
-                <p className="mt-1 text-sm font-bold leading-relaxed text-ink-muted">
-                  {item.text}
-                </p>
-              </div>
-            </article>
+        <div className="mb-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {FEATURES.map((item, i) => (
+            <AnimatedContent key={item.title} delay={i * 0.05} distance={22}>
+              <article className="flex h-full gap-4 rounded-3xl border border-border-soft bg-gray-soft/50 p-5 shadow-sm transition-transform hover:-translate-y-0.5">
+                <span
+                  className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full ${item.tone}`}
+                >
+                  <item.icon size={20} strokeWidth={2.25} />
+                </span>
+                <div>
+                  <h3 className="text-base font-semibold tracking-tight text-ink">
+                    {item.title}
+                  </h3>
+                  <p className="mt-1 text-sm leading-relaxed text-ink-muted">
+                    {item.body}
+                  </p>
+                </div>
+              </article>
+            </AnimatedContent>
           ))}
+        </div>
+
+        <div className="flex justify-center">
+          <Button href="#lista" variant="pink">
+            <UserPlus size={18} />
+            Criar conta no ANIMAPS
+          </Button>
         </div>
       </div>
     </section>

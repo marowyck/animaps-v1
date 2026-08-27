@@ -13,7 +13,7 @@ gsap.registerPlugin(ScrollTrigger);
 const FAQS = [
   {
     q: "Quando o ANIMAPS vai lançar?",
-    a: "Estamos em fase de lista de espera. Quem se cadastrar recebe prioridade no acesso ao piloto e avisos de novidades.",
+    a: "Estamos abrindo contas com prioridade de acesso ao piloto. Quem se cadastrar agora recebe avisos e entra na frente.",
   },
   {
     q: "O ANIMAPS é gratuito?",
@@ -21,11 +21,11 @@ const FAQS = [
   },
   {
     q: "Como funciona o Match ideal?",
-    a: "Você cria um perfil com espaço, tempo e experiência. O sistema sugere animais compatíveis com a sua rotina — não é só um feed de fotos.",
+    a: "Você cria sua conta, completa o perfil com espaço, tempo e experiência. O sistema sugere animais compatíveis com a sua rotina — não é só um feed de fotos.",
   },
   {
     q: "Como ONGs e clínicas participam?",
-    a: "ONGs cadastram animais e gerenciam solicitações. Clínicas entram como parceiras verificadas no fluxo de adoção responsável.",
+    a: "Crie a conta da sua organização. ONGs cadastram animais e gerenciam solicitações. Clínicas entram como parceiras verificadas no fluxo de adoção responsável.",
   },
   {
     q: "E se eu encontrar um animal em situação urgente?",
@@ -33,7 +33,7 @@ const FAQS = [
   },
   {
     q: "Como meus dados são usados?",
-    a: "Na lista de espera coletamos nome, e-mail e tipo de perfil com o seu consentimento. Detalhes na política de privacidade.",
+    a: "Ao criar sua conta coletamos nome, e-mail e tipo de perfil com o seu consentimento. Detalhes na política de privacidade.",
   },
   {
     q: "O ANIMAPS funciona em todo o Brasil?",
@@ -66,21 +66,20 @@ export function FAQ() {
     <section
       id="faq"
       ref={container}
-      className="relative z-10 bg-pastel-yellow px-4 py-24 md:py-28"
+      className="relative z-10 bg-pastel-pink px-4 pt-20 pb-10 md:pt-24 md:pb-12"
     >
-      <SectionDivider fill="var(--ink)" position="top" />
+      <SectionDivider fill="#ffffff" position="top" />
 
-      <div className="relative z-10 mx-auto max-w-3xl pt-12 md:pt-16">
-        <div className="mb-12 text-center">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-pastel-orange px-4 py-2 text-sm font-black uppercase tracking-wider text-brand-orange">
-            <HelpCircle size={16} /> FAQ
+      <div className="relative z-10 mx-auto max-w-3xl pt-10 md:pt-12">
+        <div className="mb-10 text-center">
+          <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 text-xs font-semibold uppercase tracking-wider text-brand-pink">
+            <HelpCircle size={14} /> FAQ
           </div>
-          <h2 className="font-display text-4xl text-ink md:text-5xl">
+          <h2 className="font-display text-3xl tracking-tight text-ink md:text-4xl">
             Dúvidas frequentes
           </h2>
-          <p className="mt-4 font-bold text-ink-muted">
-            {/* TODO copy */}
-            Respostas rápidas antes de entrar na lista.
+          <p className="mt-2 text-base text-ink-muted">
+            Respostas rápidas antes de criar sua conta.
           </p>
         </div>
 

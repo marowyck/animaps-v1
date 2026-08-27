@@ -1,21 +1,15 @@
 "use client";
 
-import { useRef } from "react";
-import { gsap } from "gsap";
-import { useGSAP } from "@gsap/react";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Heart, Building2, Stethoscope, Landmark } from "lucide-react";
-import { SectionDivider } from "./SectionDivider";
-
-gsap.registerPlugin(ScrollTrigger);
+import { AnimatedContent, ScrollReveal } from "@/components/bits";
 
 const AUDIENCES = [
   {
     title: "Tutores",
     body: "Encontre um animal compatível com a sua rotina.",
     icon: Heart,
-    tone: "bg-pastel-orange",
-    iconColor: "text-brand-orange",
+    tone: "bg-pastel-pink",
+    iconColor: "text-brand-pink",
   },
   {
     title: "ONGs",
@@ -28,66 +22,65 @@ const AUDIENCES = [
     title: "Clínicas",
     body: "Parceria verificada no fluxo de adoção responsável.",
     icon: Stethoscope,
-    tone: "bg-pastel-blue",
-    iconColor: "text-brand-blue",
+    tone: "bg-pastel-sky",
+    iconColor: "text-brand-green",
   },
   {
     title: "Órgãos e pesquisa",
-    body: "Menção institucional — indicadores agregados no futuro.",
+    body: "Indicadores agregados para quem cuida da cidade.",
     icon: Landmark,
-    tone: "bg-pastel-purple",
-    iconColor: "text-brand-purple",
+    tone: "bg-pastel-pink",
+    iconColor: "text-brand-pink",
   },
 ];
 
 export function AudienceCards() {
-  const container = useRef<HTMLElement>(null);
-
-  useGSAP(
-    () => {
-      gsap.from(".audience-card", {
-        scrollTrigger: { trigger: container.current, start: "top 75%" },
-        y: 40,
-        opacity: 0,
-        duration: 0.7,
-        stagger: 0.12,
-        ease: "back.out(1.5)",
-      });
-    },
-    { scope: container },
-  );
-
   return (
     <section
       id="para-quem"
-      ref={container}
-      className="relative z-10 bg-gray-soft px-4 py-24 md:py-28"
+      className="relative z-10 bg-gray-soft px-4 py-20 md:py-24"
     >
-      <SectionDivider fill="#ffffff" position="top" />
-
-      <div className="relative z-10 mx-auto max-w-6xl pt-12 md:pt-16">
-        <p className="mb-3 text-sm font-black uppercase tracking-wider text-brand-purple">
-          Para quem é
+      <div className="relative z-10 mx-auto max-w-6xl pt-4 md:pt-6">
+        <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-brand-green">
+          É para você se…
         </p>
-        <h2 className="font-display mb-12 max-w-xl text-4xl leading-tight text-ink md:text-5xl">
-          Feito para quem cuida — de formas diferentes.
-        </h2>
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {AUDIENCES.map((a) => (
-            <article
-              key={a.title}
-              className={`audience-card rounded-[2rem] p-6 shadow-sm transition-transform hover:-translate-y-1 ${a.tone}`}
-            >
-              <div
-                className={`mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-white ${a.iconColor}`}
+        <ScrollReveal>
+          <h2 className="font-display mb-3 max-w-xl text-3xl leading-tight tracking-tight text-ink md:text-4xl">
+            Feito para quem cuida —{" "}
+            <span className="text-brand-green">de formas diferentes.</span>
+          </h2>
+        </ScrollReveal>
+        <p className="mb-8 max-w-lg text-base text-ink-muted">
+          Adotante, ONG, clínica ou órgão: crie sua conta e use o que combina
+          com o seu papel.
+        </p>
+        <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {AUDIENCES.map((a, i) => (
+            <AnimatedContent key={a.title} delay={i * 0.07} distance={24}>
+              <article
+                className={`h-full rounded-3xl p-5 shadow-sm transition-transform hover:-translate-y-0.5 ${a.tone}`}
               >
-                <a.icon size={24} strokeWidth={2.5} />
-              </div>
-              <h3 className="font-display text-xl text-ink">{a.title}</h3>
-              <p className="mt-3 text-sm font-bold text-ink-muted">{a.body}</p>
-            </article>
+                <div
+                  className={`mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-white ${a.iconColor}`}
+                >
+                  <a.icon size={20} strokeWidth={2.25} />
+                </div>
+                <h3 className="text-lg font-semibold tracking-tight text-ink">
+                  {a.title}
+                </h3>
+                <p className="mt-1.5 text-sm leading-relaxed text-ink-muted">
+                  {a.body}
+                </p>
+              </article>
+            </AnimatedContent>
           ))}
         </div>
+        <a
+          href="#lista"
+          className="inline-flex min-h-11 items-center rounded-full bg-brand-pink px-6 py-3 text-sm font-semibold text-white shadow-md transition-colors hover:bg-brand-pink-hover"
+        >
+          Criar conta
+        </a>
       </div>
     </section>
   );

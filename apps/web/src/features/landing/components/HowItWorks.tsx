@@ -1,101 +1,100 @@
 "use client";
 
-import { useRef } from "react";
-import { gsap } from "gsap";
-import { useGSAP } from "@gsap/react";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { UserRound, Sparkles, HeartHandshake } from "lucide-react";
+import {
+  UserPlus,
+  UserRound,
+  Sparkles,
+  HeartHandshake,
+} from "lucide-react";
+import { Button } from "@/components/Button";
+import { AnimatedContent, ScrollReveal } from "@/components/bits";
 import { SectionDivider } from "./SectionDivider";
-
-gsap.registerPlugin(ScrollTrigger);
 
 const STEPS = [
   {
-    title: "Crie seu perfil",
-    desc: "Espaço, tempo e experiência — o essencial para um Match ideal.",
-    icon: UserRound,
-    color: "bg-pastel-blue text-brand-blue",
-    border: "border-blue-200",
+    title: "Crie sua conta",
+    desc: "Garanta seu acesso à plataforma com prioridade no piloto.",
+    icon: UserPlus,
+    color: "bg-pastel-pink text-brand-pink",
+    border: "border-brand-pink/25",
   },
   {
-    title: "Veja o Match ideal",
-    desc: "Animais compatíveis com a sua rotina, não só fotos bonitas.",
+    title: "Complete seu perfil",
+    desc: "Espaço, tempo e experiência — base do seu Match ideal.",
+    icon: UserRound,
+    color: "bg-pastel-green text-brand-green",
+    border: "border-brand-green/25",
+  },
+  {
+    title: "Veja o Match e o mapa",
+    desc: "Animais compatíveis com a sua rotina e ocorrências perto de você.",
     icon: Sparkles,
-    color: "bg-pastel-orange text-brand-orange",
-    border: "border-orange-200",
+    color: "bg-pastel-pink text-brand-pink",
+    border: "border-brand-pink/25",
   },
   {
     title: "Adote com responsabilidade",
-    desc: "Solicite, acompanhe e feche o processo com a ONG.",
+    desc: "Solicite, acompanhe com a ONG e faça parte da comunidade.",
     icon: HeartHandshake,
     color: "bg-pastel-green text-brand-green",
-    border: "border-green-200",
+    border: "border-brand-green/25",
   },
 ];
 
 export function HowItWorks() {
-  const container = useRef<HTMLElement>(null);
-
-  useGSAP(
-    () => {
-      gsap.from(".step-card", {
-        scrollTrigger: { trigger: container.current, start: "top 70%" },
-        y: 50,
-        opacity: 0,
-        duration: 0.6,
-        stagger: 0.2,
-        ease: "back.out(1.5)",
-      });
-    },
-    { scope: container },
-  );
-
   return (
     <section
       id="como-funciona"
-      ref={container}
-      className="relative z-10 bg-white py-28 md:py-32"
+      className="relative z-10 bg-pastel-green pt-20 pb-10 md:pt-24 md:pb-12"
     >
       <SectionDivider fill="var(--pastel-sky)" position="top" />
 
-      <div className="relative z-10 mx-auto max-w-6xl px-4 pt-12 md:pt-16">
-        <div className="mb-16 text-center">
-          <h2 className="font-display mb-4 text-4xl text-ink md:text-5xl">
-            Como funciona —{" "}
-            <span className="text-brand-orange underline decoration-wavy">
-              simples.
-            </span>
-          </h2>
-          <p className="font-bold text-ink-muted">
-            Três passos. Sem drama.
+      <div className="relative z-10 mx-auto max-w-6xl px-4 pt-10 md:pt-12">
+        <div className="mb-12 text-center">
+          <ScrollReveal>
+            <h2 className="font-display mb-2 text-3xl tracking-tight text-ink md:text-4xl">
+              Da conta ao match —{" "}
+              <span className="text-brand-pink">simples.</span>
+            </h2>
+          </ScrollReveal>
+          <p className="text-base text-ink-muted">
+            Quatro passos para você entrar na plataforma e cuidar de verdade.
           </p>
         </div>
 
-        <div className="grid gap-8 md:grid-cols-3">
+        <div className="mb-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {STEPS.map((step, idx) => (
-            <div
-              key={step.title}
-              className={`step-card group relative flex flex-col items-center overflow-hidden rounded-[3rem] border-4 ${step.border} bg-white p-8 text-center shadow-xl transition-transform hover:-translate-y-2`}
-            >
-              <span
-                aria-hidden
-                className="pointer-events-none absolute top-2 right-6 font-display text-8xl text-gray-100 transition-colors group-hover:text-gray-200"
-              >
-                {idx + 1}
-              </span>
+            <AnimatedContent key={step.title} delay={idx * 0.1} distance={28}>
               <div
-                className={`relative mb-8 flex h-28 w-28 items-center justify-center rounded-full ${step.color} shadow-sm ring-8 ring-white transition-transform duration-300 group-hover:scale-110`}
+                className={`group relative flex h-full flex-col items-center overflow-hidden rounded-3xl border-2 ${step.border} bg-white p-6 text-center shadow-sm transition-transform hover:-translate-y-0.5`}
               >
-                <step.icon size={40} strokeWidth={2.5} />
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute top-2 right-4 font-display text-5xl text-ink/5"
+                >
+                  {idx + 1}
+                </span>
+                <div
+                  className={`relative mb-5 flex h-16 w-16 items-center justify-center rounded-full ${step.color} shadow-sm ring-4 ring-white transition-transform duration-300 group-hover:scale-105`}
+                >
+                  <step.icon size={28} strokeWidth={2.25} />
+                </div>
+                <h3 className="relative mb-2 text-lg font-semibold tracking-tight text-ink">
+                  {step.title}
+                </h3>
+                <p className="relative text-sm leading-relaxed text-ink-muted">
+                  {step.desc}
+                </p>
               </div>
-              <h3 className="relative font-display mb-4 text-2xl text-ink">
-                {step.title}
-              </h3>
-              <p className="relative text-lg font-bold leading-relaxed text-ink-muted">
-                {step.desc}
-              </p>
-            </div>
+            </AnimatedContent>
           ))}
+        </div>
+
+        <div className="flex justify-center">
+          <Button href="#lista" variant="pink">
+            <UserPlus size={18} />
+            Criar minha conta
+          </Button>
         </div>
       </div>
     </section>

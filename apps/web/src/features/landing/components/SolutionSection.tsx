@@ -1,103 +1,119 @@
 "use client";
 
+import {
+  Sparkles,
+  Building2,
+  Stethoscope,
+  MapPinned,
+  BarChart3,
+  UserPlus,
+} from "lucide-react";
+import { Button } from "@/components/Button";
+import {
+  AnimatedContent,
+  DotGrid,
+  ScrollReveal,
+  updateDotGridVars,
+} from "@/components/bits";
 import { useRef } from "react";
-import { gsap } from "gsap";
-import { useGSAP } from "@gsap/react";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { HeartHandshake, MapPinned, Building2 } from "lucide-react";
 import { SectionDivider } from "./SectionDivider";
 
-gsap.registerPlugin(ScrollTrigger);
-
-const ITEMS = [
+const PILLARS = [
   {
-    icon: HeartHandshake,
-    title: "Match ideal",
-    body: "Compatibilidade real — não só “bonitinho”.",
-    color: "bg-pastel-orange text-brand-orange",
-  },
-  {
-    icon: MapPinned,
-    title: "Mapa de ocorrências",
-    body: "Denúncias georreferenciadas, com ou sem conta.",
-    color: "bg-pastel-blue text-brand-blue",
+    icon: Sparkles,
+    title: "Match inteligente",
+    body: "Você vê animais compatíveis com a sua rotina — não só fotos bonitas.",
   },
   {
     icon: Building2,
-    title: "ONGs e clínicas",
-    body: "Mesmo fluxo, perfis verificados.",
-    color: "bg-pastel-green text-brand-green",
+    title: "Gestão para ONGs",
+    body: "Cadastre animais e acompanhe solicitações sem planilha infinita.",
+  },
+  {
+    icon: Stethoscope,
+    title: "Marketplace de profissionais",
+    body: "Veterinários e especialistas no mesmo fluxo de cuidado.",
+  },
+  {
+    icon: MapPinned,
+    title: "Georreferenciamento",
+    body: "Mapa de ocorrências para denunciar e agir com contexto.",
+  },
+  {
+    icon: BarChart3,
+    title: "Indicadores ambientais",
+    body: "Dados que ajudam quem cuida da cidade e da fauna.",
   },
 ];
 
 export function SolutionSection() {
   const container = useRef<HTMLElement>(null);
 
-  useGSAP(
-    () => {
-      gsap.from(".solution-item", {
-        scrollTrigger: { trigger: container.current, start: "top 75%" },
-        y: 40,
-        opacity: 0,
-        duration: 0.7,
-        stagger: 0.15,
-        ease: "back.out(1.5)",
-      });
-    },
-    { scope: container },
-  );
-
   return (
     <section
       id="solucao"
       ref={container}
-      className="relative z-10 bg-pastel-sky py-24 md:py-28"
+      className="relative z-10 overflow-x-hidden bg-pastel-sky py-20 md:py-24"
+      onMouseMove={(e) => {
+        if (container.current) {
+          updateDotGridVars(container.current, e.clientX, e.clientY);
+        }
+      }}
     >
-      <SectionDivider fill="#333333" position="top" />
+      <SectionDivider fill="var(--gray-soft)" position="top" />
+      <DotGrid
+        opacity={0.4}
+        gap={30}
+        baseColor="rgba(224, 122, 150, 0.12)"
+        activeColor="rgba(95, 175, 106, 0.3)"
+        proximity={110}
+      />
 
-      {/*
-        Two equal columns (sum = full width). Avoid 5+8 on a 12-col grid
-        (13 > 12 wraps the cards below). Oi glyphs are wide — clip +
-        line breaks keep the title inside its column.
-      */}
-      <div className="relative z-10 mx-auto grid max-w-6xl items-start gap-10 px-4 pt-12 md:grid-cols-2 md:gap-12 md:pt-16 lg:gap-16">
-        <div className="min-w-0 overflow-x-clip">
-          <div className="mb-6 inline-block rounded-full border-2 border-blue-200 bg-pastel-blue px-4 py-2 text-sm font-black uppercase tracking-wider text-brand-blue">
-            A solução
+      <div className="relative z-10 mx-auto max-w-6xl px-4 pt-10 md:pt-12">
+        <div className="mx-auto mb-10 max-w-2xl text-center">
+          <div className="mb-4 inline-block rounded-full border border-brand-green/30 bg-pastel-green px-3 py-1 text-xs font-semibold uppercase tracking-wider text-brand-green">
+            O produto
           </div>
-          <h2 className="font-display mb-6 text-[clamp(1.85rem,4vw,2.75rem)] leading-[1.1] text-ink">
-            Match ideal +
-            <br />
-            <span className="text-brand-blue">
-              mapa de
-              <br />
-              ocorrências.
-            </span>
-          </h2>
-          <p className="max-w-md text-lg font-bold leading-relaxed text-ink-muted">
-            Tecnologia e coração no mesmo lugar — para adotar com
-            responsabilidade e denunciar com segurança.
+          <ScrollReveal>
+            <h2 className="font-display mb-4 text-3xl leading-tight tracking-tight text-ink md:text-4xl">
+              Uma plataforma.{" "}
+              <span className="text-brand-green">Todo o cuidado.</span>
+            </h2>
+          </ScrollReveal>
+          <p className="text-base leading-relaxed text-ink-muted md:text-lg">
+            Com a sua conta você ganha match responsável, mapa de ocorrências e
+            um só lugar para{" "}
+            <span className="font-semibold text-brand-pink">adotantes</span>,{" "}
+            <span className="font-semibold text-brand-green">ONGs</span>,{" "}
+            <span className="font-semibold text-brand-blue">veterinários</span> e{" "}
+            <span className="font-semibold text-brand-green">órgãos públicos</span>.
           </p>
         </div>
 
-        <ul className="relative z-10 min-w-0 space-y-4">
-          {ITEMS.map((item) => (
-            <li
-              key={item.title}
-              className="solution-item flex items-start gap-4 rounded-[2rem] border-2 border-transparent bg-white p-5 shadow-sm transition-colors hover:border-brand-blue/30"
-            >
-              <div
-                className={`mt-1 flex h-12 w-12 shrink-0 items-center justify-center rounded-full ${item.color}`}
-              >
-                <item.icon size={24} strokeWidth={2.5} />
-              </div>
-              <div className="min-w-0">
-                <h3 className="text-lg font-black text-ink">{item.title}</h3>
-                <p className="font-medium text-ink-muted">{item.body}</p>
-              </div>
-            </li>
+        <ul className="mb-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {PILLARS.map((item, i) => (
+            <AnimatedContent key={item.title} delay={i * 0.08} distance={28}>
+              <li className="flex h-full items-start gap-4 rounded-3xl border border-transparent bg-white p-5 shadow-sm transition-colors hover:border-brand-pink/25">
+                <div className="mt-0.5 flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-pastel-pink text-brand-pink">
+                  <item.icon size={22} strokeWidth={2.25} />
+                </div>
+                <div className="min-w-0">
+                  <h3 className="text-lg font-semibold text-ink">{item.title}</h3>
+                  <p className="mt-1 text-sm leading-relaxed text-ink-muted md:text-base">
+                    {item.body}
+                  </p>
+                </div>
+              </li>
+            </AnimatedContent>
           ))}
         </ul>
+
+        <div className="flex justify-center">
+          <Button href="#lista" variant="pink">
+            <UserPlus size={18} />
+            Criar conta
+          </Button>
+        </div>
       </div>
     </section>
   );

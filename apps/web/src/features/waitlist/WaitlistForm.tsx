@@ -120,7 +120,8 @@ export function WaitlistForm() {
             >
               política de privacidade
             </a>{" "}
-            (coleta de nome, e-mail e tipo de perfil para a lista de espera).
+            (coleta de nome, e-mail e tipo de perfil para criar sua conta e
+              prioridade de acesso).
           </>
         }
       />
@@ -132,7 +133,7 @@ export function WaitlistForm() {
       ) : null}
       {status === "ok" ? (
         <p className="mt-4 text-sm font-bold text-brand-green" role="status">
-          Você entrou na lista. Em breve falamos com você.
+          Conta na lista! Em breve falamos com você sobre o acesso.
         </p>
       ) : null}
 
@@ -140,10 +141,10 @@ export function WaitlistForm() {
         <Button
           type="submit"
           disabled={status === "loading"}
-          variant="orange"
+          variant="pink"
           magnetic={false}
         >
-          {status === "loading" ? "Enviando…" : "Entrar na lista de espera"}
+          {status === "loading" ? "Enviando…" : "Criar minha conta"}
         </Button>
       </div>
     </form>

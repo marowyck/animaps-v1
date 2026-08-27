@@ -1,14 +1,50 @@
 "use client";
 
 import { useRef } from "react";
+import Image from "next/image";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
-import { Heart, PawPrint, ArrowDown } from "lucide-react";
+import { UserPlus, ArrowDown, PawPrint } from "lucide-react";
 import { Button } from "@/components/Button";
+import {
+  DotGrid,
+  ScrollReveal,
+  TiltedCard,
+  updateDotGridVars,
+} from "@/components/bits";
 import { OrganicBlob } from "./OrganicBlob";
 
 gsap.registerPlugin(ScrollTrigger);
+
+const PAW_MARKS = [
+  { top: "8%", left: "5%", size: 34, rotate: -18, opacity: 0.28, color: "pink" },
+  { top: "14%", left: "22%", size: 22, rotate: 14, opacity: 0.2, color: "green" },
+  { top: "10%", left: "48%", size: 28, rotate: -8, opacity: 0.22, color: "pink" },
+  { top: "16%", left: "72%", size: 40, rotate: 24, opacity: 0.26, color: "pink" },
+  { top: "12%", left: "90%", size: 24, rotate: -30, opacity: 0.2, color: "green" },
+  { top: "28%", left: "8%", size: 26, rotate: 20, opacity: 0.24, color: "green" },
+  { top: "32%", left: "30%", size: 18, rotate: -22, opacity: 0.18, color: "pink" },
+  { top: "26%", left: "58%", size: 32, rotate: 10, opacity: 0.22, color: "green" },
+  { top: "34%", left: "84%", size: 36, rotate: -16, opacity: 0.28, color: "pink" },
+  { top: "44%", left: "3%", size: 42, rotate: 8, opacity: 0.22, color: "pink" },
+  { top: "48%", left: "18%", size: 20, rotate: 28, opacity: 0.2, color: "green" },
+  { top: "42%", left: "40%", size: 24, rotate: -12, opacity: 0.16, color: "pink" },
+  { top: "50%", left: "66%", size: 30, rotate: 18, opacity: 0.24, color: "pink" },
+  { top: "46%", left: "92%", size: 28, rotate: -26, opacity: 0.26, color: "green" },
+  { top: "60%", left: "10%", size: 22, rotate: -14, opacity: 0.22, color: "green" },
+  { top: "64%", left: "28%", size: 36, rotate: 32, opacity: 0.26, color: "pink" },
+  { top: "58%", left: "52%", size: 18, rotate: -6, opacity: 0.18, color: "green" },
+  { top: "62%", left: "76%", size: 34, rotate: -20, opacity: 0.24, color: "pink" },
+  { top: "70%", left: "4%", size: 30, rotate: 12, opacity: 0.2, color: "pink" },
+  { top: "74%", left: "38%", size: 26, rotate: -28, opacity: 0.24, color: "green" },
+  { top: "78%", left: "58%", size: 38, rotate: 16, opacity: 0.28, color: "pink" },
+  { top: "72%", left: "88%", size: 22, rotate: 8, opacity: 0.2, color: "green" },
+  { top: "86%", left: "16%", size: 28, rotate: 22, opacity: 0.22, color: "pink" },
+  { top: "88%", left: "48%", size: 24, rotate: -10, opacity: 0.2, color: "green" },
+  { top: "84%", left: "70%", size: 32, rotate: 30, opacity: 0.26, color: "pink" },
+  { top: "90%", left: "92%", size: 20, rotate: -18, opacity: 0.18, color: "green" },
+] as const;
 
 function prefersReducedMotion(): boolean {
   if (typeof window === "undefined") return false;
@@ -25,51 +61,51 @@ export function Hero() {
 
       const tl = gsap.timeline();
       tl.from(".hero-text", {
-        x: -50,
+        x: -36,
         opacity: 0,
-        duration: 0.8,
+        duration: 0.65,
         ease: "power3.out",
       })
         .from(
           ".hero-blob",
           {
-            scale: 0,
+            scale: 0.85,
             opacity: 0,
-            duration: 1,
+            duration: 0.9,
             ease: "elastic.out(1, 0.75)",
           },
-          "-=0.6",
+          "-=0.45",
         )
         .from(
           ".hero-image",
           {
-            scale: 0.8,
+            scale: 0.9,
             opacity: 0,
-            duration: 0.8,
+            duration: 0.6,
             ease: "back.out(1.5)",
           },
-          "-=0.8",
+          "-=0.6",
         )
         .from(
           ".hero-cta",
           {
-            y: 40,
+            y: 20,
             opacity: 0,
-            duration: 0.6,
+            duration: 0.45,
             ease: "power2.out",
           },
-          "-=0.4",
+          "-=0.3",
         );
 
       if (blobRef.current) {
         gsap.to(blobRef.current, {
-          yPercent: -10,
+          yPercent: -6,
           ease: "none",
           scrollTrigger: {
             trigger: containerRef.current,
             start: "top top",
             end: "bottom top",
-            scrub: true,
+            scrub: 0.6,
           },
         });
       }
@@ -81,58 +117,87 @@ export function Hero() {
     <section
       id="topo"
       ref={containerRef}
-      className="relative overflow-hidden px-4 pb-24 pt-32"
+      className="relative flex min-h-[88vh] flex-col justify-center overflow-x-hidden px-4 pb-28 pt-32 md:min-h-[92vh] md:pb-32 md:pt-36"
+      onMouseMove={(e) => {
+        if (containerRef.current) {
+          updateDotGridVars(containerRef.current, e.clientX, e.clientY);
+        }
+      }}
     >
-      <div ref={blobRef} className="pointer-events-none absolute inset-0">
+      <DotGrid opacity={0.5} gap={28} proximity={130} />
+
+      <div
+        className="pointer-events-none absolute inset-0 z-[1] overflow-hidden"
+        aria-hidden
+      >
+        {PAW_MARKS.map((paw, i) => (
+          <PawPrint
+            key={i}
+            size={paw.size}
+            fill="currentColor"
+            strokeWidth={0}
+            className={`absolute ${paw.color === "green" ? "text-brand-green" : "text-brand-pink"}`}
+            style={{
+              top: paw.top,
+              left: paw.left,
+              opacity: paw.opacity,
+              transform: `rotate(${paw.rotate}deg)`,
+            }}
+          />
+        ))}
+      </div>
+
+      <div ref={blobRef} className="pointer-events-none absolute inset-0 z-[1]">
         <OrganicBlob
-          color="yellow"
-          className="hero-blob right-0 top-0 h-[500px] w-[500px] translate-x-1/4 -translate-y-1/4 opacity-40 mix-blend-multiply blur-3xl md:h-[700px] md:w-[700px]"
+          color="pink"
+          className="hero-blob -right-8 top-[8%] h-[280px] w-[280px] opacity-40 blur-3xl md:h-[400px] md:w-[400px]"
         />
         <OrganicBlob
-          color="orange"
-          className="bottom-[10%] left-[-5%] h-48 w-48 opacity-50 md:h-72 md:w-72"
+          color="green"
+          className="bottom-[18%] left-[-4%] h-44 w-44 opacity-35 blur-2xl md:h-64 md:w-64"
         />
       </div>
 
-      <div className="relative z-10 mx-auto grid max-w-7xl grid-cols-1 items-center gap-16 md:grid-cols-2">
-        <div className="hero-text text-left">
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-pastel-blue px-4 py-2 text-sm font-bold text-brand-blue">
-            <PawPrint size={16} /> Plataforma de proteção animal
-          </div>
-
-          <h1 className="font-display mb-6 text-5xl leading-none text-ink drop-shadow-sm md:text-7xl lg:text-8xl">
+      <div className="relative z-10 mx-auto grid w-full max-w-6xl grid-cols-1 items-center gap-10 md:grid-cols-2 md:gap-12">
+        <div className="hero-text min-w-0 text-left">
+          <h1 className="font-display mb-4 text-4xl leading-[1.12] tracking-tight text-ink md:text-5xl lg:text-6xl">
             O seu melhor <br />
-            <span className="text-brand-orange">amigo espera.</span>
+            <span className="text-brand-pink">amigo espera.</span>
           </h1>
 
-          <p className="mb-10 max-w-md text-xl font-bold leading-relaxed text-ink-muted">
-            {/* TODO copy — content brief */}
-            Unimos tecnologia e coração para o Match ideal — e um mapa de
+          <ScrollReveal className="mb-8 max-w-md text-base leading-relaxed text-ink-muted md:text-lg">
+            Crie sua conta no ANIMAPS e encontre o Match ideal — com mapa de
             ocorrências para quem precisa de ajuda agora.
-          </p>
+          </ScrollReveal>
 
-          <div className="hero-cta flex flex-wrap gap-4">
-            <Button href="#lista" variant="orange">
-              <Heart fill="currentColor" size={22} />
-              Entrar na lista de espera
+          <div className="hero-cta flex flex-wrap gap-3">
+            <Button href="#lista" variant="pink" magnetic={false}>
+              <UserPlus size={18} />
+              Criar conta
             </Button>
-            <Button href="#como-funciona" variant="white">
-              <ArrowDown size={22} />
+            <Button href="#como-funciona" variant="white" magnetic={false}>
+              <ArrowDown size={18} />
               Ver como funciona
             </Button>
           </div>
         </div>
 
-        <div className="hero-image relative flex justify-center">
-          <div className="absolute inset-0 scale-105 rotate-6 rounded-[60%_40%_30%_70%/60%_30%_70%_40%] bg-brand-orange opacity-50" />
-          <div className="relative z-10 h-[320px] w-[320px] overflow-hidden rounded-[60%_40%_30%_70%/60%_30%_70%_40%] border-8 border-white shadow-2xl md:h-[420px] md:w-[420px]">
-            {/* Placeholder até fotos stock — design brief */}
-            <div className="flex h-full w-full items-end justify-end bg-[linear-gradient(160deg,var(--pastel-yellow)_0%,var(--pastel-orange)_50%,var(--pastel-green)_100%)] p-6">
-              <span className="rounded-full bg-white/80 px-3 py-1 text-xs font-bold text-ink">
-                Foto · placeholder
-              </span>
+        <div className="hero-image relative flex justify-center md:justify-end">
+          <TiltedCard rotateAmplitude={8} scaleOnHover={1.03}>
+            <div className="relative">
+              <div className="absolute inset-0 scale-105 rotate-6 rounded-[60%_40%_30%_70%/60%_30%_70%_40%] bg-brand-green/40" />
+              <div className="relative z-10 h-[300px] w-[300px] overflow-hidden rounded-[60%_40%_30%_70%/60%_30%_70%_40%] border-[6px] border-white shadow-xl md:h-[400px] md:w-[400px]">
+                <Image
+                  src="/images/hero-pet.jpg"
+                  alt="Cachorro caramelo de olhar atento, pronto para encontrar um lar"
+                  fill
+                  priority
+                  className="object-cover"
+                  sizes="(max-width: 768px) 300px, 400px"
+                />
+              </div>
             </div>
-          </div>
+          </TiltedCard>
         </div>
       </div>
     </section>
