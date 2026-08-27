@@ -3,7 +3,7 @@
 Technical plan for the ANIMAPS institutional landing.  
 Sources: Phase 1 decisions + visual design round + [`ANIMAPS_Roadmap.md`](../ANIMAPS_Roadmap.md) §1.4–1.6 + content/design briefs.
 
-**Status:** Friendly visual pivot applied in [`apps/web`](../apps/web) (Sour Gummy + Oi, BubbleMenu, waves, multi-pastel, GSAP bounce). Waitlist still placeholder (no Postgres).
+**Status:** Pink/green friendly landing in [`apps/web`](../apps/web) (Bagel Fat One + Nunito, BubbleMenu, waves, React Bits, GSAP). Waitlist still placeholder (no Postgres). Public `/` only.
 
 ---
 
@@ -12,12 +12,12 @@ Sources: Phase 1 decisions + visual design round + [`ANIMAPS_Roadmap.md`](../ANI
 | Layer | Choice |
 |---|---|
 | Framework | **Next.js** (App Router) + **TypeScript** |
-| Style | **Tailwind CSS v4** (tokens in `app/globals.css` via `@theme`) — **multi-pastel** palette |
-| Smooth scroll | **`lenis`** (`lenis/react`) — `autoRaf: false` + sync on `gsap.ticker` |
+| Style | **Tailwind CSS v4** (tokens in `app/globals.css` via `@theme`) — **pink + green** brand |
+| Smooth scroll | **`lenis`** (`lenis/react`) — `autoRaf: false` + sync on `gsap.ticker` + **`anchors`** |
 | Animation | **GSAP** + `@gsap/react` + `ScrollTrigger` — easings `back.out` / `elastic.out` |
-| Icons | **`lucide-react`** (colored badges; social brand icons removed in v1.25 — use Share2/Globe/etc.) |
-| UI bits | **React Bits** (selective copy-paste — not plugged yet; motion covered by GSAP) |
-| Fonts | **Sour Gummy** (body) + **Oi** (display) via `next/font/google` |
+| Icons | **`lucide-react`** (+ small inline SVGs for social brands in Footer) |
+| UI bits | **React Bits–style** copy in `components/bits/` (ClickSpark, CurvedLoop, DotGrid, TiltedCard, …) |
+| Fonts | **Bagel Fat One** (display) + **Nunito** (body) via `next/font/google` |
 | Monorepo app | `apps/web` (`@animaps/web`) |
 | Hosting | **Vercel** |
 | Analytics | **Google Analytics 4** (after cookie consent — to wire) |
@@ -26,29 +26,42 @@ Sources: Phase 1 decisions + visual design round + [`ANIMAPS_Roadmap.md`](../ANI
 Dark mode: out of scope.  
 Custom cursor: out of scope.
 
-**Visual/code reference:** `animaps-web/src` (BubbleMenu, waves, Hero timeline).
-
 ### Lenis + GSAP (confirmed pattern)
 
+Implementation: [`apps/web/src/app/providers.tsx`](../apps/web/src/app/providers.tsx)
+
 - Package: `lenis` → `import { ReactLenis, useLenis } from "lenis/react"`
-- Options: `autoRaf: false`, `syncTouch: true`
-- Sync: `lenis.on("scroll", ScrollTrigger.update)` + `gsap.ticker.add((t) => lenis.raf(t * 1000))`
-- Implementation: [`apps/web/src/app/providers.tsx`](../apps/web/src/app/providers.tsx)
-- If `prefers-reduced-motion: reduce` → **do not** init Lenis (native scroll)
+- Sync: `lenis.on("scroll", ScrollTrigger.update)` + `gsap.ticker.add((t) => lenis.raf(t * 1000))` with `autoRaf: false`
+- If `prefers-reduced-motion: reduce` → **do not** init Lenis; use `NativeAnchorScroll` fallback
+- Body: prefer `overflow-x-clip` (not `overflow-x-hidden`) so Lenis root scroll stays healthy
+
+**Tuned options (easy page travel — avoid heavy “lag behind” feel):**
+
+| Option | Value | Why |
+|---|---|---|
+| `lerp` | `~0.16` | Snappier follow than very low lerp |
+| `duration` | `~1` | Anchor animations |
+| `syncTouch` | `false` | Native touch/trackpad feels lighter |
+| `wheelMultiplier` | `~1.2` | Slightly easier vertical travel |
+| `touchMultiplier` | `~1.4` | Same for touch |
+| `anchors` | `{ offset: -96, duration: ~1.05, easing }` | Smooth hash navigation matching `scroll-padding-top: 6rem` |
 
 ### GSAP — plugins / patterns
 
 | Item | Use |
 |---|---|
-| `ScrollTrigger` | Bounce entry for cards/steps/stats; light Hero parallax; Lenis sync |
+| `ScrollTrigger` | Bounce entry for cards/steps/FAQ; soft Hero parallax (`scrub: 0.6`); Lenis sync |
 | Hero timeline | Text + blob `elastic.out` + photo `back.out` + CTAs |
 | BubbleMenu | Open/close with `back.out`; pastel link hover |
+| CurvedLoop | Infinite `x` marquee; per-glyph `translateY(sin)` |
 
-### React Bits
+### React Bits (`components/bits/`)
 
-React Bits is **not** a monolithic npm package — **copy-paste**. Add components sparingly. This iteration covers motion with GSAP/Lenis.
+Copy-paste style components, brand-reskinned. Always respect `prefers-reduced-motion` where motion is involved.
 
-Always behind `prefers-reduced-motion`.
+Notable: **`CurvedLoop`** — continuous ribbon + optional **`bridgeAbove`** fill so section color meets the wave (no white seam under FAQ / HowItWorks).
+
+**Performance note:** avoid `will-change-transform` on every marquee character (hundreds of layers) — keep it on the track only.
 
 ---
 
@@ -62,52 +75,55 @@ Align with roadmap §0.6 (MVC on web):
 | **Controller** | Next.js Server Actions / Route Handlers (waitlist submit, i18n routing) |
 | **Model** | Waitlist TypeScript types + minimal HTTP client until API |
 
-Mandatory componentization from day 1 (reuse across platform).
-
 ### Components (`apps/web/src`)
 
 ```
 components/                    # design system (app-wide reuse)
   Button.tsx
   Input.tsx
-  Select.tsx                   # custom dropdown (not native <select>)
+  Select.tsx
   Checkbox.tsx
   AccordionItem.tsx
+  bits/                        # React Bits–style motion/décor
+    CurvedLoop.tsx
+    ClickSpark.tsx
+    DotGrid.tsx
+    TiltedCard.tsx
+    …
 
 app/
-  providers.tsx                # Lenis + GSAP (SmoothScrollProvider)
+  providers.tsx                # SmoothScrollProvider (Lenis + anchors + GSAP sync)
+  page.tsx                     # Landing composition
   api/waitlist/                # temporary Route Handler → Nest marketing Wave 2
 
-features/landing/components/   # marketing sections
+features/landing/components/
   Header.tsx                   # BubbleMenu
-  Hero.tsx
-  ProblemSection.tsx
+  Hero.tsx                     # taller viewport + filled PawPrint field
   SolutionSection.tsx
-  HowItWorks.tsx
+  HowItWorks.tsx               # bg-pastel-green (feeds green CurvedLoop bridge)
   AudienceCards.tsx
   Differentials.tsx
-  SocialProofCarousel.tsx
-  FAQ.tsx
-  WaitlistSection.tsx          # section chrome + WaitlistForm
-  Footer.tsx
+  FAQ.tsx                      # bg-pastel-pink (feeds pink CurvedLoop bridge)
+  WaitlistSection.tsx
+  Footer.tsx                   # clean columns + social + wordmark
   OrganicBlob.tsx
-  SectionDivider.tsx           # wave SVG
+  SectionDivider.tsx
 
-features/waitlist/             # form, types, validation, submit
-features/consent/              # CookieBanner + localStorage LGPD
+features/waitlist/
+features/consent/
 ```
+
+**Not in public page flow:** `ProblemSection`, `SocialProofCarousel`.
 
 Visual specs: [`landing-design-brief.md`](landing-design-brief.md).
 
 ### Motion and performance
 
-Intensity: **expressive and playful** (`back.out` / `elastic.out`), without competing with reading.
-
-- Prefer `transform` / `opacity` animations (compositor-friendly)
-- Check `prefers-reduced-motion` on **all** effects: Hero, BubbleMenu, Select, Accordion, Lenis
-- Light Hero parallax
-- Disable Lenis if `prefers-reduced-motion`
-- Global custom scrollbar + `.scrollbar-clean`; `scroll-padding-top` for anchors
+- Prefer `transform` / `opacity` (compositor-friendly)
+- Check `prefers-reduced-motion` on Hero, BubbleMenu, Select, Accordion, Lenis, CurvedLoop
+- Soft Hero parallax only
+- Disable Lenis under reduced motion; anchors still land with header offset
+- Global custom scrollbar; `scroll-padding-top` for fixed BubbleMenu
 
 ---
 
@@ -125,17 +141,12 @@ Intensity: **expressive and playful** (`back.out` / `elastic.out`), without comp
 
 **Own endpoint** (no Mailchimp/Typeform in MVP):
 
-Acceptable options this phase:
+1. **Route Handler in `apps/web`** + light `waitlist_entries` — preferred if API not ready  
+2. **Minimal Nest endpoint in `apps/api`** — better once API is scaffolded  
 
-1. **Route Handler in `apps/web`** + light `waitlist_entries` / `WaitlistEntry` (Postgres) — preferred if API not ready.
-2. **Minimal Nest endpoint in `apps/api`** (`marketing` / temporary waitlist module) — better once API is scaffolded.
+Requirements: server-side validation, basic rate limit, waitlist lead only (`WaitlistEntry`), LGPD consent + timestamp.
 
-Requirements:
-
-- Server-side validation
-- Basic rate limit (abuse control)
-- Do not create full `User` yet — waitlist lead only (`WaitlistEntry`)
-- LGPD consent stored with timestamp
+UI copy uses **account** language (“Criar conta”); storage remains waitlist until auth ships.
 
 Field/code names: **English** (`camelCase` API / `snake_case` DB); UI in PT/EN.
 
@@ -144,9 +155,8 @@ Field/code names: **English** (`camelCase` API / `snake_case` DB); UI in PT/EN.
 ## 4. Internationalization (PT + EN)
 
 - Default: **Portuguese**
-- Selector in header/footer
-- Landing strings in dictionaries (`pt`, `en`) — Next.js App Router i18n or light lib
-- Routes or locale prefix: decide in implementation (`/`, `/en` or cookie/header)
+- Footer shows a disabled language pill (`português`) until i18n ships
+- Landing strings in dictionaries (`pt`, `en`) — to implement
 
 ---
 
@@ -166,13 +176,13 @@ Field/code names: **English** (`camelCase` API / `snake_case` DB); UI in PT/EN.
 
 Required at launch:
 
-- [ ] Optimized `title` + `description` (responsible adoption, animal abandonment, NGOs, map occurrences)
-- [ ] Open Graph + Twitter cards (attractive preview image)
+- [ ] Optimized `title` + `description`
+- [ ] Open Graph + Twitter cards
 - [ ] `sitemap.xml` + `robots.txt`
-- [ ] WebP images + `next/image` + lazy loading
-- [ ] Lighthouse / PageSpeed target **> 90** (Performance, Accessibility, Best Practices, SEO)
-- [ ] Semantic HTML + correct headings (single h1 in Hero)
-- [ ] Motion must not tank Lighthouse (lazy GSAP/Lenis if possible; `prefers-reduced-motion`)
+- [ ] WebP + `next/image` + lazy loading
+- [ ] Lighthouse / PageSpeed target **> 90**
+- [ ] Semantic HTML + single `h1` in Hero
+- [ ] Motion must not tank Lighthouse (`prefers-reduced-motion`; avoid excess compositor layers)
 
 ---
 
@@ -190,11 +200,12 @@ Required at launch:
 ## 8. Pre–go-live tests (§1.6)
 
 - [ ] Cross-browser: Chrome, Safari, Firefox
-- [ ] Real mobile devices (not emulator only)
+- [ ] Real mobile devices
 - [ ] Form submit (success, validation, rate limit)
 - [ ] PT ↔ EN switch
 - [ ] Cookie banner + GA4 only post-consent
-- [ ] Light peak smoke (social share) — Vercel/edge burst
+- [ ] Smooth hash scroll (buttons/menu → sections) feels continuous under Lenis
+- [ ] CurvedLoop bridges: no white gap under FAQ (pink) / HowItWorks (green)
 - [ ] `prefers-reduced-motion`: usable without animation
 - [ ] Design-brief anti-generic checklist (visual review)
 
@@ -202,14 +213,14 @@ Required at launch:
 
 ## 9. Suggested implementation order
 
-1. ~~Scaffold monorepo (`pnpm`, `apps/web`)~~ — **done** (`pnpm-workspace.yaml` + `@animaps/web`)
-2. ~~Design tokens + fonts + `SmoothScrollProvider`~~ — **done** (Sour Gummy/Oi after pivot)
-3. ~~Header + Hero with motion~~ — **done**
-4. ~~Other sections skeleton + WaitlistForm + `/api/waitlist` placeholder~~ — **done**
-5. Final PT/EN copy + assets (logo, stock photos with mask)
-6. Real waitlist persistence (Postgres / `WaitlistEntry`) + i18n
+1. ~~Scaffold monorepo~~ — **done**
+2. ~~Design tokens + fonts + `SmoothScrollProvider`~~ — **done** (Bagel Fat One + Nunito; Lenis anchors tuned)
+3. ~~Header + Hero + bits + section flow~~ — **done**
+4. ~~WaitlistForm + `/api/waitlist` placeholder~~ — **done**
+5. Final PT/EN copy + assets (logo, social URLs)
+6. Real waitlist persistence + i18n
 7. Cookie banner → GA4 post-consent + events
-8. SEO (OG, sitemap, robots) + Lighthouse >90
+8. SEO + Lighthouse >90
 9. Domain + Vercel production deploy
 
 **Run locally:** from root, `pnpm dev` (filters `@animaps/web`).
@@ -221,10 +232,10 @@ Required at launch:
 - Full auth / JWT / profiles (Phase 2)
 - PostGIS map / real occurrences (later phases)
 - Meta Pixel / paid ads
-- Dark mode
-- Custom cursor
-- Figma prototype (design in code)
+- Dark mode / custom cursor
+- Figma prototype
 - Mobile app
+- Investor / TAM-SAM-SOM public pages
 
 ---
 

@@ -1,25 +1,29 @@
 # Landing Page — Design Brief (Phase 1)
 
 Visual identity and UX for the ANIMAPS institutional landing.  
-Sources: Phase 1 decisions + visual design round + **post-feedback pivot** (base: `animaps-web/src`) + [`ANIMAPS_Roadmap.md`](../ANIMAPS_Roadmap.md) §1.3 + [`landing-content-brief.md`](landing-content-brief.md).
+Sources: Phase 1 decisions + visual design round + **post-feedback pivots** + [`ANIMAPS_Roadmap.md`](../ANIMAPS_Roadmap.md) §1.3 + [`landing-content-brief.md`](landing-content-brief.md).
 
-**Status:** **friendly / organic / multi-pastel** direction implemented in `apps/web` (no Figma).
+**Status:** **friendly / organic / pink+green** direction implemented in `apps/web` (no Figma). Public `/` only — product sell + account CTA (waitlist backend).
 
 ---
 
-## Pivot — friendly/organic direction (post-feedback)
+## Pivot history
 
-**Why:** First implementation (editorial + Fraunces serif) felt too “newspaper”. Feedback: friendly, pastels, more animation, more modern — use `animaps-web/src` as base.
+### 1) Editorial → friendly/organic
 
-| Before (editorial) | After (friendly — `animaps-web` ref) |
+First implementation (editorial + Fraunces) felt too “newspaper”. Feedback: friendly, pastels, more animation — use `animaps-web/src` as base.
+
+### 2) Multi-pastel rainbow → pink + green product brand
+
+Landing now centers **brand pink + brand green** (with soft pastels). Display/body fonts: **Bagel Fat One** + **Nunito**. Account-first CTAs (“Criar conta”); no Problem section; no market-stats carousel.
+
+| Earlier | Current (`apps/web`) |
 |---|---|
-| Fraunces + DM Sans | **Sour Gummy** (body) + **Oi** (display) |
-| Single terracotta pastel | **Multi-pastel** palette (orange, blue, yellow, green, purple) + saturated CTAs/text |
-| Sticky minimal header | **BubbleMenu** (logo pill + round button + bubble panel) |
-| Sober split-text | GSAP timelines with `elastic.out` / `back.out` |
-| Diagonal dividers | Organic SVG **Waves** |
-| Line icons only | **`lucide-react`** in colored badges (custom composition — not loose generic) |
-| Grain/noise | Subtle thematic SVG pattern (strokes/dots at 3%) |
+| Sour Gummy + Oi (brief v1) | **Nunito** (body) + **Bagel Fat One** (display) |
+| Multi-pastel orange/blue/yellow/purple | **Pink `#e07a96` + green `#5faf6a`** + pastels |
+| Problem + SocialProof carousel | **Removed** — solutions/benefits only |
+| Waitlist-first copy | **Account language**; form still waitlist |
+| Newsletter-heavy footer | **Clean Tinder-inspired footer** + social text links |
 
 **Personality:** welcoming / human + playful / modern (trustworthy; drop “newspaper” tone).
 
@@ -29,11 +33,9 @@ Sources: Phase 1 decisions + visual design round + **post-feedback pivot** (base
 
 Convey **trust, warmth, and lightness** — modern, rounded, pastel-colored; human without childish; not AI-generic.
 
-**Direction:** **friendly-organic** — rounded type (Sour Gummy + Oi), blob `border-radius`, waves, multi-pastel, bounce/elastic motion.
+**Direction:** **friendly-organic** — Bagel Fat One + Nunito, blob frames, wave dividers, pink/green, bounce/elastic motion.
 
 Primary audience: guardians and NGOs (balanced voice). Clinics get a dedicated card; public agencies a light mention.
-
-**Implementation reference:** `animaps-web/src` (layout, motion, BubbleMenu, waves).
 
 ---
 
@@ -45,10 +47,10 @@ Final logo **does not exist yet**. Tokens in [`apps/web/src/app/globals.css`](..
 
 | Role | Tokens | Use |
 |---|---|---|
-| Neutral | `#F4F4F4` (`gray-soft`), `#333` (`ink`) | Page background, type |
-| Saturated brand | orange `#F89D1C`, blue `#00A0E3`, yellow `#FFD400`, green `#68BC45`, purple `#92278F` | CTAs, icons, emphasis text |
-| Pastel tints | `pastel-orange/blue/yellow/green/purple/sky` | Blobs, badges, section/card backgrounds |
-| Dark (rhythm) | `#333` / `#1a1a1a` | Problem / SocialProof / Footer |
+| Neutral | mint-cream / `gray-soft`, `#243028` (`ink`) | Page background, type |
+| Brand | pink `#e07a96`, green `#5faf6a` (+ hover variants) | CTAs, emphasis, icons |
+| Pastel tints | `pastel-pink`, `pastel-green`, `pastel-sky`, … | Section surfaces, ribbons, badges |
+| Dark (rhythm) | `#1a1214` / near-black | Footer |
 
 **AA contrast:** saturated on text/CTA; pastel on surfaces only. No dark-mode toggle.
 
@@ -56,12 +58,12 @@ Final logo **does not exist yet**. Tokens in [`apps/web/src/app/globals.css`](..
 
 | Use | Font | Notes |
 |---|---|---|
-| Display / section titles | **Oi** (`--font-display`) | **Only** section `h1`/`h2` — never FAQ questions, labels, cards, or stats |
-| Body / UI / FAQ / stats | **Sour Gummy** (`--font-sour-gummy`) | Weights 100–900; single friendly readable family |
+| Display / section titles | **Bagel Fat One** (`--font-display`) | Hero `h1`, section `h2`, CurvedLoop text, footer wordmark |
+| Body / UI / FAQ | **Nunito** (`--font-nunito` / sans) | Weights 400–800 |
 
 ### Logo
 
-- [ ] Concept (ANIMAPS + map/animal symbol — avoid isolated paw cliché; prefer human+animal interaction when illustrating)
+- [ ] Concept (ANIMAPS + map/animal symbol)
 - [ ] Variants: horizontal (header pill), icon (favicon / OG)
 - No dark mode this phase
 
@@ -71,15 +73,14 @@ Final logo **does not exist yet**. Tokens in [`apps/web/src/app/globals.css`](..
 
 | Decision | Choice |
 |---|---|
-| Overall style | Friendly-organic (rounded, colorful, bounce) |
-| Imagery | Real photos (stock); **blob** frame (organic `border-radius` + white border + soft shadow) |
+| Overall style | Friendly-organic (rounded, pink/green, bounce) |
+| Imagery | Real photos; **blob** frame (organic `border-radius` + white border + soft shadow) |
 | Hero video | No |
-| Shadows | Soft on cards/CTAs (not pure flat) |
+| Hero décor | Filled `PawPrint` icons (lucide) scattered at low–medium opacity (pink/green); soft pastel blobs |
+| Shadows | Soft on cards/CTAs |
 | Border-radius | `2rem`–`3rem` on cards; pills on buttons |
-| Background texture | Subtle SVG (not grain) |
-| Decor | Solid pastel blobs (blur/mix-blend on Hero) |
-| Dividers | SVG **Wave** (default) |
-| Iconography | `lucide-react` in colored circles/badges |
+| Dividers | SVG **Wave** (`SectionDivider`) |
+| Iconography | `lucide-react` in colored circles/badges; footer social = name + icon |
 
 ---
 
@@ -87,14 +88,42 @@ Final logo **does not exist yet**. Tokens in [`apps/web/src/app/globals.css`](..
 
 No Figma. Source of truth: this brief + code in `apps/web`.
 
+### Page order (`app/page.tsx`)
+
+1. Header (BubbleMenu)  
+2. Hero (taller ~88–92vh; paw field; photo + CTAs)  
+3. Solution  
+4. How it works (`bg-pastel-green`)  
+5. **CurvedLoop** (green ribbon, `bridgeAbove`)  
+6. Audience  
+7. Differentials  
+8. FAQ (`bg-pastel-pink`)  
+9. **CurvedLoop** (pink ribbon, `bridgeAbove`)  
+10. Waitlist / create-account form  
+11. Footer  
+
 ### Header (BubbleMenu)
 
-- Floating logo pill + round button (menu/X)
+- Floating logo pill + round button (menu/X) + optional “Criar conta”
 - Bubble panel with large links, slight rotation, pastel hover colors
+- Anchors: `#topo`, `#solucao`, `#como-funciona`, `#faq`, `#lista`
+
+### CurvedLoop (marquee ribbons)
+
+- Component: [`apps/web/src/components/bits/CurvedLoop.tsx`](../apps/web/src/components/bits/CurvedLoop.tsx)
+- Continuous sine ribbon (stroke) + upright per-letter wave
+- Prop **`bridgeAbove`**: solid fill from the previous section color down to the ribbon’s lower edge (same sine) so there is **no white gap** between FAQ↔pink ribbon or HowItWorks↔green ribbon
+- Phase-locked wavelength for seamless `-50%` marquee loop
 
 ### Footer
 
-- Dark + wave on top; newsletter; link columns in distinct pastels
+Model: clean multi-column + oversized cropped brand wordmark (Tinder-like structure, quieter ANIMAPS palette).
+
+- Dark `#1a1214` + wave on top (`SectionDivider` fill `gray-soft`)
+- Columns: brand blurb + language pill · Plataforma · Conta · Jurídico · Redes sociais
+- Social: **text link + icon on the right** (Instagram, TikTok, LinkedIn, YouTube) — no extra CTA card / pill button row
+- Giant **ANIMAPS** wordmark (Bagel Fat One, pink, cropped at bottom)
+- Keep `#privacidade` / `#termos` anchors for consent + form links
 
 ---
 
@@ -102,60 +131,62 @@ No Figma. Source of truth: this brief + code in `apps/web`.
 
 ### Design system (`apps/web/src/components/`)
 
-Reusable primitives for the whole platform (not landing-only):
-
 | Component | Role |
 |---|---|
-| `Button` | Pill CTA; variants `orange`/`blue`/`green`/`white`; prop `magnetic` (default `true`) |
-| `Input` | Pill field (`rounded-full`, soft border, brand-orange focus) + label |
-| `Select` | **Custom** dropdown (trigger + floating GSAP `back.out` panel, pastel options, check, keyboard/a11y) |
-| `Checkbox` | Custom box (border → brand-orange fill + animated Check); native input `sr-only` |
-| `AccordionItem` | Reusable disclosure (FAQ / future help) |
+| `Button` | Pill CTA; variants `pink` / `orange` (alias) / `blue` / `green` / `white`; circular fill hover; `magnetic` optional |
+| `Input` | Pill field + label |
+| `Select` | Custom dropdown (GSAP panel) |
+| `Checkbox` | Custom box + animated Check |
+| `AccordionItem` | FAQ disclosures |
+
+### Bits (`apps/web/src/components/bits/`)
+
+`ClickSpark`, `AnimatedContent`, `ScrollReveal`, `Magnet`, `TiltedCard`, `DotGrid`, `CurvedLoop`, …
 
 ### Marketing (`apps/web/src/features/landing/`)
 
-`Header` (BubbleMenu), `Hero`, `ProblemSection`, `SolutionSection`, `HowItWorks`, `AudienceCards`, `Differentials`, `SocialProofCarousel`, `FAQ`, `WaitlistForm`, `CookieBanner`, `Footer`, `OrganicBlob`, `SectionDivider` (wave).
+`Header`, `Hero`, `SolutionSection`, `HowItWorks`, `AudienceCards`, `Differentials`, `FAQ`, `WaitlistSection`, `Footer`, `OrganicBlob`, `SectionDivider`.
+
+**Removed from public flow:** `ProblemSection`, `SocialProofCarousel` (files may remain unused — do not reintroduce without product ask).
 
 ### Form patterns
 
-- **Dropdown:** never styled native `<select>` as final UI — use `Select`.
-- **Checkbox:** never native `accent-*` alone — use `Checkbox`.
-- **Buttons:** always `Button`; `magnetic={false}` in compact contexts (cookie banner, form submit).
+- Dropdown: use `Select`. Checkbox: use `Checkbox`. Buttons: use `Button`; `magnetic={false}` in compact contexts.
 
-### Scrollbar
+### Scrollbar & anchors
 
-- Global: thumb `brand-orange`, track `gray-soft`, thin (`scrollbar-width: thin` + webkit).
-- Utility `.scrollbar-clean` for horizontal overflow (e.g. social-proof carousel).
-- `scroll-padding-top: 6rem` on `html` for fixed BubbleMenu anchors.
+- Global thin scrollbar; thumb brand pink
+- `scroll-padding-top: 6rem` on `html`
+- In-page hash links use Lenis **`anchors`** (offset `-96`) for smooth section travel — see tech plan
 
 ---
 
 ## 6. Motion system
 
-Intensity: **expressive and playful** (`back.out` / `elastic.out`), without competing with reading. Cursor: browser default. Lenis kept.
+Intensity: **expressive and playful**, without competing with reading. Lenis kept but tuned for **light, easy page travel** (see tech plan).
 
 | Effect | Where | Tool |
 |---|---|---|
-| Entry timeline | Hero (text, blob pop, photo, CTA) | GSAP |
-| Bubble menu open/close | Header | GSAP `back.out` |
-| Scroll-in bounce | Cards / steps / stats / FAQ | ScrollTrigger + `back.out` |
-| Select open/close | `Select` panel | GSAP `back.out` |
-| Accordion height | `AccordionItem` / FAQ | GSAP height |
-| Hover lift / scale | Cards, menu buttons | CSS + GSAP |
-| Light parallax | Hero blob | ScrollTrigger scrub |
-| Magnetic CTA | `Button` when `magnetic` | pointer transform |
+| Entry timeline | Hero | GSAP |
+| Bubble menu | Header | GSAP `back.out` |
+| Scroll-in bounce | Cards / steps / FAQ | ScrollTrigger + `back.out` |
+| Accordion height | FAQ | GSAP height |
+| Light parallax | Hero blobs | ScrollTrigger `scrub: 0.6` |
+| Marquee ribbons | CurvedLoop | GSAP `x` loop |
+| Magnetic / fill hover | `Button` | pointer + clipPath |
+| Click sparks | Page wrapper | ClickSpark |
 
-Required: `prefers-reduced-motion` (Lenis off + timelines skip).
+Required: `prefers-reduced-motion` (Lenis off + timelines skip + native anchor fallback).
 
 ---
 
 ## 7. Anti “AI-generic” checklist
 
-- [ ] No cliché purple/blue **gradient** SaaS blobs — **solid** pastel palette colors
+- [ ] No cliché purple/indigo SaaS gradients — **pink + green** solid brand
 - [ ] No generic 3D illustrations
 - [ ] No Inter/Roboto as primary face
 - [ ] No identical floating white cards without hierarchy/color
-- [ ] Lucide OK **if** in colored badges with custom composition (not loose gray icons)
+- [ ] Lucide OK in colored badges / intentional décor (filled paws in Hero)
 
 ---
 
@@ -172,20 +203,20 @@ Required: `prefers-reduced-motion` (Lenis off + timelines skip).
 
 | Artifact | Status |
 |---|---|
-| Friendly pivot + `animaps-web` reference | Done |
-| Multi-pastel palette + Sour Gummy/Oi | Done in code |
-| Bounce/elastic motion + BubbleMenu + waves | Done in code |
-| Design system (`Button`, `Input`, `Select`, `Checkbox`, `Accordion`) | Done |
-| FAQ + custom scrollbar + anchor scroll-padding | Done |
+| Friendly pivot + pink/green + Bagel/Nunito | Done in code |
+| BubbleMenu + waves + bits (CurvedLoop, etc.) | Done in code |
+| Continuous ribbon bridges (`bridgeAbove`) | Done |
+| Clean footer + social links | Done |
+| Hero paw field + taller viewport | Done |
+| Design system primitives | Done |
 | Logo + favicon | Pending |
-| Stock photos | Pending (Hero placeholder) |
+| Final stock photos | Hero photo present; refine as needed |
 | Figma prototype | Cancelled |
 
 ---
 
 ## References
 
-- Base project: `animaps-web/src`
 - [`landing-content-brief.md`](landing-content-brief.md)
 - [`landing-tech-plan.md`](landing-tech-plan.md)
 - [`personas.md`](personas.md)
