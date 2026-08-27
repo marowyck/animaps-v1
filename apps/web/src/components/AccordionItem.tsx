@@ -69,7 +69,7 @@ export function AccordionItem({
   return (
     <div
       className={`overflow-hidden rounded-[2rem] border-2 border-border-soft bg-white shadow-sm transition-colors ${
-        open ? "border-brand-orange/40" : ""
+        open ? "border-brand-pink/40" : ""
       } ${className}`}
     >
       <button
@@ -78,14 +78,14 @@ export function AccordionItem({
         aria-expanded={open}
         aria-controls={panelId}
         onClick={() => setOpen((v) => !v)}
-        className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-orange"
+        className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-pink"
       >
         <span className="text-base font-black leading-snug text-ink md:text-lg">
           {question}
         </span>
         <span
           aria-hidden
-          className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-pastel-orange text-brand-orange transition-transform duration-300 ${
+          className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-pastel-pink text-brand-pink transition-transform duration-300 ${
             open ? "rotate-180" : ""
           }`}
         >

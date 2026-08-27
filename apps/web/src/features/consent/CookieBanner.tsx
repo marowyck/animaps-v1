@@ -41,7 +41,7 @@ export function CookieBanner() {
       <div className="mt-4 flex flex-wrap gap-3">
         <Button
           type="button"
-          variant="orange"
+          variant="pink"
           magnetic={false}
           className="!px-5 !py-2.5 !text-sm"
           onClick={() => choose("accepted")}

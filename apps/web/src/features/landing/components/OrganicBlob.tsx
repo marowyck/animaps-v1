@@ -1,10 +1,11 @@
 type OrganicBlobProps = {
   className?: string;
-  color?: "orange" | "blue" | "yellow" | "green" | "purple" | "sky";
+  color?: "pink" | "orange" | "blue" | "yellow" | "green" | "purple" | "sky";
 };
 
 const colorMap = {
-  orange: "bg-pastel-orange",
+  pink: "bg-pastel-pink",
+  orange: "bg-pastel-pink",
   blue: "bg-pastel-blue",
   yellow: "bg-pastel-yellow",
   green: "bg-pastel-green",

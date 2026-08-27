@@ -9,7 +9,7 @@ type InputProps = {
 } & Omit<InputHTMLAttributes<HTMLInputElement>, "className">;
 
 const fieldClass =
-  "w-full rounded-full border-2 border-border-soft bg-gray-soft px-5 py-3.5 font-bold text-ink outline-none transition-colors focus:border-brand-orange focus:bg-white disabled:opacity-60";
+  "w-full rounded-full border-2 border-border-soft bg-gray-soft px-5 py-3.5 font-bold text-ink outline-none transition-colors focus:border-brand-pink focus:bg-white disabled:opacity-60";
 
 export function Input({
   label,

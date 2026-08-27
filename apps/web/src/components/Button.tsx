@@ -3,10 +3,13 @@
 import {
   useCallback,
   useRef,
+  useState,
   type MouseEvent,
   type ReactNode,
   type RefObject,
 } from "react";
+import { gsap } from "gsap";
+import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
 
 type ButtonProps = {
   children: ReactNode;
@@ -15,18 +18,20 @@ type ButtonProps = {
   type?: "button" | "submit";
   className?: string;
   disabled?: boolean;
-  variant?: "orange" | "blue" | "green" | "white";
-  /** Magnetic hover effect — default true for CTAs; set false for compact UI (banners, forms). */
+  variant?: "pink" | "orange" | "blue" | "green" | "white";
   magnetic?: boolean;
 };
 
-const variantClass = {
-  orange:
-    "bg-brand-orange text-white hover:bg-brand-orange-hover shadow-lg",
-  blue: "bg-brand-blue text-white hover:bg-brand-blue-hover shadow-lg",
-  green: "bg-brand-green text-white hover:bg-brand-green-hover shadow-lg",
-  white:
-    "bg-white border-4 border-gray-soft text-ink hover:border-brand-orange hover:text-brand-orange shadow-sm",
+const FILL = {
+  pink: { base: "bg-brand-pink text-white", fill: "bg-brand-pink-hover", textHover: "" },
+  orange: { base: "bg-brand-pink text-white", fill: "bg-brand-pink-hover", textHover: "" },
+  blue: { base: "bg-brand-blue text-white", fill: "bg-brand-blue-hover", textHover: "" },
+  green: { base: "bg-brand-green text-white", fill: "bg-brand-green-hover", textHover: "" },
+  white: {
+    base: "bg-white border-2 border-brand-green/45 text-ink",
+    fill: "bg-brand-green",
+    textHover: "group-hover:text-white",
+  },
 } as const;
 
 export function Button({
@@ -36,45 +41,91 @@ export function Button({
   type = "button",
   className = "",
   disabled = false,
-  variant = "orange",
+  variant = "pink",
   magnetic = true,
 }: ButtonProps) {
   const ref = useRef<HTMLAnchorElement | HTMLButtonElement>(null);
+  const fillRef = useRef<HTMLSpanElement>(null);
+  const reduced = usePrefersReducedMotion();
+  const [hovered, setHovered] = useState(false);
+  const skin = FILL[variant];
 
   const handleMove = useCallback(
     (e: MouseEvent) => {
-      if (!magnetic) return;
+      if (!magnetic || reduced) return;
       const el = ref.current;
-      if (!el || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-        return;
-      }
+      if (!el) return;
       const rect = el.getBoundingClientRect();
       const x = e.clientX - rect.left - rect.width / 2;
       const y = e.clientY - rect.top - rect.height / 2;
-      el.style.transform = `translate(${x * 0.22}px, ${y * 0.22}px)`;
+      el.style.transform = `translate(${x * 0.12}px, ${y * 0.12}px)`;
     },
-    [magnetic],
+    [magnetic, reduced],
+  );
+
+  const handleEnter = useCallback(
+    (e: MouseEvent) => {
+      setHovered(true);
+      const fill = fillRef.current;
+      if (!fill || reduced) return;
+      const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+      const x = ((e.clientX - rect.left) / rect.width) * 100;
+      const y = ((e.clientY - rect.top) / rect.height) * 100;
+      gsap.set(fill, { clipPath: `circle(0% at ${x}% ${y}%)` });
+      gsap.to(fill, {
+        clipPath: `circle(150% at ${x}% ${y}%)`,
+        duration: 0.45,
+        ease: "power2.out",
+      });
+    },
+    [reduced],
   );
 
   const handleLeave = useCallback(() => {
+    setHovered(false);
     const el = ref.current;
-    if (!el) return;
-    el.style.transform = "translate(0, 0)";
-  }, []);
+    if (el) el.style.transform = "translate(0, 0)";
+    const fill = fillRef.current;
+    if (!fill || reduced) return;
+    gsap.to(fill, {
+      clipPath: "circle(0% at 50% 50%)",
+      duration: 0.35,
+      ease: "power2.in",
+    });
+  }, [reduced]);
 
-  const base = `inline-flex items-center justify-center gap-2 rounded-full px-8 py-4 text-lg font-black transition-[transform,background-color,border-color,color] duration-200 ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-orange disabled:opacity-60 ${variantClass[variant]}`;
+  const base = `group relative inline-flex min-h-12 min-w-[13.5rem] items-center justify-center gap-2 overflow-hidden rounded-full px-6 py-3 text-base font-semibold shadow-md transition-transform duration-200 ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-pink disabled:opacity-60 ${skin.base} ${className}`;
+
+  const content = (
+    <>
+      <span
+        ref={fillRef}
+        aria-hidden
+        className={`pointer-events-none absolute inset-0 z-0 ${skin.fill}`}
+        style={{ clipPath: "circle(0% at 50% 50%)" }}
+      />
+      <span
+        className={`relative z-10 inline-flex items-center gap-2 ${
+          variant === "white" && hovered ? "text-white" : ""
+        } ${skin.textHover}`}
+      >
+        {children}
+      </span>
+    </>
+  );
 
   if (href) {
     return (
       <a
         ref={ref as RefObject<HTMLAnchorElement>}
         href={href}
-        className={`${base} ${className}`}
+        className={base}
         onMouseMove={handleMove}
+        onMouseEnter={handleEnter}
         onMouseLeave={handleLeave}
         onClick={onClick}
       >
-        {children}
+        {content}
       </a>
     );
   }
@@ -84,12 +135,13 @@ export function Button({
       ref={ref as RefObject<HTMLButtonElement>}
       type={type}
       disabled={disabled}
-      className={`${base} ${className}`}
+      className={base}
       onMouseMove={handleMove}
+      onMouseEnter={handleEnter}
       onMouseLeave={handleLeave}
       onClick={onClick}
     >
-      {children}
+      {content}
     </button>
   );
 }

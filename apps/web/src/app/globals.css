@@ -2,30 +2,35 @@
 @import "lenis/dist/lenis.css";
 
 :root {
-  /* Neutrals */
-  --gray-soft: #f4f4f4;
-  --ink: #333333;
-  --ink-muted: #6b7280;
+  /* Neutrals — mint-cream */
+  --gray-soft: #f5faf6;
+  --ink: #243028;
+  --ink-muted: #5c6b62;
   --white: #ffffff;
-  --border-soft: #e5e7eb;
+  --border-soft: #d8e8dc;
 
-  /* Brand saturated (text / icons / CTAs — WCAG on light) */
-  --brand-orange: #f89d1c;
-  --brand-orange-hover: #e08a0f;
-  --brand-blue: #00a0e3;
-  --brand-blue-hover: #008fc9;
-  --brand-yellow: #ffd400;
-  --brand-green: #68bc45;
-  --brand-green-hover: #57a338;
-  --brand-purple: #92278f;
+  /* Brand — pink heart + green care */
+  --brand-pink: #e07a96;
+  --brand-pink-hover: #c96682;
+  --brand-green: #5faf6a;
+  --brand-green-hover: #4e9858;
+  --brand-blue: #5aafc4;
+  --brand-blue-hover: #4899ae;
+  --brand-yellow: #e8c85a;
+  --brand-purple: #a87aaa;
 
-  /* Pastel tints (surfaces / blobs / badges) */
-  --pastel-orange: #ffe4c4;
-  --pastel-blue: #d4eef9;
-  --pastel-yellow: #fff4b8;
-  --pastel-green: #d8f0c8;
-  --pastel-purple: #f0d4ee;
-  --pastel-sky: #e3f2fd;
+  /* Orange aliases → pink (legacy class names) */
+  --brand-orange: var(--brand-pink);
+  --brand-orange-hover: var(--brand-pink-hover);
+
+  /* Pastel tints */
+  --pastel-pink: #f8d9e4;
+  --pastel-green: #d4edd8;
+  --pastel-blue: #d2eaf1;
+  --pastel-yellow: #f5ecc0;
+  --pastel-purple: #ecd9ea;
+  --pastel-sky: #e6f3e9;
+  --pastel-orange: var(--pastel-pink);
 
   --background: var(--gray-soft);
   --foreground: var(--ink);
@@ -43,6 +48,8 @@
   --color-ink-muted: var(--ink-muted);
   --color-border-soft: var(--border-soft);
 
+  --color-brand-pink: var(--brand-pink);
+  --color-brand-pink-hover: var(--brand-pink-hover);
   --color-brand-orange: var(--brand-orange);
   --color-brand-orange-hover: var(--brand-orange-hover);
   --color-brand-blue: var(--brand-blue);
@@ -52,6 +59,7 @@
   --color-brand-green-hover: var(--brand-green-hover);
   --color-brand-purple: var(--brand-purple);
 
+  --color-pastel-pink: var(--pastel-pink);
   --color-pastel-orange: var(--pastel-orange);
   --color-pastel-blue: var(--pastel-blue);
   --color-pastel-yellow: var(--pastel-yellow);
@@ -59,25 +67,21 @@
   --color-pastel-purple: var(--pastel-purple);
   --color-pastel-sky: var(--pastel-sky);
 
-  --font-sans: var(--font-sour-gummy), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-display), cursive, ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-nunito), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-bagel), ui-rounded, ui-sans-serif, system-ui, sans-serif;
 
   --radius-lg: 2.5rem;
   --radius-md: 1.5rem;
   --radius-sm: 1rem;
 }
 
-/* No dark mode */
-
-/* Anchor offset for fixed BubbleMenu header */
 html {
   scroll-padding-top: 6rem;
 }
 
-/* Custom scrollbar — clean, brand-aligned */
 html {
   scrollbar-width: thin;
-  scrollbar-color: var(--brand-orange) var(--gray-soft);
+  scrollbar-color: var(--brand-pink) var(--gray-soft);
 }
 
 ::-webkit-scrollbar {
@@ -91,18 +95,18 @@ html {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--brand-orange);
+  background: var(--brand-pink);
   border-radius: 999px;
   border: 2px solid var(--gray-soft);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--brand-orange-hover);
+  background: var(--brand-pink-hover);
 }
 
 .scrollbar-clean {
   scrollbar-width: thin;
-  scrollbar-color: var(--brand-orange) var(--pastel-orange);
+  scrollbar-color: var(--brand-green) var(--pastel-green);
 }
 
 .scrollbar-clean::-webkit-scrollbar {
@@ -116,34 +120,55 @@ html {
 }
 
 .scrollbar-clean::-webkit-scrollbar-thumb {
-  background: var(--brand-orange);
+  background: var(--brand-green);
   border-radius: 999px;
   border: none;
 }
 
 body {
   background-color: var(--background);
-  background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10 10 C 20 20, 40 20, 50 10' stroke='%23000000' stroke-width='2' fill='none' opacity='0.03'/%3E%3Cpath d='M60 60 C 70 70, 90 70, 100 60' stroke='%23000000' stroke-width='2' fill='none' opacity='0.03'/%3E%3Ccircle cx='30' cy='80' r='5' fill='%23000000' opacity='0.03'/%3E%3C/svg%3E");
+  background-image: radial-gradient(
+    rgba(95, 175, 106, 0.07) 1.2px,
+    transparent 1.2px
+  );
+  background-size: 28px 28px;
   color: var(--foreground);
   font-family: var(--font-sans);
 }
 
 .font-display {
   font-family: var(--font-display);
+  letter-spacing: -0.02em;
 }
 
 .font-sans {
   font-family: var(--font-sans);
 }
 
-/* Organic blob photo mask via border-radius (amigável, não polygon) */
 .organic-blob {
   border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+}
+
+@keyframes curved-loop-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.curved-loop-track {
+  animation: curved-loop-marquee linear infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
   html.lenis,
   html.lenis body {
     scroll-behavior: auto !important;
+  }
+
+  .curved-loop-track {
+    animation: none !important;
   }
 }

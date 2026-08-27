@@ -244,8 +244,8 @@ export function Select({
         disabled={disabled}
         onClick={() => !disabled && setOpen((v) => !v)}
         onKeyDown={onTriggerKeyDown}
-        className={`flex w-full items-center justify-between gap-3 rounded-full border-2 bg-gray-soft px-5 py-3.5 text-left font-bold outline-none transition-colors focus:border-brand-orange focus:bg-white disabled:opacity-60 ${
-          open ? "border-brand-orange bg-white" : "border-border-soft"
+        className={`flex w-full items-center justify-between gap-3 rounded-full border-2 bg-gray-soft px-5 py-3.5 text-left font-bold outline-none transition-colors focus:border-brand-pink focus:bg-white disabled:opacity-60 ${
+          open ? "border-brand-pink bg-white" : "border-border-soft"
         } ${error ? "border-red-400" : ""} ${
           selected ? "text-ink" : "text-ink-muted"
         }`}
@@ -254,7 +254,7 @@ export function Select({
         <ChevronDown
           size={20}
           strokeWidth={2.5}
-          className={`shrink-0 text-brand-orange transition-transform duration-300 ${
+          className={`shrink-0 text-brand-pink transition-transform duration-300 ${
             open ? "rotate-180" : ""
           }`}
           aria-hidden
@@ -291,12 +291,12 @@ export function Select({
                 backgroundColor: isHighlighted
                   ? colors.bg
                   : isSelected
-                    ? "var(--pastel-orange)"
+                    ? "var(--pastel-pink)"
                     : "transparent",
                 color: isHighlighted
                   ? colors.text
                   : isSelected
-                    ? "var(--brand-orange)"
+                    ? "var(--brand-pink)"
                     : "var(--ink)",
               }}
             >

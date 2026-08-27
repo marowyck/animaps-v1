@@ -32,7 +32,7 @@ export function Checkbox({
         />
         <span
           aria-hidden
-          className="flex h-6 w-6 items-center justify-center rounded-lg border-2 border-border-soft bg-white transition-all duration-200 peer-checked:border-brand-orange peer-checked:bg-brand-orange peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-brand-orange group-hover:border-brand-orange/60"
+          className="flex h-6 w-6 items-center justify-center rounded-lg border-2 border-border-soft bg-white transition-all duration-200 peer-checked:border-brand-pink peer-checked:bg-brand-pink peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-brand-pink group-hover:border-brand-pink/60"
         >
           <Check
             size={16}
