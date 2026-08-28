@@ -97,10 +97,10 @@ export function WaitlistForm({
       noValidate
     >
       <div
-        className={`grid overflow-visible ${embedded ? "gap-2.5" : "gap-5"} sm:grid-cols-2`}
+        className={`grid overflow-visible ${embedded ? "grid-cols-2 gap-2.5" : "gap-5 sm:grid-cols-2"}`}
       >
         <Input
-          className="sm:col-span-2"
+          className="col-span-2"
           compact={embedded}
           label={t.form.name}
           name="name"
@@ -111,7 +111,7 @@ export function WaitlistForm({
         />
 
         <Input
-          className="sm:col-span-2"
+          className="col-span-2"
           compact={embedded}
           label={t.form.email}
           name="email"
@@ -123,7 +123,7 @@ export function WaitlistForm({
         />
 
         <Select
-          className="sm:col-span-2"
+          className="col-span-2"
           compact={embedded}
           label={t.form.profileType}
           name="profileType"

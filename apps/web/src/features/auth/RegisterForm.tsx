@@ -71,20 +71,20 @@ export function RegisterForm() {
     .replace("{total}", "2");
 
   return (
-    <div className="flex min-h-0 flex-col">
+    <div className="flex w-full flex-col pb-2">
       <div className="flex shrink-0 items-start justify-between gap-3">
-        <h1 className="font-display min-w-0 flex-1 text-2xl tracking-tight text-ink lg:text-[1.65rem]">
+        <h1 className="font-display min-w-0 flex-1 text-[1.35rem] leading-tight tracking-tight text-ink sm:text-2xl lg:text-[1.65rem]">
           {step === 1 ? t.auth.register.title : t.auth.register.step2Title}
         </h1>
         <span
-          className="mt-1 inline-flex shrink-0 items-center rounded-full border border-border-soft bg-gray-soft px-2.5 py-1 text-[0.7rem] font-bold tabular-nums tracking-tight text-ink-muted"
+          className="mt-0.5 inline-flex shrink-0 items-center rounded-full border border-border-soft bg-gray-soft px-2.5 py-1 text-[0.7rem] font-bold tabular-nums tracking-tight text-ink-muted"
           aria-label={stepLabel}
           aria-live="polite"
         >
           {step}/2
         </span>
       </div>
-      <p className="mt-1 shrink-0 text-xs leading-snug text-ink-muted line-clamp-2">
+      <p className="mt-1 shrink-0 text-xs leading-snug text-ink-muted sm:line-clamp-2">
         {step === 1
           ? t.auth.register.subtitle
           : t.auth.register.step2Subtitle}
@@ -92,7 +92,7 @@ export function RegisterForm() {
 
       {step === 1 ? (
         <>
-          <div className="mt-3 min-h-0">
+          <div className="mt-3">
             <WaitlistForm
               embedded
               initialValues={profile ?? undefined}
@@ -117,7 +117,7 @@ export function RegisterForm() {
       ) : (
         <form
           onSubmit={onPasswordSubmit}
-          className="mt-3 flex min-h-0 flex-col gap-3"
+          className="mt-3 flex flex-col gap-3"
           noValidate
         >
           <Input

@@ -19,11 +19,11 @@ export function LoginForm() {
   }
 
   return (
-    <div className="flex min-h-0 flex-col">
-      <h1 className="font-display shrink-0 text-2xl tracking-tight text-ink lg:text-[1.65rem]">
+    <div className="flex w-full flex-col pb-2">
+      <h1 className="font-display shrink-0 text-[1.35rem] leading-tight tracking-tight text-ink sm:text-2xl lg:text-[1.65rem]">
         {t.auth.login.title}
       </h1>
-      <p className="mt-1 shrink-0 text-xs leading-snug text-ink-muted line-clamp-2">
+      <p className="mt-1 shrink-0 text-xs leading-snug text-ink-muted sm:line-clamp-2">
         {t.auth.login.subtitle}
       </p>
 

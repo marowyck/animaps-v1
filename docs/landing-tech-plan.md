@@ -255,7 +255,8 @@ Required at launch:
 - [ ] Real mobile devices
 - [ ] Form submit (success, validation, rate limit) — feedback via **toasts**
 - [ ] PT ↔ EN ↔ ES switch from **Header menu**, **Footer**, and **auth** language menu (no URL change; preference persists)
-- [ ] Header shows **Log in** + **Create account** beside the menu toggle
+- [ ] Header shows **Log in** + **Create account** beside the menu toggle from `md` up; on small screens CTAs are menu-only (no chrome overflow)
+- [ ] Auth forms scroll on mobile (`safe-area` bottom padding); no overlapping LGPD / Google / Continuar controls
 - [ ] `/register` two-step signup (profile → strong password + reveal toggle) + waitlist submit; `/login` UI (Google CTA UI-only until OAuth)
 - [ ] Auth split layout: carousel (rescue/adoption/wildlife) + form column; step pill `n/2`; no logo in form chrome; no landing Header/Footer on auth routes
 - [ ] Landing CTAs navigate to `/register` (no in-page waitlist block)

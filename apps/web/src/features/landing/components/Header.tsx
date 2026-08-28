@@ -176,25 +176,38 @@ export function Header() {
   return (
     <div
       ref={containerRef}
-      className="pointer-events-none fixed inset-x-0 top-0 z-50 flex items-start justify-between gap-3 p-4 md:p-6"
+      className="pointer-events-none fixed inset-x-0 top-0 z-50 flex items-start justify-between gap-2 p-3 sm:gap-3 sm:p-4 md:p-6"
     >
       <a
         href="/#top"
-        className="pointer-events-auto flex cursor-pointer items-center gap-2 rounded-full bg-white/90 px-3 py-2 text-lg font-semibold text-ink shadow-sm backdrop-blur-sm"
+        className="pointer-events-auto flex max-w-[42%] cursor-pointer items-center gap-1.5 rounded-full bg-white/90 px-2.5 py-1.5 text-base font-semibold text-ink shadow-sm backdrop-blur-sm sm:max-w-none sm:gap-2 sm:px-3 sm:py-2 sm:text-lg"
       >
-        <PawPrint size={20} className="text-brand-pink" fill="currentColor" />
-        <span className="font-display tracking-tight">ANIMAPS</span>
+        <PawPrint size={18} className="shrink-0 text-brand-pink sm:size-5" fill="currentColor" />
+        <span className="font-display truncate tracking-tight">ANIMAPS</span>
       </a>
 
-      <div ref={clusterRef} className="pointer-events-auto relative">
-        <div className="flex items-center gap-1.5 rounded-full border border-white/70 bg-white/90 p-1.5 shadow-md backdrop-blur-md">
-          <Button href="/login" variant="white" size="sm" magnetic={false}>
+      <div ref={clusterRef} className="pointer-events-auto relative max-w-[58%] sm:max-w-none">
+        <div className="flex items-center gap-1 rounded-full border border-white/70 bg-white/90 p-1 shadow-md backdrop-blur-md sm:gap-1.5 sm:p-1.5">
+          {/* Full CTAs from md up — on small screens they live in the bubble menu */}
+          <Button
+            href="/login"
+            variant="white"
+            size="sm"
+            magnetic={false}
+            className="!hidden md:!inline-flex"
+          >
             <LogIn size={16} className="shrink-0" aria-hidden />
             <span>{t.nav.login}</span>
           </Button>
-          <Button href="/register" variant="pink" size="sm" magnetic={false}>
+          <Button
+            href="/register"
+            variant="pink"
+            size="sm"
+            magnetic={false}
+            className="!hidden md:!inline-flex"
+          >
             <PawPrint size={16} className="shrink-0" fill="currentColor" aria-hidden />
-            <span>{t.nav.createAccount}</span>
+            <span className="whitespace-nowrap">{t.nav.createAccount}</span>
           </Button>
           <Button
             type="button"
@@ -206,6 +219,7 @@ export function Header() {
             aria-controls="bubble-menu"
             aria-label={isOpen ? t.nav.closeMenu : t.nav.openMenu}
             onClick={() => setIsOpen((v) => !v)}
+            className="!size-10 sm:!size-11"
           >
             {isOpen ? <X size={20} strokeWidth={2.25} /> : <Menu size={20} strokeWidth={2.25} />}
           </Button>

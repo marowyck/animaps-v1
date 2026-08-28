@@ -116,9 +116,9 @@ No Figma. Source of truth: this brief + code in `apps/web`.
 ### Header (BubbleMenu)
 
 - Floating logo pill (left) + frosted chrome cluster (right):
-  - **Log in** — `Button` `white` / `sm` → `/login` (secondary)
-  - **Create account** — `Button` `pink` / `sm` → `/register` (primary)
-  - Icon menu toggle
+  - **Log in** — `Button` `white` / `sm` → `/login` (secondary) — **hidden below `md`** (available in bubble menu)
+  - **Create account** — `Button` `pink` / `sm` → `/register` (primary) — **hidden below `md`** (available in bubble menu)
+  - Icon menu toggle (always visible)
 - Menu toggle uses Button variant **`soft`**: **pastel green + brand-green icon** when closed; **brand pink** when open — never solid black/ink (breaks pink+green friendliness)
 - Bubble panel opens **below** the cluster (does not cover the CTAs or toggle); closes on toggle, outside click, Escape, or nav link
 - Nav rows: label + **lucide icon on the right**; slight rotation on open; pastel pink/green hover fills
