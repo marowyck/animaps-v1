@@ -3,7 +3,7 @@
 Content and strategy for the ANIMAPS institutional landing.  
 Sources: Phase 1 alignment decisions + [`ANIMAPS_Roadmap.md`](../ANIMAPS_Roadmap.md) §1.1–1.2 + [`personas.md`](personas.md).
 
-**Status:** decisions closed; public landing uses **account-first** CTAs (“Criar conta”) while the form still posts to the **waitlist** backend until auth ships.
+**Status:** decisions closed; public landing uses **account-first** CTAs (“Criar conta”) that navigate to **`/register`** (waitlist backend until auth ships). **`/login`** is a placeholder. In-page section hashes and app paths are **English**.
 
 ---
 
@@ -11,10 +11,12 @@ Sources: Phase 1 alignment decisions + [`ANIMAPS_Roadmap.md`](../ANIMAPS_Roadmap
 
 **Lead capture** focused on guardians/adopters (`guardian`), with **balanced** messaging for NGOs (`ngo`).
 
-- Hero primary CTA: **"Criar conta"** / create account (maps to waitlist form `#lista`)
+- Hero primary CTA: **"Criar conta"** / create account → **`/register`**
+- Secondary chrome: **Log in** → **`/login`**
 - Out of scope this phase: sponsorship, paid traffic, Meta Pixel, investor pages
 - Geographic framing: **national** (do not lock copy to a pilot city)
 - **No Problem section** on the public page — sell solutions/benefits only
+- **No waitlist/create-account block on `/`** — form lives only on `/register`
 
 ---
 
@@ -43,10 +45,14 @@ Post-launch review window: **2 weeks** (roadmap §1.7).
 
 ## 4. Tone of voice
 
-- **Emotional with real data**, not melodramatic.
-- Direct, human, responsible — avoid tech jargon.
-- Canonical matching term: **"Ideal Match"** / PT **"Match ideal"** (not “algorithm”, not “smart compatibility” in external copy).
-- Languages: **Portuguese + English** from launch (i18n strings; PT default).
+- **Warm and human**, not corporate or robotic — speak like a person who cares about animals.
+- **Clear with room to breathe** — not telegram-sparse, not fluffy. Prefer a short paragraph or two over one clipped line when context helps trust.
+- Direct, emotional with real care; avoid tech jargon and empty marketing adjectives.
+- Address the reader as **you**; concrete outcomes.
+- Canonical matching term: **"Ideal Match"** / PT **"Match ideal"** / ES **"Match ideal"** (not “algorithm”, not “smart compatibility” in external copy).
+- Languages: **Portuguese (default) + English + Spanish** via client dictionaries (no `/en` or `/es` routes). Keep the three locales in sync when editing copy.
+
+Copy source of truth: [`apps/web/src/i18n/messages/pt.ts`](../apps/web/src/i18n/messages/pt.ts) (then `en.ts`, `es.ts`).
 
 ---
 
@@ -70,17 +76,25 @@ Post-launch review window: **2 weeks** (roadmap §1.7).
 
 Canonical public order (matches `apps/web/src/app/page.tsx`):
 
-1. **Hero** — emotional line (*“O seu melhor amigo espera.”*) + CTAs “Criar conta” / “Ver como funciona” + pet photo; decorative filled paw prints in background.
+1. **Hero** — emotional line (*“O seu melhor amigo espera.”*) + CTAs “Criar conta” (`/register`) / “Ver como funciona” (`/#how-it-works`) + pet photo; decorative filled paw prints in background.
 2. **The Solution** — product benefits / Ideal Match + occurrence map; plain language (**no Problem section above**).
 3. **How it works** — steps: create account → profile → match/map → adopt; section surface **pastel green** (feeds green CurvedLoop bridge).
 4. **CurvedLoop (green)** — marquee; `bridgeAbove` continues green into the wave.
 5. **Who it’s for** — cards: Guardian, NGO, Clinic, Public agency / research.
 6. **Differentiators** — ANIMAPS features only (no competitor comparison table required).
-7. **FAQ** — launch, free?, Ideal Match, NGOs/clinics, urgency/map, LGPD, coverage, mobile app; surface **pastel pink**.
+7. **FAQ** — launch, free?, Ideal Match, NGOs/clinics, urgency/map, LGPD, coverage, mobile app; surface **pastel pink**; questions use shared `Button` (`cursor-pointer`).
 8. **CurvedLoop (pink)** — marquee; `bridgeAbove` continues pink into the wave.
-9. **Final CTA** — create-account / waitlist form + privacy link.
 
-**Footer:** brand blurb, platform/account/legal columns, social links (name + icon), language pill, oversized ANIMAPS wordmark. No newsletter CTA card.
+**Auth routes (English):**
+
+- **`/register`** — create-account / waitlist form + privacy link to `/#privacy`
+- **`/login`** — placeholder copy + CTAs to `/register` and home (real auth later)
+
+**Header chrome:** persistent **Create account** (`/register`) + menu (sections + register + login + language).
+
+**Footer:** brand blurb, platform/account/legal columns, social links (name + icon), **active PT | EN | ES** (`LocaleSwitcher`), oversized ANIMAPS wordmark. No newsletter CTA card. No locale URL prefixes.
+
+**Section hashes (English):** `#top`, `#solution`, `#how-it-works`, `#audience`, `#differentials`, `#faq`, `#privacy`, `#terms`.
 
 ---
 
@@ -99,7 +113,7 @@ Canonical public order (matches `apps/web/src/app/page.tsx`):
 ### Microcopy guidelines
 
 - User-language labels (“I’m a guardian / Want to adopt”, “I’m an NGO”, etc.).
-- Errors: specific and actionable (“Enter a valid email”).
+- Errors: specific and actionable (“Enter a valid email”). Client validation returns **message keys** mapped through i18n.
 - Success: immediate confirmation (account/waitlist framing).
 - No password or documents (`taxId`) this phase — interest only.
 - UI may say **create account**; backend remains waitlist until auth.
@@ -112,7 +126,7 @@ Canonical public order (matches `apps/web/src/app/page.tsx`):
 - Publish a **minimum** landing version covering: waitlist fields (name, email, profile type, city), consent basis, retention, LGPD rights.
 - Controller remains **TBD** until pre-launch ([`lgpd-checklist.md`](lgpd-checklist.md)).
 - Minimum terms for site use / waitlist capture.
-- Footer keeps `#privacidade` and `#termos` anchors.
+- Footer keeps `/#privacy` and `/#terms` anchors.
 
 ---
 
@@ -131,13 +145,14 @@ Execution backlog (§1.7):
 
 ## 10. Copy checklist before go-live
 
-- [ ] Hero headline + subheadline (PT and EN)
+- [ ] Hero headline + subheadline review (PT / EN / ES dictionaries) — warm, not sparse, not fluffy
 - [ ] Section copy with consistent “Ideal Match” / “Match ideal”
 - [ ] No Problem-section scare copy on public `/`
-- [ ] Form microcopy (labels, errors, success) PT and EN — account-facing where appropriate
+- [ ] Form microcopy (labels, errors, success) across locales — account-facing where appropriate
 - [ ] Adapted privacy policy + minimum terms
 - [ ] Official social profile URLs in Footer
-- [ ] Tone review (emotional ≠ melodramatic)
+- [ ] Tone review (warm/human ≠ melodramatic; not robotic)
+- [ ] Locale parity: same structure and length intent across `pt` / `en` / `es`
 
 ---
 

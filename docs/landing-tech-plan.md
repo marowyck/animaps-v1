@@ -3,7 +3,7 @@
 Technical plan for the ANIMAPS institutional landing.  
 Sources: Phase 1 decisions + visual design round + [`ANIMAPS_Roadmap.md`](../ANIMAPS_Roadmap.md) §1.4–1.6 + content/design briefs.
 
-**Status:** Pink/green friendly landing in [`apps/web`](../apps/web) (Bagel Fat One + Nunito, BubbleMenu, waves, React Bits, GSAP). Waitlist still placeholder (no Postgres). Public `/` only.
+**Status:** Pink/green friendly landing in [`apps/web`](../apps/web) (Bagel Fat One + Nunito, BubbleMenu, shared `Button` / `LocaleSwitcher`, waves, React Bits, GSAP, client i18n PT/EN/ES). Account capture on **`/register`** (waitlist API placeholder); **`/login`** placeholder. Public `/` is product-only.
 
 ---
 
@@ -72,18 +72,19 @@ Align with roadmap §0.6 (MVC on web):
 | Layer | Landing responsibility |
 |---|---|
 | **View** | React components (`Hero`, cards, form, footer) + Tailwind |
-| **Controller** | Next.js Server Actions / Route Handlers (waitlist submit, i18n routing) |
+| **Controller** | Next.js Server Actions / Route Handlers (waitlist submit) |
 | **Model** | Waitlist TypeScript types + minimal HTTP client until API |
 
 ### Components (`apps/web/src`)
 
 ```
 components/                    # design system (app-wide reuse)
-  Button.tsx
+  Button.tsx                   # shared CTAs + chrome (variants/sizes; cursor-pointer)
+  LocaleSwitcher.tsx           # PT | EN | ES (Header menu + Footer)
   Input.tsx
-  Select.tsx
+  Select.tsx                   # trigger composes Button field
   Checkbox.tsx
-  AccordionItem.tsx
+  AccordionItem.tsx            # question row composes Button ghost
   bits/                        # React Bits–style motion/décor
     CurvedLoop.tsx
     ClickSpark.tsx
@@ -91,21 +92,30 @@ components/                    # design system (app-wide reuse)
     TiltedCard.tsx
     …
 
+i18n/                          # client locale (no path prefixes)
+  LocaleProvider.tsx
+  locales.ts                   # LOCALES, storage key, detectBrowserLocale
+  messages/{pt,en,es}.ts
+  types.ts
+  index.ts
+
 app/
-  providers.tsx                # SmoothScrollProvider (Lenis + anchors + GSAP sync)
-  page.tsx                     # Landing composition
+  providers.tsx                # LocaleProvider outside Lenis; SmoothScrollProvider
+  page.tsx                     # Landing composition (no waitlist section)
+  register/page.tsx            # Create-account / waitlist form
+  login/page.tsx               # Login placeholder until auth
   api/waitlist/                # temporary Route Handler → Nest marketing Wave 2
 
 features/landing/components/
-  Header.tsx                   # BubbleMenu
+  Header.tsx                   # frosted CTA → /register + BubbleMenu + LocaleSwitcher
   Hero.tsx                     # taller viewport + filled PawPrint field
   SolutionSection.tsx
   HowItWorks.tsx               # bg-pastel-green (feeds green CurvedLoop bridge)
   AudienceCards.tsx
   Differentials.tsx
   FAQ.tsx                      # bg-pastel-pink (feeds pink CurvedLoop bridge)
-  WaitlistSection.tsx
-  Footer.tsx                   # clean columns + social + wordmark
+  WaitlistSection.tsx          # used on /register (not on /)
+  Footer.tsx                   # columns + LocaleSwitcher + social + wordmark
   OrganicBlob.tsx
   SectionDivider.tsx
 
@@ -115,15 +125,18 @@ features/consent/
 
 **Not in public page flow:** `ProblemSection`, `SocialProofCarousel`.
 
+**Button rule:** feature code must not hardcode styled `<button>` / CTA `<a>` — use `Button` or `LocaleSwitcher`. See design brief § Header / Button system.
+
 Visual specs: [`landing-design-brief.md`](landing-design-brief.md).
 
 ### Motion and performance
 
 - Prefer `transform` / `opacity` (compositor-friendly)
-- Check `prefers-reduced-motion` on Hero, BubbleMenu, Select, Accordion, Lenis, CurvedLoop
+- Check `prefers-reduced-motion` on Hero, BubbleMenu, Select, Accordion, Lenis, CurvedLoop, Button fill
 - Soft Hero parallax only
 - Disable Lenis under reduced motion; anchors still land with header offset
-- Global custom scrollbar; `scroll-padding-top` for fixed BubbleMenu
+- Global custom scrollbar; `scroll-padding-top` for fixed header chrome
+- `Button`: `magnetic` does **not** gate fill hover — fill stays on for `md` fill variants; `white` also has CSS green hover fallback
 
 ---
 
@@ -148,15 +161,21 @@ Requirements: server-side validation, basic rate limit, waitlist lead only (`Wai
 
 UI copy uses **account** language (“Criar conta”); storage remains waitlist until auth ships.
 
-Field/code names: **English** (`camelCase` API / `snake_case` DB); UI in PT/EN.
+Field/code names: **English** (`camelCase` API / `snake_case` DB); UI in **PT / EN / ES**.
 
 ---
 
-## 4. Internationalization (PT + EN)
+## 4. Internationalization (PT + EN + ES)
 
-- Default: **Portuguese**
-- Footer shows a disabled language pill (`português`) until i18n ships
-- Landing strings in dictionaries (`pt`, `en`) — to implement
+- Default: **Portuguese** (`pt`)
+- Also: **English** (`en`), **Spanish** (`es`)
+- **No locale path prefixes** (`/en`, `/es`) — same app routes; English path names: `/`, `/register`, `/login`, and section hashes `/#top`, `/#solution`, `/#how-it-works`, `/#audience`, `/#faq`, `/#privacy`, `/#terms`
+- Implementation: [`apps/web/src/i18n/`](../apps/web/src/i18n/) — typed message dictionaries + `LocaleProvider` / `useT()` / `useLocale()`
+- Preference: `localStorage` key `animaps-locale`; first visit falls back to `navigator.language`
+- Language UI: **`LocaleSwitcher`** in **Header bubble menu** and **Footer** (updates `document.documentElement.lang` + `document.title`)
+- Provider wraps the app **outside** Lenis so locale works with reduced motion
+- SSR metadata in `layout.tsx` stays PT default; client syncs title after hydrate
+- Nav keys include `language` / `languageAria` for the in-menu label
 
 ---
 
@@ -167,7 +186,7 @@ Field/code names: **English** (`camelCase` API / `snake_case` DB); UI in PT/EN.
 | GA4 | **Yes** — measure origin and conversion |
 | Meta Pixel | **No** |
 | Minimum events | `cta_click`, `waitlist_submit`, (optional) `scroll_depth` |
-| Cookie banner | **Yes**, simple (accept / reject non-essential) |
+| Cookie banner | **Yes**, simple (accept / reject non-essential) via `Button` |
 | GA4 load | **After** consent for non-essential cookies |
 
 ---
@@ -202,7 +221,13 @@ Required at launch:
 - [ ] Cross-browser: Chrome, Safari, Firefox
 - [ ] Real mobile devices
 - [ ] Form submit (success, validation, rate limit)
-- [ ] PT ↔ EN switch
+- [ ] PT ↔ EN ↔ ES switch from **Header menu** and **Footer** (no URL change; preference persists)
+- [ ] `/register` form submit; `/login` placeholder links to register + home
+- [ ] Landing CTAs navigate to `/register` (no in-page waitlist block)
+- [ ] English hashes: `/#top`, `/#solution`, `/#how-it-works`, `/#audience`, `/#faq`, `/#privacy`, `/#terms`
+- [ ] Bubble menu: opens below CTA; closes via toggle / outside / Escape / nav click
+- [ ] Soft menu toggle: green when closed, pink when open
+- [ ] `Button` hovers (esp. `white` secondary CTA green fill)
 - [ ] Cookie banner + GA4 only post-consent
 - [ ] Smooth hash scroll (buttons/menu → sections) feels continuous under Lenis
 - [ ] CurvedLoop bridges: no white gap under FAQ (pink) / HowItWorks (green)
@@ -217,11 +242,14 @@ Required at launch:
 2. ~~Design tokens + fonts + `SmoothScrollProvider`~~ — **done** (Bagel Fat One + Nunito; Lenis anchors tuned)
 3. ~~Header + Hero + bits + section flow~~ — **done**
 4. ~~WaitlistForm + `/api/waitlist` placeholder~~ — **done**
-5. Final PT/EN copy + assets (logo, social URLs)
-6. Real waitlist persistence + i18n
-7. Cookie banner → GA4 post-consent + events
-8. SEO + Lighthouse >90
-9. Domain + Vercel production deploy
+5. ~~Client i18n PT/EN/ES + LocaleSwitcher~~ — **done**
+6. ~~Shared `Button` / Header chrome polish~~ — **done**
+7. ~~`/register` + `/login`; English section hashes; waitlist off landing~~ — **done**
+8. Final copy polish + assets (logo, social URLs)
+9. Real waitlist persistence + real auth for `/login`
+10. Cookie banner → GA4 post-consent + events
+11. SEO + Lighthouse >90
+12. Domain + Vercel production deploy
 
 **Run locally:** from root, `pnpm dev` (filters `@animaps/web`).
 
