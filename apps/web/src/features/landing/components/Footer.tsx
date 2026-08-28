@@ -140,7 +140,7 @@ export function Footer({
               {t.footer.blurb}
             </p>
             <div className="mt-5">
-              <LocaleSwitcher tone="dark" aria-label={t.footer.languageAria} />
+              <LocaleSwitcher tone="dark" variant="menu" aria-label={t.footer.languageAria} />
             </div>
           </div>
 

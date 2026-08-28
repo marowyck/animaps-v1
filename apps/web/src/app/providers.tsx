@@ -5,6 +5,7 @@ import { ReactLenis, useLenis } from "lenis/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { LocaleProvider } from "@/i18n";
+import { ToastProvider } from "@/components/Toast";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -126,7 +127,9 @@ function SmoothScrollInner({ children }: { children: ReactNode }) {
 export function SmoothScrollProvider({ children }: { children: ReactNode }) {
   return (
     <LocaleProvider>
-      <SmoothScrollInner>{children}</SmoothScrollInner>
+      <ToastProvider>
+        <SmoothScrollInner>{children}</SmoothScrollInner>
+      </ToastProvider>
     </LocaleProvider>
   );
 }

@@ -2,6 +2,7 @@ export {
   LOCALES,
   DEFAULT_LOCALE,
   LOCALE_LABELS,
+  LOCALE_NAMES,
   HTML_LANG,
   type Locale,
 } from "./locales";
