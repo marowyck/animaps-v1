@@ -15,8 +15,16 @@ type CurvedLoopProps = {
   amplitude?: number;
   wavelength?: number;
   ribbonThickness?: number;
-  /** Fill pink/green from above down to the ribbon wave (covers gap under previous section). */
+  /** Fill from above down to the ribbon wave (covers gap under previous section). */
   bridgeAbove?: boolean;
+  bridgeAboveFill?: string;
+  /**
+   * Fill from the ribbon’s lower sine edge downward (e.g. footer `#1a1214`)
+   * so the marquee text rides the same wave as the dark section below.
+   */
+  bridgeBelow?: boolean;
+  bridgeBelowFill?: string;
+  bridgeBelowExtend?: number;
 };
 
 /** Single continuous sine centerline — stroke fills the ribbon without polygon seams. */
@@ -43,7 +51,7 @@ function buildCenterlinePath(
  * Solid fill from above the band down to the lower edge of the wavy ribbon —
  * same sine as the stroke, so it reads as one continuous “ondinha”.
  */
-function buildBridgePath(
+function buildBridgeAbovePath(
   width: number,
   amplitude: number,
   wavelength: number,
@@ -73,9 +81,41 @@ function buildBridgePath(
   return `${d} Z`;
 }
 
+/** Solid fill from the ribbon’s lower sine edge down (footer / next section). */
+function buildBridgeBelowPath(
+  width: number,
+  amplitude: number,
+  wavelength: number,
+  centerY: number,
+  thickness: number,
+  extendDown: number,
+) {
+  if (width <= 0 || extendDown <= 0) return "";
+  const step = 3;
+  const pad = 2;
+  const half = thickness / 2;
+  const bottomY = centerY + amplitude + half + extendDown;
+
+  const topEdge: string[] = [];
+  for (let x = -pad; x <= width + pad; x += step) {
+    const y = centerY + Math.sin(x / wavelength) * amplitude + half;
+    topEdge.push(`${x},${y.toFixed(2)}`);
+  }
+  const endX = width + pad;
+  const endY =
+    centerY + Math.sin(endX / wavelength) * amplitude + half;
+  topEdge.push(`${endX},${endY.toFixed(2)}`);
+
+  let d = `M ${topEdge[0]}`;
+  for (let i = 1; i < topEdge.length; i++) d += ` L ${topEdge[i]}`;
+  d += ` L ${endX},${bottomY}`;
+  d += ` L ${-pad},${bottomY}`;
+  return `${d} Z`;
+}
+
 /**
  * Infinite marquee with one continuous wavy ribbon (no seam between loops).
- * With bridgeAbove, a solid fill meets the previous section and ends as the wave.
+ * bridgeAbove / bridgeBelow paint the same sine so text rides the section join.
  */
 export default function CurvedLoop({
   marqueeText,
@@ -88,6 +128,10 @@ export default function CurvedLoop({
   wavelength = 88,
   ribbonThickness = 52,
   bridgeAbove = false,
+  bridgeAboveFill,
+  bridgeBelow = false,
+  bridgeBelowFill = "#1a1214",
+  bridgeBelowExtend = 96,
 }: CurvedLoopProps) {
   const reduced = usePrefersReducedMotion();
   const trackRef = useRef<HTMLDivElement>(null);
@@ -103,8 +147,8 @@ export default function CurvedLoop({
 
   const bandH = ribbonThickness + amplitude * 2 + 28;
   const centerY = bandH / 2;
-  // Enough to cover the white gap under the previous section (FAQ, etc.)
-  const bridgeExtend = bridgeAbove ? 120 : 0;
+  const bridgeExtendUp = bridgeAbove ? 120 : 0;
+  const bridgeExtendDown = bridgeBelow ? bridgeBelowExtend : 0;
 
   const halfW = textWidth / 2;
   const periodHint = 2 * Math.PI * wavelength;
@@ -167,30 +211,47 @@ export default function CurvedLoop({
   );
 
   const ribbonD = buildCenterlinePath(textWidth, amplitude, wl, centerY);
-  const bridgeD = bridgeAbove
-    ? buildBridgePath(
+  const bridgeAboveD = bridgeAbove
+    ? buildBridgeAbovePath(
         textWidth,
         amplitude,
         wl,
         centerY,
         ribbonThickness,
-        bridgeExtend,
+        bridgeExtendUp,
+      )
+    : "";
+  const bridgeBelowD = bridgeBelow
+    ? buildBridgeBelowPath(
+        textWidth,
+        amplitude,
+        wl,
+        centerY,
+        ribbonThickness,
+        bridgeExtendDown,
       )
     : "";
 
-  const svgH = bandH + bridgeExtend;
-  const svgTop = bridgeAbove ? -bridgeExtend : 0;
+  const svgH = bandH + bridgeExtendUp + bridgeExtendDown;
+  const svgTop = bridgeAbove ? -bridgeExtendUp : 0;
 
   return (
     <section
-      className={`relative z-10 overflow-x-hidden overflow-y-visible bg-transparent ${bridgeAbove ? "-mt-1 pt-0 pb-2" : "py-2"} ${className}`}
+      className={`relative z-10 overflow-x-hidden overflow-y-visible ${
+        bridgeAbove || bridgeBelow ? "-mt-1 pt-0 pb-0" : "bg-transparent py-2"
+      } ${className}`}
       aria-hidden
+      style={
+        bridgeBelow
+          ? { marginBottom: -Math.min(bridgeExtendDown, 72) }
+          : undefined
+      }
     >
       <div className="overflow-x-hidden overflow-y-visible">
         <div
           ref={trackRef}
           className="relative w-max will-change-transform"
-          style={{ height: bandH }}
+          style={{ height: bandH + bridgeExtendDown }}
         >
           {textWidth > 0 && ribbonD ? (
             <svg
@@ -204,8 +265,11 @@ export default function CurvedLoop({
                 overflow: "visible",
               }}
             >
-              {bridgeD ? (
-                <path d={bridgeD} fill={ribbonFill} />
+              {bridgeAboveD ? (
+                <path d={bridgeAboveD} fill={bridgeAboveFill ?? ribbonFill} />
+              ) : null}
+              {bridgeBelowD ? (
+                <path d={bridgeBelowD} fill={bridgeBelowFill} />
               ) : null}
               <path
                 d={ribbonD}
@@ -220,7 +284,8 @@ export default function CurvedLoop({
 
           <div
             ref={textRef}
-            className="relative z-10 flex h-full items-center whitespace-nowrap px-1"
+            className="relative z-10 flex items-center whitespace-nowrap px-1"
+            style={{ height: bandH }}
           >
             {chars.map((ch, i) => (
               <span

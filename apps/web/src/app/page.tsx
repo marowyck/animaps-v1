@@ -8,13 +8,15 @@ import {
   AudienceCards,
   Differentials,
   FAQ,
-  WaitlistSection,
   Footer,
 } from "@/features/landing";
 import { CookieBanner } from "@/features/consent";
 import { ClickSpark, CurvedLoop } from "@/components/bits";
+import { useT } from "@/i18n";
 
 export default function HomePage() {
+  const t = useT();
+
   return (
     <ClickSpark sparkColor="#e07a96" sparkSize={10} sparkRadius={18} sparkCount={9}>
       <Header />
@@ -24,7 +26,7 @@ export default function HomePage() {
         <HowItWorks />
 
         <CurvedLoop
-          marqueeText="Match ideal · Adoção com cuidado · Crie sua conta"
+          marqueeText={t.marquees.green}
           speed={40}
           ribbonFill="var(--pastel-green)"
           bridgeAbove
@@ -35,16 +37,17 @@ export default function HomePage() {
         <FAQ />
 
         <CurvedLoop
-          marqueeText="Seu match espera · Entre na plataforma"
+          marqueeText={t.marquees.pink}
           speed={42}
           direction="right"
           ribbonFill="var(--pastel-pink)"
           bridgeAbove
+          bridgeBelow
+          bridgeBelowFill="#1a1214"
+          className="bg-pastel-pink"
         />
-
-        <WaitlistSection />
       </main>
-      <Footer />
+      <Footer showDivider={false} />
       <CookieBanner />
     </ClickSpark>
   );
