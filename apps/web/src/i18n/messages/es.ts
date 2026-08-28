@@ -214,11 +214,65 @@ export const es: Messages = {
     closing:
       "Toda adopción empieza con un encuentro. Todo cambio empieza con un sí.",
   },
-  login: {
-    title: "Entrar en ANIMAPS",
-    body: "El inicio de sesión completo todavía está en camino. Por ahora, crea tu cuenta para asegurar prioridad en el piloto — te avisamos cuando el acceso esté listo.",
-    ctaRegister: "Crear cuenta",
-    ctaHome: "Volver al inicio",
+  auth: {
+    google: "Entrar con Google",
+    googleSoon: "El acceso con Google llega pronto.",
+    or: "o",
+    brandHomeAria: "ANIMAPS — volver al inicio",
+    showPassword: "Mostrar contraseña",
+    hidePassword: "Ocultar contraseña",
+    slides: {
+      rescue: {
+        title: "Cada rescate empieza con un gesto.",
+        body: "Cuando alguien actúa a tiempo, una vida gana otra oportunidad — y la red de cuidado crece.",
+        imageAlt: "Voluntario acogiendo a un cachorro rescatado envuelto en una toalla",
+      },
+      adoption: {
+        title: "El match correcto lo cambia todo.",
+        body: "Adoptar con cariño es encontrar el animal que encaja con tu rutina — y dar un hogar de verdad.",
+        imageAlt: "Niño abrazando a un perro recién adoptado en un porche soleado",
+      },
+      wildlife: {
+        title: "La fauna también nos necesita.",
+        body: "Proteger animales silvestres es cuidar el equilibrio del bosque y el futuro que compartimos.",
+        imageAlt: "Ave silvestre posada en una rama en el bosque atlántico",
+      },
+    },
+    register: {
+      title: "Crea tu cuenta",
+      subtitle: "Primero tus datos — luego una contraseña fuerte para proteger tu cuenta.",
+      step2Title: "Crea tu contraseña",
+      step2Subtitle:
+        "Usa una mayúscula y un carácter especial. Confirma para terminar el registro.",
+      stepOf: "Paso {current} de {total}",
+      continue: "Continuar",
+      back: "Volver",
+      password: "Contraseña",
+      confirmPassword: "Confirmar contraseña",
+      passwordHint: "Requisitos de la contraseña",
+      passwordRules: {
+        minLength: "Al menos 8 caracteres",
+        uppercase: "Al menos una letra mayúscula",
+        special: "Al menos un carácter especial",
+      },
+      errors: {
+        passwordRequired: "Completa la contraseña y la confirmación.",
+        passwordWeak: "La contraseña aún no cumple los requisitos.",
+        passwordMismatch: "Las contraseñas no coinciden.",
+      },
+      hasAccount: "¿Ya tienes cuenta?",
+      loginLink: "Iniciar sesión",
+    },
+    login: {
+      title: "Entrar en ANIMAPS",
+      subtitle: "Accede a tu cuenta para seguir cuidando — match, mapa y adopción en un solo lugar.",
+      email: "Correo",
+      password: "Contraseña",
+      submit: "Entrar",
+      noAccount: "¿Aún no tienes cuenta?",
+      registerLink: "Crear cuenta",
+      soon: "El inicio de sesión completo todavía está en camino. Por ahora, crea tu cuenta para asegurar prioridad.",
+    },
   },
   form: {
     name: "Nombre",

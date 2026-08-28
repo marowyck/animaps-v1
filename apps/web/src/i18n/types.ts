@@ -115,11 +115,52 @@ export type Messages = {
     body: string;
     closing: string;
   };
-  login: {
-    title: string;
-    body: string;
-    ctaRegister: string;
-    ctaHome: string;
+  auth: {
+    google: string;
+    googleSoon: string;
+    or: string;
+    brandHomeAria: string;
+    showPassword: string;
+    hidePassword: string;
+    slides: {
+      rescue: { title: string; body: string; imageAlt: string };
+      adoption: { title: string; body: string; imageAlt: string };
+      wildlife: { title: string; body: string; imageAlt: string };
+    };
+    register: {
+      title: string;
+      subtitle: string;
+      step2Title: string;
+      step2Subtitle: string;
+      stepOf: string;
+      continue: string;
+      back: string;
+      password: string;
+      confirmPassword: string;
+      passwordHint: string;
+      passwordRules: {
+        minLength: string;
+        uppercase: string;
+        special: string;
+      };
+      errors: {
+        passwordRequired: string;
+        passwordWeak: string;
+        passwordMismatch: string;
+      };
+      hasAccount: string;
+      loginLink: string;
+    };
+    login: {
+      title: string;
+      subtitle: string;
+      email: string;
+      password: string;
+      submit: string;
+      noAccount: string;
+      registerLink: string;
+      soon: string;
+    };
   };
   form: {
     name: string;

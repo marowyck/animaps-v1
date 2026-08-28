@@ -29,6 +29,7 @@ type SelectProps = {
   disabled?: boolean;
   className?: string;
   error?: string;
+  compact?: boolean;
 };
 
 const HOVER_COLORS = [
@@ -55,6 +56,7 @@ export function Select({
   disabled = false,
   className = "",
   error,
+  compact = false,
 }: SelectProps) {
   const [open, setOpen] = useState(false);
   const [highlight, setHighlight] = useState(-1);
@@ -216,7 +218,10 @@ export function Select({
 
   return (
     <div ref={rootRef} className={`relative block ${className}`}>
-      <span id={labelId} className="mb-1.5 block text-sm font-bold text-ink">
+      <span
+        id={labelId}
+        className="mb-1.5 block text-sm font-bold text-ink"
+      >
         {label}
         {required ? <span className="sr-only"> (obrigatório)</span> : null}
       </span>
@@ -250,7 +255,9 @@ export function Select({
         onKeyDown={onTriggerKeyDown}
         className={`${open ? "border-brand-pink bg-white" : ""} ${
           error ? "border-red-400" : ""
-        } ${selected ? "text-ink" : "text-ink-muted"}`}
+        } ${selected ? "text-ink" : "text-ink-muted"} ${
+          compact ? "!px-5 !py-3 !text-[0.95rem]" : ""
+        }`}
       >
         <span className="truncate">{displayLabel}</span>
         <ChevronDown

@@ -214,11 +214,65 @@ export const en: Messages = {
     closing:
       "Every adoption starts with a meeting. Every change starts with a yes.",
   },
-  login: {
-    title: "Log in to ANIMAPS",
-    body: "Full login is still on the way. For now, create your account to secure early pilot access — we’ll let you know when sign-in is ready.",
-    ctaRegister: "Create account",
-    ctaHome: "Back to home",
+  auth: {
+    google: "Continue with Google",
+    googleSoon: "Google sign-in is coming soon.",
+    or: "or",
+    brandHomeAria: "ANIMAPS — back to home",
+    showPassword: "Show password",
+    hidePassword: "Hide password",
+    slides: {
+      rescue: {
+        title: "Every rescue starts with one gesture.",
+        body: "When someone acts in time, a life gets another chance — and the care network grows.",
+        imageAlt: "Volunteer comforting a rescued puppy wrapped in a towel",
+      },
+      adoption: {
+        title: "The right match changes everything.",
+        body: "Adopting with care means finding the animal that fits your life — and giving a real home.",
+        imageAlt: "Child hugging a newly adopted dog on a sunny porch",
+      },
+      wildlife: {
+        title: "Wildlife needs us too.",
+        body: "Protecting wild animals means caring for the forest’s balance and the future we share.",
+        imageAlt: "Wild bird perched on a branch in the Atlantic forest",
+      },
+    },
+    register: {
+      title: "Create your account",
+      subtitle: "First your details — then a strong password to protect your account.",
+      step2Title: "Create your password",
+      step2Subtitle:
+        "Use an uppercase letter and a special character. Confirm to finish signup.",
+      stepOf: "Step {current} of {total}",
+      continue: "Continue",
+      back: "Back",
+      password: "Password",
+      confirmPassword: "Confirm password",
+      passwordHint: "Password requirements",
+      passwordRules: {
+        minLength: "At least 8 characters",
+        uppercase: "At least one uppercase letter",
+        special: "At least one special character",
+      },
+      errors: {
+        passwordRequired: "Enter your password and confirmation.",
+        passwordWeak: "Your password doesn’t meet the requirements yet.",
+        passwordMismatch: "Passwords don’t match.",
+      },
+      hasAccount: "Already have an account?",
+      loginLink: "Log in",
+    },
+    login: {
+      title: "Log in to ANIMAPS",
+      subtitle: "Sign in to keep caring — match, map, and adoption in one place.",
+      email: "Email",
+      password: "Password",
+      submit: "Log in",
+      noAccount: "Don’t have an account yet?",
+      registerLink: "Create account",
+      soon: "Full login is still on the way. For now, create your account to secure early access.",
+    },
   },
   form: {
     name: "Name",
