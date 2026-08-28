@@ -55,7 +55,7 @@ Sources: [`der.dbml`](der.dbml) · [`schema.prisma`](schema.prisma) · [`bounded
 | `id` | `id` | uuid | yes | gen | PK |
 | `name` | `name` | varchar | yes | — | |
 | `email` | `email` | varchar | yes | — | UNIQUE · **PII** |
-| `password_hash` | — | varchar | no* | null | Never expose · **PII** · *app: hash OR external identity |
+| `password_hash` | — | varchar | no* | null | Never expose · **PII** · email/password register (hashed) **or** external identity (Google/OAuth). Never store on `waitlist_entries`. |
 | `role` | `role` | `user_role` | yes | — | |
 | `phone` | `phone` | varchar | no | null | **PII** |
 | `city` | `city` | varchar | no | null | |
@@ -259,18 +259,22 @@ Sources: [`der.dbml`](der.dbml) · [`schema.prisma`](schema.prisma) · [`bounded
 
 ## `waitlist_entries`
 
+Marketing lead from **`/register` step 1** (profile + LGPD). **Step 2 password is UI-only today** and must never be columns on this table — credentials belong on `users.password_hash` when identity auth ships.
+
 | DB | API | Type | Req | Default | Notes |
 |---|---|---|---|---|---|
 | `id` | `id` | uuid | yes | gen | PK |
 | `name` | `name` | varchar | yes | — | **PII** |
 | `email` | `email` | varchar | yes | — | UNIQUE · **PII** |
-| `profile_type` | `profileType` | `waitlist_profile_type` | yes | — | Landing form |
+| `profile_type` | `profileType` | `waitlist_profile_type` | yes | — | Register step 1 (`guardian` / `ngo` / `clinic` / `other`) |
 | `city` | `city` | varchar | no | null | |
 | `state` | `state` | varchar | no | null | |
 | `lgpd_consent_at` | `lgpdConsentAt` | timestamptz | yes | — | Consent timestamp |
 | `created_at` | `createdAt` | timestamptz | yes | now() | |
 
 **Indexes:** UNIQUE (`email`); (`created_at`).
+
+**Out of scope on this table:** `password_hash`, OAuth tokens, locale preference (client `localStorage` only).
 
 ---
 

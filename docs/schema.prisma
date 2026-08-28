@@ -111,7 +111,8 @@ enum OccurrenceReportReason {
   inappropriate_content
 }
 
-/// Waitlist lead profile (landing form) — distinct from UserRole (product accounts).
+/// Waitlist lead profile from `/register` step 1 — distinct from UserRole (product accounts).
+/// Do not store passwords here; credentials belong on `User.passwordHash` when identity auth ships.
 enum WaitlistProfileType {
   guardian
   ngo
@@ -150,7 +151,9 @@ model User {
   id              String    @id @default(uuid()) @db.Uuid
   name            String
   email           String    @unique
-  /// Nullable for future OAuth — app rule: passwordHash OR external identity required.
+  /// Hashed credential for email/password register (UI: min 8, uppercase, special).
+  /// Nullable for Google/OAuth — app rule: passwordHash OR external identity required.
+  /// Never store plaintext; never put passwords on WaitlistEntry.
   passwordHash    String?   @map("password_hash")
   role            UserRole
   phone           String?
@@ -396,6 +399,9 @@ model DevicePushToken {
   @@map("device_push_tokens")
 }
 
+/// Marketing lead from `/register` step 1 (name, email, profile, city/state, LGPD).
+/// Step 2 password is validated in the web UI only today and must NOT be persisted here.
+/// When identity auth ships: create `User` (+ hash) and optionally link/convert this lead.
 model WaitlistEntry {
   id              String              @id @default(uuid()) @db.Uuid
   name            String

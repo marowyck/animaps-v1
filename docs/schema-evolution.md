@@ -37,8 +37,11 @@ Clients (`apps/web`, future `apps/mobile`) **never** access Postgres. Sync via A
 
 ## Auth evolution
 
-- `passwordHash` is nullable so OAuth can land without a full `AuthProvider` table yet.
+- `/register` is a **two-step UI**: (1) profile lead → `waitlist_entries`; (2) strong password validated client-side only until identity auth persists a hash on `users.password_hash`.
+- **Never** add password columns to `waitlist_entries`.
+- `passwordHash` is nullable so Google/OAuth can land without a full `AuthProvider` table yet.
 - App rule until then: require `passwordHash` **or** an external identity (document when OAuth ships).
+- Google CTA on web is UI-only today; add an identity/provider table only when OAuth is implemented (additive).
 
 ## Ownership checks
 

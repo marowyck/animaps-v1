@@ -4,7 +4,7 @@
 
 Project animaps {
   database_type: 'PostgreSQL'
-  Note: 'Responsible adoption + georeferenced animal occurrences'
+  Note: 'Responsible adoption + georeferenced animal occurrences. /register is two-step UI: waitlist_entries stores the lead only; password hashes belong on users.password_hash when identity auth ships (never on waitlist).'
 }
 
 Enum user_role {
@@ -138,7 +138,7 @@ Table users {
   id uuid [pk]
   name varchar [not null]
   email varchar [unique, not null]
-  password_hash varchar [note: 'Nullable for future OAuth - app rule: hash OR external identity']
+  password_hash varchar [note: 'Email/password register hash (strong password in UI). Nullable for Google/OAuth — app rule: hash OR external identity. Never plaintext.']
   role user_role [not null]
   phone varchar
   city varchar
@@ -339,6 +339,8 @@ Table waitlist_entries {
   state varchar
   lgpd_consent_at timestamp [not null]
   created_at timestamp [not null, default: `now()`]
+
+  Note: '/register step 1 lead only. Do NOT store passwords here — credentials go to users.password_hash when auth ships.'
 
   indexes {
     created_at
