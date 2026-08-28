@@ -188,6 +188,10 @@ export function Header() {
 
       <div ref={clusterRef} className="pointer-events-auto relative">
         <div className="flex items-center gap-1.5 rounded-full border border-white/70 bg-white/90 p-1.5 shadow-md backdrop-blur-md">
+          <Button href="/login" variant="white" size="sm" magnetic={false}>
+            <LogIn size={16} className="shrink-0" aria-hidden />
+            <span>{t.nav.login}</span>
+          </Button>
           <Button href="/register" variant="pink" size="sm" magnetic={false}>
             <PawPrint size={16} className="shrink-0" fill="currentColor" aria-hidden />
             <span>{t.nav.createAccount}</span>
@@ -243,7 +247,7 @@ export function Header() {
             <div className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-ink-muted">
               {t.nav.language}
             </div>
-            <LocaleSwitcher tone="light" />
+            <LocaleSwitcher tone="light" variant="menu" />
           </div>
         </div>
       </div>
