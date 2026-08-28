@@ -6,23 +6,17 @@ import {
   type WaitlistLead,
 } from "./types";
 
-/** Portuguese select labels — presentation only. */
-export const PROFILE_OPTIONS = [
-  { value: "guardian", label: "Tutor / quero adotar" },
-  { value: "ngo", label: "ONG" },
-  { value: "clinic", label: "Clínica veterinária" },
-  { value: "other", label: "Outro" },
-] as const;
+export type WaitlistFormErrorKey = "requiredFields" | "lgpdRequired";
 
-/** Client-side form checks. */
+/** Client-side form checks — map keys via i18n in the form UI. */
 export function validateWaitlistFormClient(
   form: WaitlistFormState,
-): string | null {
+): WaitlistFormErrorKey | null {
   if (!form.name.trim() || !form.email.trim() || !form.profileType) {
-    return "Preencha nome, e-mail e tipo de perfil.";
+    return "requiredFields";
   }
   if (!form.lgpdConsent) {
-    return "É necessário aceitar a política de privacidade.";
+    return "lgpdRequired";
   }
   return null;
 }
@@ -36,7 +30,7 @@ export type ParseWaitlistResult =
 
 /**
  * Server-side waitlist payload validation.
- * Preserves existing API error messages and status codes.
+ * Preserves existing API error messages and status codes (PT).
  */
 export function parseWaitlistBody(body: WaitlistBody): ParseWaitlistResult {
   const name = body.name?.trim() ?? "";

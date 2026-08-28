@@ -6,8 +6,10 @@ export type {
   WaitlistLead,
 } from "./types";
 export {
-  PROFILE_OPTIONS,
   validateWaitlistFormClient,
   parseWaitlistBody,
 } from "./validation";
-export type { ParseWaitlistResult } from "./validation";
+export type {
+  ParseWaitlistResult,
+  WaitlistFormErrorKey,
+} from "./validation";

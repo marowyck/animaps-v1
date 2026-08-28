@@ -14,6 +14,7 @@ import {
   updateDotGridVars,
 } from "@/components/bits";
 import { OrganicBlob } from "./OrganicBlob";
+import { useT } from "@/i18n";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -52,6 +53,7 @@ function prefersReducedMotion(): boolean {
 }
 
 export function Hero() {
+  const t = useT();
   const containerRef = useRef<HTMLElement>(null);
   const blobRef = useRef<HTMLDivElement>(null);
 
@@ -115,7 +117,7 @@ export function Hero() {
 
   return (
     <section
-      id="topo"
+      id="top"
       ref={containerRef}
       className="relative flex min-h-[88vh] flex-col justify-center overflow-x-hidden px-4 pb-28 pt-32 md:min-h-[92vh] md:pb-32 md:pt-36"
       onMouseMove={(e) => {
@@ -161,23 +163,22 @@ export function Hero() {
       <div className="relative z-10 mx-auto grid w-full max-w-6xl grid-cols-1 items-center gap-10 md:grid-cols-2 md:gap-12">
         <div className="hero-text min-w-0 text-left">
           <h1 className="font-display mb-4 text-4xl leading-[1.12] tracking-tight text-ink md:text-5xl lg:text-6xl">
-            O seu melhor <br />
-            <span className="text-brand-pink">amigo espera.</span>
+            {t.hero.titleLine1} <br />
+            <span className="text-brand-pink">{t.hero.titleHighlight}</span>
           </h1>
 
           <ScrollReveal className="mb-8 max-w-md text-base leading-relaxed text-ink-muted md:text-lg">
-            Crie sua conta no ANIMAPS e encontre o Match ideal — com mapa de
-            ocorrências para quem precisa de ajuda agora.
+            {t.hero.body}
           </ScrollReveal>
 
           <div className="hero-cta flex flex-wrap gap-3">
-            <Button href="#lista" variant="pink" magnetic={false}>
+            <Button href="/register" variant="pink" magnetic={false}>
               <UserPlus size={18} />
-              Criar conta
+              {t.hero.ctaAccount}
             </Button>
-            <Button href="#como-funciona" variant="white" magnetic={false}>
+            <Button href="/#how-it-works" variant="white" magnetic={false}>
               <ArrowDown size={18} />
-              Ver como funciona
+              {t.hero.ctaHow}
             </Button>
           </div>
         </div>
@@ -186,14 +187,16 @@ export function Hero() {
           <TiltedCard rotateAmplitude={8} scaleOnHover={1.03}>
             <div className="relative">
               <div className="absolute inset-0 scale-105 rotate-6 rounded-[60%_40%_30%_70%/60%_30%_70%_40%] bg-brand-green/40" />
-              <div className="relative z-10 h-[300px] w-[300px] overflow-hidden rounded-[60%_40%_30%_70%/60%_30%_70%_40%] border-[6px] border-white shadow-xl md:h-[400px] md:w-[400px]">
+              <div className="relative z-10 h-[340px] w-[340px] overflow-hidden rounded-[60%_40%_30%_70%/60%_30%_70%_40%] border-[6px] border-white shadow-xl md:h-[460px] md:w-[460px]">
                 <Image
                   src="/images/hero-pet.jpg"
-                  alt="Cachorro caramelo de olhar atento, pronto para encontrar um lar"
+                  alt={t.hero.imageAlt}
                   fill
                   priority
+                  quality={95}
                   className="object-cover"
-                  sizes="(max-width: 768px) 300px, 400px"
+                  style={{ objectPosition: "68% 52%" }}
+                  sizes="(max-width: 768px) 680px, 920px"
                 />
               </div>
             </div>

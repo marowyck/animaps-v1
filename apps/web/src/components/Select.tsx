@@ -11,6 +11,7 @@ import {
 import { Check, ChevronDown } from "lucide-react";
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
+import { Button } from "@/components/Button";
 
 export type SelectOption = {
   value: string;
@@ -231,9 +232,12 @@ export function Select({
         />
       ) : null}
 
-      <button
+      <Button
         id={buttonId}
         type="button"
+        variant="field"
+        size="field"
+        magnetic={false}
         role="combobox"
         aria-expanded={open}
         aria-haspopup="listbox"
@@ -244,11 +248,9 @@ export function Select({
         disabled={disabled}
         onClick={() => !disabled && setOpen((v) => !v)}
         onKeyDown={onTriggerKeyDown}
-        className={`flex w-full items-center justify-between gap-3 rounded-full border-2 bg-gray-soft px-5 py-3.5 text-left font-bold outline-none transition-colors focus:border-brand-pink focus:bg-white disabled:opacity-60 ${
-          open ? "border-brand-pink bg-white" : "border-border-soft"
-        } ${error ? "border-red-400" : ""} ${
-          selected ? "text-ink" : "text-ink-muted"
-        }`}
+        className={`${open ? "border-brand-pink bg-white" : ""} ${
+          error ? "border-red-400" : ""
+        } ${selected ? "text-ink" : "text-ink-muted"}`}
       >
         <span className="truncate">{displayLabel}</span>
         <ChevronDown
@@ -259,7 +261,7 @@ export function Select({
           }`}
           aria-hidden
         />
-      </button>
+      </Button>
 
       <ul
         id={listboxId}

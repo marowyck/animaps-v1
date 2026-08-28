@@ -1,16 +1,14 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useMemo, useState } from "react";
 import { Button } from "@/components/Button";
 import { Input } from "@/components/Input";
 import { Select } from "@/components/Select";
 import { Checkbox } from "@/components/Checkbox";
+import { useT } from "@/i18n";
 import { submitWaitlist } from "./submitWaitlist";
 import type { ProfileType, WaitlistFormState } from "./types";
-import {
-  PROFILE_OPTIONS,
-  validateWaitlistFormClient,
-} from "./validation";
+import { validateWaitlistFormClient } from "./validation";
 
 const INITIAL: WaitlistFormState = {
   name: "",
@@ -22,11 +20,23 @@ const INITIAL: WaitlistFormState = {
 };
 
 export function WaitlistForm() {
+  const t = useT();
   const [form, setForm] = useState<WaitlistFormState>(INITIAL);
   const [status, setStatus] = useState<"idle" | "loading" | "ok" | "error">(
     "idle",
   );
   const [errorMsg, setErrorMsg] = useState("");
+
+  const profileOptions = useMemo(
+    () =>
+      [
+        { value: "guardian", label: t.form.profiles.guardian },
+        { value: "ngo", label: t.form.profiles.ngo },
+        { value: "clinic", label: t.form.profiles.clinic },
+        { value: "other", label: t.form.profiles.other },
+      ] as const,
+    [t],
+  );
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
@@ -34,7 +44,7 @@ export function WaitlistForm() {
 
     const clientError = validateWaitlistFormClient(form);
     if (clientError) {
-      setErrorMsg(clientError);
+      setErrorMsg(t.form.errors[clientError]);
       setStatus("error");
       return;
     }
@@ -46,7 +56,9 @@ export function WaitlistForm() {
       setForm(INITIAL);
     } catch (err) {
       setStatus("error");
-      setErrorMsg(err instanceof Error ? err.message : "Erro inesperado.");
+      setErrorMsg(
+        err instanceof Error ? err.message : t.form.unexpectedError,
+      );
     }
   }
 
@@ -59,7 +71,7 @@ export function WaitlistForm() {
       <div className="grid gap-5 overflow-visible sm:grid-cols-2">
         <Input
           className="sm:col-span-2"
-          label="Nome"
+          label={t.form.name}
           name="name"
           autoComplete="name"
           value={form.name}
@@ -69,7 +81,7 @@ export function WaitlistForm() {
 
         <Input
           className="sm:col-span-2"
-          label="E-mail"
+          label={t.form.email}
           name="email"
           type="email"
           autoComplete="email"
@@ -80,9 +92,9 @@ export function WaitlistForm() {
 
         <Select
           className="sm:col-span-2"
-          label="Eu sou"
+          label={t.form.profileType}
           name="profileType"
-          options={[...PROFILE_OPTIONS]}
+          options={[...profileOptions]}
           value={form.profileType}
           onChange={(v) =>
             setForm({ ...form, profileType: v as ProfileType | "" })
@@ -91,14 +103,14 @@ export function WaitlistForm() {
         />
 
         <Input
-          label="Cidade"
+          label={t.form.city}
           name="city"
           value={form.city}
           onChange={(e) => setForm({ ...form, city: e.target.value })}
         />
 
         <Input
-          label="Estado"
+          label={t.form.state}
           name="state"
           value={form.state}
           onChange={(e) => setForm({ ...form, state: e.target.value })}
@@ -113,15 +125,14 @@ export function WaitlistForm() {
         required
         label={
           <>
-            Li e aceito a{" "}
+            {t.form.privacyBefore}{" "}
             <a
-              href="#privacidade"
+              href="/#privacy"
               className="font-bold underline underline-offset-2"
             >
-              política de privacidade
+              {t.form.privacyLink}
             </a>{" "}
-            (coleta de nome, e-mail e tipo de perfil para criar sua conta e
-              prioridade de acesso).
+            {t.form.privacyAfter}
           </>
         }
       />
@@ -133,7 +144,7 @@ export function WaitlistForm() {
       ) : null}
       {status === "ok" ? (
         <p className="mt-4 text-sm font-bold text-brand-green" role="status">
-          Conta na lista! Em breve falamos com você sobre o acesso.
+          {t.form.success}
         </p>
       ) : null}
 
@@ -144,7 +155,7 @@ export function WaitlistForm() {
           variant="pink"
           magnetic={false}
         >
-          {status === "loading" ? "Enviando…" : "Criar minha conta"}
+          {status === "loading" ? t.form.submitting : t.form.submit}
         </Button>
       </div>
     </form>

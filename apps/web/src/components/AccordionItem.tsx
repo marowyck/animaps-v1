@@ -4,6 +4,7 @@ import { useId, useRef, useState, type ReactNode } from "react";
 import { ChevronDown } from "lucide-react";
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
+import { Button } from "@/components/Button";
 
 type AccordionItemProps = {
   question: string;
@@ -72,13 +73,16 @@ export function AccordionItem({
         open ? "border-brand-pink/40" : ""
       } ${className}`}
     >
-      <button
+      <Button
         id={buttonId}
         type="button"
+        variant="ghost"
+        size="stretch"
+        magnetic={false}
         aria-expanded={open}
         aria-controls={panelId}
         onClick={() => setOpen((v) => !v)}
-        className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-pink"
+        className="rounded-none shadow-none"
       >
         <span className="text-base font-black leading-snug text-ink md:text-lg">
           {question}
@@ -91,7 +95,7 @@ export function AccordionItem({
         >
           <ChevronDown size={22} strokeWidth={2.5} />
         </span>
-      </button>
+      </Button>
       <div
         id={panelId}
         ref={panelRef}

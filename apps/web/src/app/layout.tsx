@@ -18,9 +18,9 @@ const nunito = Nunito({
 });
 
 export const metadata: Metadata = {
-  title: "ANIMAPS — Match ideal para adoção responsável",
+  title: "ANIMAPS — O match certo pro seu melhor amigo",
   description:
-    "Plataforma de adoção responsável e mapa de ocorrências. Crie sua conta.",
+    "Crie sua conta no ANIMAPS, encontre o Match ideal e use o mapa de ocorrências. Adoção responsável com carinho.",
 };
 
 export default function RootLayout({

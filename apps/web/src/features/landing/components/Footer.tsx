@@ -1,28 +1,9 @@
-import { Languages, PawPrint } from "lucide-react";
-import { SectionDivider } from "./SectionDivider";
+"use client";
 
-const COLUMNS = [
-  {
-    title: "Plataforma",
-    links: [
-      { href: "#solucao", label: "Solução" },
-      { href: "#como-funciona", label: "Como funciona" },
-      { href: "#para-quem", label: "Para quem" },
-      { href: "#faq", label: "FAQ" },
-    ],
-  },
-  {
-    title: "Conta",
-    links: [{ href: "#lista", label: "Criar conta" }],
-  },
-  {
-    title: "Jurídico",
-    links: [
-      { href: "#privacidade", label: "Privacidade", id: "privacidade" },
-      { href: "#termos", label: "Termos" },
-    ],
-  },
-] as const;
+import { PawPrint } from "lucide-react";
+import { LocaleSwitcher } from "@/components/LocaleSwitcher";
+import { useT } from "@/i18n";
+import { SectionDivider } from "./SectionDivider";
 
 const SOCIALS = [
   {
@@ -92,18 +73,61 @@ const SOCIAL_ICONS = {
   YouTube: YouTubeIcon,
 } as const;
 
-export function Footer() {
+type FooterProps = {
+  /** Color of the top wave (should match the section above). Ignored when `showDivider` is false. */
+  dividerFill?: string;
+  /** When false, the organic top wave is omitted (e.g. CurvedLoop already paints the sine join). */
+  showDivider?: boolean;
+};
+
+export function Footer({
+  dividerFill = "var(--gray-soft)",
+  showDivider = true,
+}: FooterProps) {
+  const t = useT();
   const year = new Date().getFullYear();
 
+  const columns = [
+    {
+      title: t.footer.platform,
+      links: [
+        { href: "/#solution", label: t.footer.solution },
+        { href: "/#how-it-works", label: t.footer.howItWorks },
+        { href: "/#audience", label: t.footer.whoFor },
+        { href: "/#faq", label: t.footer.faq },
+      ],
+    },
+    {
+      title: t.footer.account,
+      links: [
+        { href: "/register", label: t.footer.createAccount },
+        { href: "/login", label: t.footer.login },
+      ],
+    },
+    {
+      title: t.footer.legal,
+      links: [
+        { href: "/#privacy", label: t.footer.privacy, id: "privacy" },
+        { href: "/#terms", label: t.footer.terms, id: "terms" },
+      ],
+    },
+  ];
+
   return (
-    <footer className="relative z-10 overflow-hidden bg-[#1a1214] pt-24 text-white">
-      <SectionDivider fill="var(--gray-soft)" position="top" />
+    <footer
+      className={`relative z-10 overflow-hidden bg-[#1a1214] text-white ${
+        showDivider ? "pt-24" : "pt-6 md:pt-8"
+      }`}
+    >
+      {showDivider ? (
+        <SectionDivider fill={dividerFill} position="top" />
+      ) : null}
 
       <div className="relative z-10 mx-auto max-w-6xl px-4 pt-10 pb-8 md:px-6 md:pt-14 md:pb-12">
         <div className="grid grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-3 lg:grid-cols-5">
           <div className="col-span-2 sm:col-span-3 lg:col-span-1">
             <a
-              href="#topo"
+              href="/#top"
               className="inline-flex items-center gap-2 text-white/90 transition-colors hover:text-white"
             >
               <PawPrint size={18} aria-hidden />
@@ -113,20 +137,14 @@ export function Footer() {
               © {year} Animaps
             </p>
             <p className="mt-3 max-w-[16rem] text-xs leading-relaxed text-white/40">
-              Match entre pessoas e animais — adoção com cuidado.
+              {t.footer.blurb}
             </p>
-            <button
-              type="button"
-              disabled
-              className="mt-5 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3.5 py-1.5 text-xs text-white/55"
-              aria-label="Idioma: português"
-            >
-              <Languages size={14} aria-hidden />
-              português
-            </button>
+            <div className="mt-5">
+              <LocaleSwitcher tone="dark" aria-label={t.footer.languageAria} />
+            </div>
           </div>
 
-          {COLUMNS.map((col) => (
+          {columns.map((col) => (
             <div key={col.title}>
               <h3 className="text-sm font-semibold text-white">{col.title}</h3>
               <ul className="mt-4 space-y-2.5">
@@ -146,7 +164,7 @@ export function Footer() {
           ))}
 
           <div>
-            <h3 className="text-sm font-semibold text-white">Redes sociais</h3>
+            <h3 className="text-sm font-semibold text-white">{t.footer.social}</h3>
             <ul className="mt-4 space-y-2.5">
               {SOCIALS.map((s) => {
                 const Icon = SOCIAL_ICONS[s.label];

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Button } from "@/components/Button";
+import { useT } from "@/i18n";
 import {
   readCookieConsent,
   writeCookieConsent,
@@ -9,6 +10,7 @@ import {
 } from "./storage";
 
 export function CookieBanner() {
+  const t = useT();
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -27,14 +29,13 @@ export function CookieBanner() {
   return (
     <div
       role="dialog"
-      aria-label="Consentimento de cookies"
+      aria-label={t.cookies.aria}
       className="fixed inset-x-4 bottom-4 z-[60] mx-auto max-w-lg rounded-[2rem] border-2 border-border-soft bg-white p-5 shadow-xl md:inset-x-auto md:right-6 md:bottom-6"
     >
       <p className="text-sm font-bold text-ink-muted">
-        Usamos cookies essenciais e, com seu consentimento, analytics (GA4) para
-        melhorar a experiência.{" "}
-        <a href="#privacidade" className="underline underline-offset-2">
-          Saiba mais
+        {t.cookies.body}{" "}
+        <a href="/#privacy" className="underline underline-offset-2">
+          {t.cookies.learnMore}
         </a>
         .
       </p>
@@ -42,20 +43,20 @@ export function CookieBanner() {
         <Button
           type="button"
           variant="pink"
+          size="sm"
           magnetic={false}
-          className="!px-5 !py-2.5 !text-sm"
           onClick={() => choose("accepted")}
         >
-          Aceitar
+          {t.cookies.accept}
         </Button>
         <Button
           type="button"
           variant="white"
+          size="sm"
           magnetic={false}
-          className="!border-2 !px-5 !py-2.5 !text-sm"
           onClick={() => choose("rejected")}
         >
-          Recusar não essenciais
+          {t.cookies.reject}
         </Button>
       </div>
     </div>

@@ -4,6 +4,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { ReactLenis, useLenis } from "lenis/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { LocaleProvider } from "@/i18n";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -72,12 +73,11 @@ function NativeAnchorScroll() {
   return null;
 }
 
-export function SmoothScrollProvider({ children }: { children: ReactNode }) {
+function SmoothScrollInner({ children }: { children: ReactNode }) {
   const [reduced, setReduced] = useState(false);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    // Client-only: matchMedia is unavailable during SSR.
     /* eslint-disable react-hooks/set-state-in-effect -- hydrate motion preference after mount */
     setReduced(prefersReducedMotion());
     setReady(true);
@@ -101,12 +101,10 @@ export function SmoothScrollProvider({ children }: { children: ReactNode }) {
     <ReactLenis
       root
       options={{
-        // Higher lerp = less “lag behind” the wheel → easier to travel the page
         lerp: 0.16,
         duration: 1,
         easing: easeOutExpo,
         smoothWheel: true,
-        // Native touch/trackpad feels lighter than Lenis syncing every gesture
         syncTouch: false,
         touchMultiplier: 1.4,
         wheelMultiplier: 1.2,
@@ -121,5 +119,14 @@ export function SmoothScrollProvider({ children }: { children: ReactNode }) {
       <LenisGsapSync />
       {children}
     </ReactLenis>
+  );
+}
+
+/** Locale outside Lenis so language works with reduced motion too. */
+export function SmoothScrollProvider({ children }: { children: ReactNode }) {
+  return (
+    <LocaleProvider>
+      <SmoothScrollInner>{children}</SmoothScrollInner>
+    </LocaleProvider>
   );
 }

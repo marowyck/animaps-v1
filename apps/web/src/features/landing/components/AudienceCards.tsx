@@ -2,32 +2,29 @@
 
 import { Heart, Building2, Stethoscope, Landmark } from "lucide-react";
 import { AnimatedContent, ScrollReveal } from "@/components/bits";
+import { useT } from "@/i18n";
 
-const AUDIENCES = [
+const AUDIENCE_META = [
   {
-    title: "Tutores",
-    body: "Encontre um animal compatível com a sua rotina.",
+    key: "guardians" as const,
     icon: Heart,
     tone: "bg-pastel-pink",
     iconColor: "text-brand-pink",
   },
   {
-    title: "ONGs",
-    body: "Cadastre animais e gerencie solicitações sem planilha.",
+    key: "ngos" as const,
     icon: Building2,
     tone: "bg-pastel-green",
     iconColor: "text-brand-green",
   },
   {
-    title: "Clínicas",
-    body: "Parceria verificada no fluxo de adoção responsável.",
+    key: "clinics" as const,
     icon: Stethoscope,
     tone: "bg-pastel-sky",
     iconColor: "text-brand-green",
   },
   {
-    title: "Órgãos e pesquisa",
-    body: "Indicadores agregados para quem cuida da cidade.",
+    key: "agencies" as const,
     icon: Landmark,
     tone: "bg-pastel-pink",
     iconColor: "text-brand-pink",
@@ -35,28 +32,32 @@ const AUDIENCES = [
 ];
 
 export function AudienceCards() {
+  const t = useT();
+  const audiences = AUDIENCE_META.map((a) => ({
+    ...a,
+    title: t.audience.cards[a.key].title,
+    body: t.audience.cards[a.key].body,
+  }));
+
   return (
     <section
-      id="para-quem"
+      id="audience"
       className="relative z-10 bg-gray-soft px-4 py-20 md:py-24"
     >
       <div className="relative z-10 mx-auto max-w-6xl pt-4 md:pt-6">
         <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-brand-green">
-          É para você se…
+          {t.audience.eyebrow}
         </p>
         <ScrollReveal>
           <h2 className="font-display mb-3 max-w-xl text-3xl leading-tight tracking-tight text-ink md:text-4xl">
-            Feito para quem cuida —{" "}
-            <span className="text-brand-green">de formas diferentes.</span>
+            {t.audience.titleBefore}{" "}
+            <span className="text-brand-green">{t.audience.titleHighlight}</span>
           </h2>
         </ScrollReveal>
-        <p className="mb-8 max-w-lg text-base text-ink-muted">
-          Adotante, ONG, clínica ou órgão: crie sua conta e use o que combina
-          com o seu papel.
-        </p>
+        <p className="mb-8 max-w-lg text-base text-ink-muted">{t.audience.body}</p>
         <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {AUDIENCES.map((a, i) => (
-            <AnimatedContent key={a.title} delay={i * 0.07} distance={24}>
+          {audiences.map((a, i) => (
+            <AnimatedContent key={a.key} delay={i * 0.07} distance={24}>
               <article
                 className={`h-full rounded-3xl p-5 shadow-sm transition-transform hover:-translate-y-0.5 ${a.tone}`}
               >
@@ -75,12 +76,6 @@ export function AudienceCards() {
             </AnimatedContent>
           ))}
         </div>
-        <a
-          href="#lista"
-          className="inline-flex min-h-11 items-center rounded-full bg-brand-pink px-6 py-3 text-sm font-semibold text-white shadow-md transition-colors hover:bg-brand-pink-hover"
-        >
-          Criar conta
-        </a>
       </div>
     </section>
   );
