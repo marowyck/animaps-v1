@@ -31,7 +31,7 @@ animaps/
 
 | Package | Role |
 |---|---|
-| `@animaps/web` | Landing + waitlist + cookie consent |
+| `@animaps/web` | Landing + waitlist + auth UI (`/register`, `/login`) + cookie consent |
 
 ## Web feature layout
 
@@ -39,12 +39,15 @@ animaps/
 apps/web/src/
 ├── app/                 # Next routing + bootstrap (thin)
 │   ├── api/waitlist/    # Temporary Route Handler (moves to apps/api in Wave 2)
-│   └── providers.tsx    # Lenis / GSAP smooth scroll
+│   ├── register/        # Two-step create-account UI (waitlist backend)
+│   ├── login/           # Login UI placeholder (real auth later)
+│   └── providers.tsx    # Locale + Toast + Lenis / GSAP
 ├── features/
 │   ├── landing/         # Marketing sections (web-only)
+│   ├── auth/            # Split layout, register/login forms, password rules
 │   ├── waitlist/        # Form UI + client/server validation + types
 │   └── consent/         # Cookie banner (web-only localStorage)
-└── components/          # Shared primitives (Button, Input, Select…)
+└── components/          # Shared primitives (Button, Input, Select, Toast, LocaleSwitcher…)
 ```
 
 Import other features only through their `index.ts` public API.
@@ -62,6 +65,7 @@ Import other features only through their `index.ts` public API.
 | Domain | Where it lives today | Future |
 |---|---|---|
 | landing | `apps/web` features/landing | web-only |
+| auth UI | `apps/web` features/auth (`/register`, `/login`) | Nest `identity` (real auth later) |
 | waitlist / marketing | web feature + Next `/api/waitlist` | Nest `marketing` module |
 | consent | web features/consent | web-only; mobile will use native privacy UX |
 | identity, adoption, occurrence, notifications, analytics | docs only | `apps/api` modules |
@@ -98,8 +102,8 @@ Import other features only through their `index.ts` public API.
 
 ## Waitlist today vs Wave 2
 
-- **Today:** `POST /api/waitlist` Next Route Handler uses `features/waitlist` (`parseWaitlistBody`); persistence is `console.info` (schema already defines `WaitlistEntry`).
-- **Wave 2:** Nest `marketing` persists `WaitlistEntry`; web calls `NEXT_PUBLIC_API_BASE_URL`; remove the Next route. Extract shared types/validation into packages if API and web both need them.
+- **Today:** `/register` is a two-step create-account UI (`features/auth` + `WaitlistForm`); step 2 validates a strong password client-side, then `POST /api/waitlist` persists the **profile lead only** (`parseWaitlistBody`; password not stored yet). Persistence is still `console.info` (schema already defines `WaitlistEntry`). `/login` is UI-only until Nest `identity` auth.
+- **Wave 2:** Nest `marketing` persists `WaitlistEntry`; Nest `identity` owns real password/OAuth signup; web calls `NEXT_PUBLIC_API_BASE_URL`; remove the Next waitlist route. Extract shared types/validation into packages if API and web both need them.
 
 ## Tooling
 

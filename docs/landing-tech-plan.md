@@ -3,7 +3,7 @@
 Technical plan for the ANIMAPS institutional landing.  
 Sources: Phase 1 decisions + visual design round + [`ANIMAPS_Roadmap.md`](../ANIMAPS_Roadmap.md) §1.4–1.6 + content/design briefs.
 
-**Status:** Pink/green friendly landing in [`apps/web`](../apps/web) (Bagel Fat One + Nunito, BubbleMenu, shared `Button` / `LocaleSwitcher`, waves, React Bits, GSAP, client i18n PT/EN/ES). Account capture on **`/register`** (waitlist API placeholder); **`/login`** placeholder. Public `/` is product-only.
+**Status:** Pink/green friendly landing in [`apps/web`](../apps/web) (Bagel Fat One + Nunito, BubbleMenu, shared `Button` / `LocaleSwitcher` / `Toast`, waves, React Bits, GSAP, client i18n PT/EN/ES). Account capture on **`/register`** (two-step UI → waitlist API); **`/login`** split UI (email/password + Google CTA UI-only). Public `/` is product-only. Header exposes **Log in** + **Create account**.
 
 ---
 
@@ -80,8 +80,9 @@ Align with roadmap §0.6 (MVC on web):
 ```
 components/                    # design system (app-wide reuse)
   Button.tsx                   # shared CTAs + chrome (variants/sizes; cursor-pointer)
-  LocaleSwitcher.tsx           # PT | EN | ES (Header menu + Footer)
-  Input.tsx
+  LocaleSwitcher.tsx           # pills or menu (“Language” + icon); Footer/Header/auth
+  Toast.tsx                    # bottom-right outcome alerts (see ui-patterns.md)
+  Input.tsx                    # pill field; optional password reveal (Eye / EyeOff)
   Select.tsx                   # trigger composes Button field
   Checkbox.tsx
   AccordionItem.tsx            # question row composes Button ghost
@@ -94,38 +95,53 @@ components/                    # design system (app-wide reuse)
 
 i18n/                          # client locale (no path prefixes)
   LocaleProvider.tsx
-  locales.ts                   # LOCALES, storage key, detectBrowserLocale
+  locales.ts                   # LOCALES, LOCALE_NAMES, storage key, detectBrowserLocale
   messages/{pt,en,es}.ts
   types.ts
   index.ts
 
 app/
-  providers.tsx                # LocaleProvider outside Lenis; SmoothScrollProvider
+  providers.tsx                # LocaleProvider + ToastProvider outside Lenis; SmoothScrollProvider
   page.tsx                     # Landing composition (no waitlist section)
-  register/page.tsx            # Create-account / waitlist form
-  login/page.tsx               # Login placeholder until auth
+  register/page.tsx            # Auth split: carousel + two-step register card
+  login/page.tsx               # Auth split: carousel + login card (Google UI-only)
   api/waitlist/                # temporary Route Handler → Nest marketing Wave 2
 
+features/auth/                 # shared auth chrome (no landing Header/Footer)
+  AuthSplitLayout.tsx
+  AuthImageCarousel.tsx
+  GoogleAuthButton.tsx
+  LoginForm.tsx
+  RegisterForm.tsx             # step 1 WaitlistForm onContinue → step 2 password
+  passwordValidation.ts        # strong password rules (client)
+
 features/landing/components/
-  Header.tsx                   # frosted CTA → /register + BubbleMenu + LocaleSwitcher
+  Header.tsx                   # Log in + Create account + BubbleMenu + LocaleSwitcher
   Hero.tsx                     # taller viewport + filled PawPrint field
   SolutionSection.tsx
   HowItWorks.tsx               # bg-pastel-green (feeds green CurvedLoop bridge)
   AudienceCards.tsx
   Differentials.tsx
   FAQ.tsx                      # bg-pastel-pink (feeds pink CurvedLoop bridge)
-  WaitlistSection.tsx          # used on /register (not on /)
-  Footer.tsx                   # columns + LocaleSwitcher + social + wordmark
+  WaitlistSection.tsx          # optional section chrome; form embeds in RegisterForm
+  Footer.tsx                   # columns + LocaleSwitcher menu + social + wordmark
   OrganicBlob.tsx
   SectionDivider.tsx
 
 features/waitlist/
+  WaitlistForm.tsx             # profile fields; optional onContinue for multi-step
+  validation.ts
+  submitWaitlist.ts
+  …
+
 features/consent/
 ```
 
 **Not in public page flow:** `ProblemSection`, `SocialProofCarousel`.
 
 **Button rule:** feature code must not hardcode styled `<button>` / CTA `<a>` — use `Button` or `LocaleSwitcher`. See design brief § Header / Button system.
+
+**Toast rule:** any outcome the user must notice uses `useToast` — never permanent inline status under forms. See [`ui-patterns.md`](ui-patterns.md).
 
 Visual specs: [`landing-design-brief.md`](landing-design-brief.md).
 
@@ -135,20 +151,37 @@ Visual specs: [`landing-design-brief.md`](landing-design-brief.md).
 - Check `prefers-reduced-motion` on Hero, BubbleMenu, Select, Accordion, Lenis, CurvedLoop, Button fill
 - Soft Hero parallax only
 - Disable Lenis under reduced motion; anchors still land with header offset
-- Global custom scrollbar; `scroll-padding-top` for fixed header chrome
-- `Button`: `magnetic` does **not** gate fill hover — fill stays on for `md` fill variants; `white` also has CSS green hover fallback
+- Global custom scrollbar (transparent track, pink thumb); `scroll-padding-top` for fixed header chrome
+- `Button`: `magnetic` does **not** gate fill hover — fill stays on for `md` fill variants; `white` has CSS green hover; compact `pink` uses color/shadow hover **without scale**
+- Toast enter/exit: CSS swipe (translate + opacity)
 
 ---
 
 ## 3. Form and persistence
 
-### Fields (aligned with content brief)
+### Register flow (UI)
+
+1. **Step 1 — profile:** `WaitlistForm` with `onContinue` (client validation only; no API call).
+2. **Step 2 — password:** client strong-password check (`passwordValidation.ts`), then `submitWaitlist(profile)`.
+   - Password is **not** sent to `/api/waitlist` yet (waitlist lead only until auth).
+   - Show/hide via `Input` `revealable`.
+
+### Profile fields (aligned with content brief)
 
 - `name` (string, required)
 - `email` (string, required, validated)
 - `profileType` (enum: `guardian` | `ngo` | `clinic` | `other`, required)
 - `city` / `state` (optional)
 - `lgpdConsent` (boolean, required = true)
+
+### Password rules (client — register step 2)
+
+- Min **8** characters
+- At least one **uppercase** letter
+- At least one **special** character (non-alphanumeric)
+- Confirm must match
+
+Failures → **error toast**. Live checklist stays in the form.
 
 ### Persistence
 
@@ -172,10 +205,10 @@ Field/code names: **English** (`camelCase` API / `snake_case` DB); UI in **PT / 
 - **No locale path prefixes** (`/en`, `/es`) — same app routes; English path names: `/`, `/register`, `/login`, and section hashes `/#top`, `/#solution`, `/#how-it-works`, `/#audience`, `/#faq`, `/#privacy`, `/#terms`
 - Implementation: [`apps/web/src/i18n/`](../apps/web/src/i18n/) — typed message dictionaries + `LocaleProvider` / `useT()` / `useLocale()`
 - Preference: `localStorage` key `animaps-locale`; first visit falls back to `navigator.language`
-- Language UI: **`LocaleSwitcher`** in **Header bubble menu** and **Footer** (updates `document.documentElement.lang` + `document.title`)
-- Provider wraps the app **outside** Lenis so locale works with reduced motion
+- Language UI: **`LocaleSwitcher`** (`variant="menu"` — Language label + icon dropdown) in Header, Footer, and auth; see [`ui-patterns.md`](ui-patterns.md)
+- Provider wraps the app **outside** Lenis so locale works with reduced motion; `ToastProvider` sits inside `LocaleProvider`
 - SSR metadata in `layout.tsx` stays PT default; client syncs title after hydrate
-- Nav keys include `language` / `languageAria` for the in-menu label
+- Nav keys include `language` / `languageAria`; auth includes `showPassword` / `hidePassword`
 
 ---
 
@@ -220,14 +253,16 @@ Required at launch:
 
 - [ ] Cross-browser: Chrome, Safari, Firefox
 - [ ] Real mobile devices
-- [ ] Form submit (success, validation, rate limit)
-- [ ] PT ↔ EN ↔ ES switch from **Header menu** and **Footer** (no URL change; preference persists)
-- [ ] `/register` form submit; `/login` placeholder links to register + home
+- [ ] Form submit (success, validation, rate limit) — feedback via **toasts**
+- [ ] PT ↔ EN ↔ ES switch from **Header menu**, **Footer**, and **auth** language menu (no URL change; preference persists)
+- [ ] Header shows **Log in** + **Create account** beside the menu toggle
+- [ ] `/register` two-step signup (profile → strong password + reveal toggle) + waitlist submit; `/login` UI (Google CTA UI-only until OAuth)
+- [ ] Auth split layout: carousel (rescue/adoption/wildlife) + form column; step pill `n/2`; no logo in form chrome; no landing Header/Footer on auth routes
 - [ ] Landing CTAs navigate to `/register` (no in-page waitlist block)
 - [ ] English hashes: `/#top`, `/#solution`, `/#how-it-works`, `/#audience`, `/#faq`, `/#privacy`, `/#terms`
-- [ ] Bubble menu: opens below CTA; closes via toggle / outside / Escape / nav click
+- [ ] Bubble menu: opens below CTA cluster; closes via toggle / outside / Escape / nav click
 - [ ] Soft menu toggle: green when closed, pink when open
-- [ ] `Button` hovers (esp. `white` secondary CTA green fill)
+- [ ] `Button` hovers (esp. `white` secondary CTA green fill; compact pink without scale ghost)
 - [ ] Cookie banner + GA4 only post-consent
 - [ ] Smooth hash scroll (buttons/menu → sections) feels continuous under Lenis
 - [ ] CurvedLoop bridges: no white gap under FAQ (pink) / HowItWorks (green)
@@ -245,11 +280,12 @@ Required at launch:
 5. ~~Client i18n PT/EN/ES + LocaleSwitcher~~ — **done**
 6. ~~Shared `Button` / Header chrome polish~~ — **done**
 7. ~~`/register` + `/login`; English section hashes; waitlist off landing~~ — **done**
-8. Final copy polish + assets (logo, social URLs)
-9. Real waitlist persistence + real auth for `/login`
-10. Cookie banner → GA4 post-consent + events
-11. SEO + Lighthouse >90
-12. Domain + Vercel production deploy
+8. ~~Auth split UI, two-step register, toasts, language menu, Header Log in~~ — **done**
+9. Final copy polish + assets (logo, social URLs)
+10. Real waitlist persistence + real auth for `/login` (persist password / OAuth)
+11. Cookie banner → GA4 post-consent + events
+12. SEO + Lighthouse >90
+13. Domain + Vercel production deploy
 
 **Run locally:** from root, `pnpm dev` (filters `@animaps/web`).
 
@@ -257,7 +293,7 @@ Required at launch:
 
 ## 10. Out of scope (Phase 1)
 
-- Full auth / JWT / profiles (Phase 2)
+- Full auth / JWT / profiles (Phase 2) — password is validated in UI only today
 - PostGIS map / real occurrences (later phases)
 - Meta Pixel / paid ads
 - Dark mode / custom cursor
@@ -272,6 +308,7 @@ Required at launch:
 - Roadmap §1.4–1.6
 - [`landing-content-brief.md`](landing-content-brief.md)
 - [`landing-design-brief.md`](landing-design-brief.md)
+- [`ui-patterns.md`](ui-patterns.md) — toasts, language menu, password rules, reveal toggle
 - [`git-and-ci.md`](git-and-ci.md)
 - [`lgpd-checklist.md`](lgpd-checklist.md)
 - [`privacy-policy-draft.md`](privacy-policy-draft.md)

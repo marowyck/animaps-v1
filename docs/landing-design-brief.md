@@ -3,7 +3,7 @@
 Visual identity and UX for the ANIMAPS institutional landing.  
 Sources: Phase 1 decisions + visual design round + **post-feedback pivots** + [`ANIMAPS_Roadmap.md`](../ANIMAPS_Roadmap.md) §1.3 + [`landing-content-brief.md`](landing-content-brief.md).
 
-**Status:** **friendly / organic / pink+green** direction implemented in `apps/web` (no Figma). Shared `Button` + `LocaleSwitcher`; Header CTA cluster with soft green menu. Public `/` sells the product; account capture lives on **`/register`** (waitlist backend); **`/login`** is a placeholder until auth ships.
+**Status:** **friendly / organic / pink+green** direction implemented in `apps/web` (no Figma). Shared `Button` + `LocaleSwitcher` + `Toast`; Header CTA cluster with **Log in** + **Create account** + soft green menu. Public `/` sells the product; **`/register`** and **`/login`** use an immersive split layout (image carousel + form card). Google CTA is UI-only until OAuth ships.
 
 ---
 
@@ -103,18 +103,28 @@ No Figma. Source of truth: this brief + code in `apps/web`.
 
 **Separate routes (English paths):**
 
-- `/register` — create-account / waitlist form (`WaitlistSection`)
-- `/login` — branded placeholder until real auth
+- `/register` + `/login` — shared **auth split layout** (`features/auth/`):
+  - Left (~2/3 desktop / top band mobile): full-bleed carousel — rescue, adoption, wildlife images with motivational i18n lines
+  - Right (~1/3): white panel; **language menu** top-right (Languages label + icon); **no brand mark / logo** in the form chrome
+  - Register: **two steps** with a compact **`{n}/2` pill** beside the title
+    1. Profile / waitlist fields + centered **Continue with Google** (UI-only)
+    2. Password + confirm, live strength checklist, show/hide eye toggle; strong-password rules (min 8, uppercase, special)
+  - Login: email/password (revealable) + Google CTA (UI-only) + link to register
+  - Outcome feedback (validation, success, “coming soon”) via **toasts** — never permanent inline status under the form
+  - No landing Header/Footer/ClickSpark on these pages
 
 ### Header (BubbleMenu)
 
-- Floating logo pill (left) + frosted chrome cluster (right): primary **Create account** CTA (`/register`) + icon menu toggle
+- Floating logo pill (left) + frosted chrome cluster (right):
+  - **Log in** — `Button` `white` / `sm` → `/login` (secondary)
+  - **Create account** — `Button` `pink` / `sm` → `/register` (primary)
+  - Icon menu toggle
 - Menu toggle uses Button variant **`soft`**: **pastel green + brand-green icon** when closed; **brand pink** when open — never solid black/ink (breaks pink+green friendliness)
-- Bubble panel opens **below** the cluster (does not cover the CTA or toggle); closes on toggle, outside click, Escape, or nav link
+- Bubble panel opens **below** the cluster (does not cover the CTAs or toggle); closes on toggle, outside click, Escape, or nav link
 - Nav rows: label + **lucide icon on the right**; slight rotation on open; pastel pink/green hover fills
 - Section anchors (English): `/#top`, `/#solution`, `/#how-it-works`, `/#faq` (+ `/#audience`, `/#differentials` where linked)
-- Account links: `/register`, `/login`
-- **Language** section inside the panel: shared **`LocaleSwitcher`** (PT | EN | ES) — same control as Footer
+- Account links in menu: `/register`, `/login`
+- **Language** section inside the panel: shared **`LocaleSwitcher`** (`variant="menu"`) — same control as Footer / auth
 
 ### Button system (`components/Button.tsx`)
 
@@ -123,19 +133,33 @@ Single reusable control for all CTAs and chrome actions — **no ad-hoc `<button
 | Prop | Notes |
 |---|---|
 | `variant` | Fill CTAs: `pink` / `orange` (alias) / `blue` / `green` / `white`. Chrome: `soft`, `ink`, `ghost`, `segment`, `field` |
-| `size` | `md` (default CTA), `sm` (header/cookies), `xs` (locale pills), `icon`, `stretch` (FAQ), `field` (Select) |
+| `size` | `md` (default CTA), `sm` (header/auth/cookies), `xs` (locale pills), `icon`, `stretch` (FAQ), `field` (Select) |
 | `magnetic` | Optional pointer pull; **independent** of fill hover (fill hover stays on for `md` fill variants) |
 | `selected` / `tone` | Locale pills (`segment`) and soft toggle open state |
 | Cursor | Always `cursor-pointer` (`disabled:cursor-not-allowed`) |
 
-- `white` secondary CTA: green border at rest; hover fills brand green + white text (CSS + optional circular fill)
+- `white` secondary CTA: green border at rest; hover fills brand green + white text
+- Compact `pink` (`sm`): soft pink shadow + `hover:bg-brand-pink-hover` — **no scale** (avoids shadow/radius ghost on full-width auth buttons)
 - FAQ questions and Select trigger compose `Button` (`ghost` / `field`) so pointer and focus stay consistent
 
 ### LocaleSwitcher (`components/LocaleSwitcher.tsx`)
 
-- Shared PT | EN | ES control used in **Header menu** and **Footer**
-- Wraps `Button` `variant="segment"` with `tone="light"` | `"dark"`
-- Persists via i18n `localStorage`; no URL locale prefixes
+- Prefer **`variant="menu"`**: localized “Language” / “Idioma” label + languages icon; dropdown lists full names (`LOCALE_NAMES`) so new locales can be added without a wider pill row
+- Optional `variant="pills"` for dense PT|EN|ES segments if needed
+- Used in Header, Footer, and auth form column
+- Details: [`ui-patterns.md`](ui-patterns.md)
+
+### Toast (`components/Toast.tsx`)
+
+- **Required** for any outcome the user must notice (error / success / warning / info)
+- Bottom-right stack; Lucide tone icons (`Info`, `CircleCheck`, `CircleX`, `CircleAlert`) — **no emoji**
+- Swipe in from the right / swipe out to the right
+- Details: [`ui-patterns.md`](ui-patterns.md)
+
+### Input (`components/Input.tsx`)
+
+- Pill fields; optional `compact` for auth panels
+- `revealable` on `type="password"`: Lucide `Eye` / `EyeOff` toggle with i18n aria labels (`showPassword` / `hidePassword`)
 
 ### CurvedLoop (marquee ribbons)
 
@@ -149,7 +173,7 @@ Single reusable control for all CTAs and chrome actions — **no ad-hoc `<button
 Model: clean multi-column + oversized cropped brand wordmark (Tinder-like structure, quieter ANIMAPS palette).
 
 - Dark `#1a1214` + wave on top (`SectionDivider` fill `gray-soft`)
-- Columns: brand blurb + **PT | EN | ES** language control · Platform · Account (`/register`, `/login`) · Legal · Social
+- Columns: brand blurb + language menu · Platform · Account (`/register`, `/login`) · Legal · Social
 - Language switcher: client-only (`localStorage`); **no** `/pt` / `/en` / `/es` routes
 - Social: **text link + icon on the right** (Instagram, TikTok, LinkedIn, YouTube) — no extra CTA card / pill button row
 - Giant **ANIMAPS** wordmark (Bagel Fat One, pink, cropped at bottom)
@@ -164,8 +188,9 @@ Model: clean multi-column + oversized cropped brand wordmark (Tinder-like struct
 | Component | Role |
 |---|---|
 | `Button` | Shared pill/icon control — see Header § Button system; all interactive buttons compose this |
-| `LocaleSwitcher` | PT \| EN \| ES segment control (Header + Footer) |
-| `Input` | Pill field + label |
+| `LocaleSwitcher` | Language menu (extensible) or optional pills |
+| `Toast` | Bottom-right outcome alerts via `useToast` |
+| `Input` | Pill field + label; optional password reveal |
 | `Select` | Custom dropdown (GSAP panel); trigger is `Button` `field` |
 | `Checkbox` | Custom box + animated Check |
 | `AccordionItem` | FAQ disclosures; question row is `Button` `ghost` + `cursor-pointer` |
@@ -176,7 +201,11 @@ Model: clean multi-column + oversized cropped brand wordmark (Tinder-like struct
 
 ### Marketing (`apps/web/src/features/landing/`)
 
-`Header`, `Hero`, `SolutionSection`, `HowItWorks`, `AudienceCards`, `Differentials`, `FAQ`, `WaitlistSection` (used on `/register`), `Footer`, `OrganicBlob`, `SectionDivider`.
+`Header`, `Hero`, `SolutionSection`, `HowItWorks`, `AudienceCards`, `Differentials`, `FAQ`, `WaitlistSection`, `Footer`, `OrganicBlob`, `SectionDivider`.
+
+### Auth (`apps/web/src/features/auth/`)
+
+`AuthSplitLayout`, `AuthImageCarousel`, `RegisterForm`, `LoginForm`, `GoogleAuthButton`, `passwordValidation`.
 
 **Removed from public flow:** `ProblemSection`, `SocialProofCarousel` (files may remain unused — do not reintroduce without product ask).
 
@@ -185,10 +214,11 @@ Model: clean multi-column + oversized cropped brand wordmark (Tinder-like struct
 - Dropdown: use `Select`. Checkbox: use `Checkbox`.
 - Buttons: **only** `Button` (or composites like `LocaleSwitcher`). Do not hardcode styled `<button>` / CTA `<a>` in features.
 - `magnetic={false}` when pull feels heavy (Hero CTAs, compact chrome); fill/CSS hover still applies on fill variants.
+- Outcome feedback: **toasts only** — see [`ui-patterns.md`](ui-patterns.md).
 
 ### Scrollbar & anchors
 
-- Global thin scrollbar; thumb brand pink
+- Global thin scrollbar; pink thumb on transparent track
 - `scroll-padding-top: 6rem` on `html`
 - In-page hash links use Lenis **`anchors`** (offset `-96`) for smooth section travel — see tech plan
 
@@ -206,7 +236,8 @@ Intensity: **expressive and playful**, without competing with reading. Lenis kep
 | Accordion height | FAQ | GSAP height |
 | Light parallax | Hero blobs | ScrollTrigger `scrub: 0.6` |
 | Marquee ribbons | CurvedLoop | GSAP `x` loop |
-| Magnetic / fill hover | `Button` | pointer pull optional; clipPath fill on `md` fill variants; CSS hover on `white` / compact `pink` |
+| Magnetic / fill hover | `Button` | pointer pull optional; clipPath fill on `md` fill variants; CSS hover on `white` / compact `pink` (no scale on `sm` pink) |
+| Toast enter/exit | Toast stack | CSS translate + opacity swipe |
 | Click sparks | Page wrapper | ClickSpark |
 
 Required: `prefers-reduced-motion` (Lenis off + timelines skip + native anchor fallback).
@@ -219,7 +250,7 @@ Required: `prefers-reduced-motion` (Lenis off + timelines skip + native anchor f
 - [ ] No generic 3D illustrations
 - [ ] No Inter/Roboto as primary face
 - [ ] No identical floating white cards without hierarchy/color
-- [ ] Lucide OK in colored badges / intentional décor (filled paws in Hero)
+- [ ] Lucide OK in colored badges / intentional décor (filled paws in Hero); toast icons from Lucide (no emoji)
 - [ ] Header chrome stays pastel pink/green — avoid heavy black icon buttons on the frosted cluster
 
 ---
@@ -228,6 +259,7 @@ Required: `prefers-reduced-motion` (Lenis off + timelines skip + native anchor f
 
 - [ ] WCAG AA contrast (saturated on text/CTA)
 - [ ] Photo `alt`; visible focus; input labels
+- [ ] Password reveal buttons expose show/hide aria labels
 - [ ] `prefers-reduced-motion`
 - [ ] Correct `lang`; touch targets ≥44px
 - [ ] Interactive controls expose `cursor-pointer`; menu `aria-expanded` / Escape to close
@@ -241,10 +273,11 @@ Required: `prefers-reduced-motion` (Lenis off + timelines skip + native anchor f
 | Friendly pivot + pink/green + Bagel/Nunito | Done in code |
 | BubbleMenu + waves + bits (CurvedLoop, etc.) | Done in code |
 | Continuous ribbon bridges (`bridgeAbove`) | Done |
-| Header CTA cluster + soft green menu + in-menu locale | Done |
-| `/register` + `/login` (English paths); landing CTAs leave `/` | Done |
-| Shared `Button` + `LocaleSwitcher` | Done |
-| Clean footer + social links | Done |
+| Header Log in + Create account + soft green menu + in-menu locale | Done |
+| `/register` + `/login` split layout (carousel + Google UI CTA) | Done |
+| Register two-step + password reveal + toasts | Done |
+| Shared `Button` + `LocaleSwitcher` + `Toast` | Done |
+| Clean footer + social links + language menu | Done |
 | Hero paw field + taller viewport | Done |
 | Design system primitives | Done |
 | Logo + favicon | Pending |
@@ -257,4 +290,5 @@ Required: `prefers-reduced-motion` (Lenis off + timelines skip + native anchor f
 
 - [`landing-content-brief.md`](landing-content-brief.md)
 - [`landing-tech-plan.md`](landing-tech-plan.md)
+- [`ui-patterns.md`](ui-patterns.md)
 - [`personas.md`](personas.md)

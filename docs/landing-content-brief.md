@@ -3,7 +3,7 @@
 Content and strategy for the ANIMAPS institutional landing.  
 Sources: Phase 1 alignment decisions + [`ANIMAPS_Roadmap.md`](../ANIMAPS_Roadmap.md) §1.1–1.2 + [`personas.md`](personas.md).
 
-**Status:** decisions closed; public landing uses **account-first** CTAs (“Criar conta”) that navigate to **`/register`** (waitlist backend until auth ships). **`/login`** is a placeholder. In-page section hashes and app paths are **English**.
+**Status:** decisions closed; public landing uses **account-first** CTAs that navigate to **`/register`** and **`/login`**. Register is a **two-step** create-account UI (profile → strong password); backend remains **waitlist** until real auth ships. Login is a UI placeholder (email/password + Google CTA). In-page section hashes and app paths are **English**.
 
 ---
 
@@ -12,7 +12,7 @@ Sources: Phase 1 alignment decisions + [`ANIMAPS_Roadmap.md`](../ANIMAPS_Roadmap
 **Lead capture** focused on guardians/adopters (`guardian`), with **balanced** messaging for NGOs (`ngo`).
 
 - Hero primary CTA: **"Criar conta"** / create account → **`/register`**
-- Secondary chrome: **Log in** → **`/login`**
+- Header chrome: **Log in** → **`/login`** (secondary) beside **Create account** (primary)
 - Out of scope this phase: sponsorship, paid traffic, Meta Pixel, investor pages
 - Geographic framing: **national** (do not lock copy to a pilot city)
 - **No Problem section** on the public page — sell solutions/benefits only
@@ -87,12 +87,14 @@ Canonical public order (matches `apps/web/src/app/page.tsx`):
 
 **Auth routes (English):**
 
-- **`/register`** — create-account / waitlist form + privacy link to `/#privacy`
-- **`/login`** — placeholder copy + CTAs to `/register` and home (real auth later)
+- **`/register`** — two-step create-account UI:
+  1. Profile fields (name, email, profile type, city/state, LGPD) + optional **Continue with Google** (UI-only toast)
+  2. Password + confirm (strong password; show/hide eye toggle) → waitlist submit + success toast
+- **`/login`** — email/password UI + Google CTA (UI-only); submit and Google show info toasts until real auth; link to `/register`
 
-**Header chrome:** persistent **Create account** (`/register`) + menu (sections + register + login + language).
+**Header chrome:** frosted cluster with **Log in** (`/login`, secondary) + **Create account** (`/register`, primary) + menu (sections + register + login + language menu).
 
-**Footer:** brand blurb, platform/account/legal columns, social links (name + icon), **active PT | EN | ES** (`LocaleSwitcher`), oversized ANIMAPS wordmark. No newsletter CTA card. No locale URL prefixes.
+**Footer:** brand blurb, platform/account/legal columns, social links (name + icon), **language menu** (`LocaleSwitcher variant="menu"`), oversized ANIMAPS wordmark. No newsletter CTA card. No locale URL prefixes.
 
 **Section hashes (English):** `#top`, `#solution`, `#how-it-works`, `#audience`, `#differentials`, `#faq`, `#privacy`, `#terms`.
 
@@ -100,7 +102,7 @@ Canonical public order (matches `apps/web/src/app/page.tsx`):
 
 ## 7. Form (microcopy)
 
-### Fields
+### Step 1 — profile
 
 | Field | Required | Notes |
 |---|---|---|
@@ -110,13 +112,27 @@ Canonical public order (matches `apps/web/src/app/page.tsx`):
 | City / State | Optional (recommended) | Helps national segmentation |
 | LGPD consent | Yes | Checkbox + link to policy |
 
+Primary action label: **Continue** (advances to step 2; does not call the API yet).
+
+### Step 2 — password
+
+| Field | Required | Notes |
+|---|---|---|
+| Password | Yes | Strong: min 8 chars, one uppercase, one special character |
+| Confirm password | Yes | Must match |
+
+- Live requirement checklist stays in the form (guidance).
+- Show/hide password via eye toggle (`Input` `revealable`).
+- Weak / mismatch / missing password → **error toast** (not inline text).
+- Final submit: waitlist API for the profile lead; password is **client-validated only** until auth persists credentials.
+
 ### Microcopy guidelines
 
 - User-language labels (“I’m a guardian / Want to adopt”, “I’m an NGO”, etc.).
-- Errors: specific and actionable (“Enter a valid email”). Client validation returns **message keys** mapped through i18n.
-- Success: immediate confirmation (account/waitlist framing).
-- No password or documents (`taxId`) this phase — interest only.
-- UI may say **create account**; backend remains waitlist until auth.
+- Errors and success that the user must notice: **toasts** ([`ui-patterns.md`](ui-patterns.md)). Client validation returns **message keys** mapped through i18n.
+- Success: account/waitlist framing via **success toast** after step 2.
+- No documents (`taxId`) this phase.
+- UI may say **create account**; storage remains waitlist until auth.
 
 ---
 
@@ -148,7 +164,7 @@ Execution backlog (§1.7):
 - [ ] Hero headline + subheadline review (PT / EN / ES dictionaries) — warm, not sparse, not fluffy
 - [ ] Section copy with consistent “Ideal Match” / “Match ideal”
 - [ ] No Problem-section scare copy on public `/`
-- [ ] Form microcopy (labels, errors, success) across locales — account-facing where appropriate
+- [ ] Form microcopy (labels, toasts, password rules) across locales — account-facing where appropriate
 - [ ] Adapted privacy policy + minimum terms
 - [ ] Official social profile URLs in Footer
 - [ ] Tone review (warm/human ≠ melodramatic; not robotic)
@@ -163,3 +179,4 @@ Execution backlog (§1.7):
 - [`privacy-policy-draft.md`](privacy-policy-draft.md)
 - [`landing-design-brief.md`](landing-design-brief.md)
 - [`landing-tech-plan.md`](landing-tech-plan.md)
+- [`ui-patterns.md`](ui-patterns.md)
