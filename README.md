@@ -56,7 +56,7 @@ ANIMAPS connects people who care for animals:
 | Phase | Scope | Status |
 |---|---|---|
 | **Phase 0** | Architecture, data model, permissions, LGPD, governance | Done |
-| **Phase 1** | Institutional landing + waitlist (`apps/web`) | In progress |
+| **Phase 1** | Institutional landing + waitlist (`apps/web`) + onboarding/dashboard shells (frontend mocks) | In progress |
 | **Phase 2** | NestJS API (DDD) + auth + real persistence | Planned |
 | **Phase 3** | Full web product (matching, map, dashboards) | Planned |
 | **Phase 4** | Mobile apps (Android/iOS) on the same API | Planned |
@@ -185,15 +185,15 @@ No required env vars in Phase 1 (waitlist persistence is a placeholder). See [`a
 
 ## Design system
 
-Shared primitives in `apps/web/src/components/`: `Button`, `Input`, `Select`, `Checkbox`, `AccordionItem`, `Toast`, `LocaleSwitcher`. Motion kit in `components/bits/`. Clay mascots: `features/landing` (`ClayFigure`) + assets in `apps/web/public/images/clay/`.
+Shared primitives in `apps/web/src/components/`: `Button`, `Input`, `Select`, `Checkbox`, `AccordionItem`, `Toast`, `LocaleSwitcher`, plus product UI (`CodeInput`, `Modal`, `SelectableCard`, `InterestTag`, `ProgressIndicator`, `FormSection`, …). Motion kit in `components/bits/`. Clay mascots: `features/landing` (`ClayFigure`) + assets in `apps/web/public/images/clay/`.
 
-Tokens: [`apps/web/src/app/globals.css`](apps/web/src/app/globals.css). Visual brief: [`docs/landing-design-brief.md`](docs/landing-design-brief.md).
+Tokens: [`apps/web/src/app/globals.css`](apps/web/src/app/globals.css) (includes semantic `--success` / `--warning` / `--error`). Visual brief: [`docs/landing-design-brief.md`](docs/landing-design-brief.md) · [`docs/design-system.md`](docs/design-system.md).
 
 ---
 
 ## Documentation
 
-All product, domain, and process docs live in [`docs/`](docs/).
+All product, domain, and process docs live in [`docs/`](docs/). Full index: [`docs/README.md`](docs/README.md).
 
 <details>
 <summary><strong>Domain & data</strong></summary>
@@ -202,12 +202,31 @@ All product, domain, and process docs live in [`docs/`](docs/).
 |---|---|
 | [architecture.md](docs/architecture.md) | Monorepo boundaries, web/mobile/API roadmap |
 | [bounded-contexts.md](docs/bounded-contexts.md) | DDD contexts |
+| [database.md](docs/database.md) | Onboarding-related schema proposals |
 | [schema-evolution.md](docs/schema-evolution.md) | How to change the DB safely |
 | [der.dbml](docs/der.dbml) | ER diagram — paste into [dbdiagram.io](https://dbdiagram.io) (not Prisma) |
 | [data-dictionary.md](docs/data-dictionary.md) | Fields, types, rules |
 | [schema.prisma](docs/schema.prisma) | Prisma draft (docs only until API) |
 | [permissions-matrix.md](docs/permissions-matrix.md) | Roles and actions |
 | [personas.md](docs/personas.md) | Product personas |
+
+</details>
+
+<details>
+<summary><strong>Product UX (onboarding & app shell)</strong></summary>
+
+| Doc | Content |
+|---|---|
+| [user-flow.md](docs/user-flow.md) | Signup → onboarding → dashboard |
+| [authentication.md](docs/authentication.md) | Email OTP UI |
+| [onboarding.md](docs/onboarding.md) | Progressive steps |
+| [verification.md](docs/verification.md) | Selfie verification |
+| [profile.md](docs/profile.md) | Optional profile fields |
+| [dashboard.md](docs/dashboard.md) | App chrome & home |
+| [matching.md](docs/matching.md) | Discover mocks & future match |
+| [roadmap.md](docs/roadmap.md) | Product phases 01–09 |
+| [design-system.md](docs/design-system.md) | Tokens & states |
+| [components.md](docs/components.md) | Shared UI catalog |
 
 </details>
 
@@ -231,10 +250,9 @@ All product, domain, and process docs live in [`docs/`](docs/).
 | [privacy-policy-draft.md](docs/privacy-policy-draft.md) | Internal privacy draft (consumer PT copy may follow) |
 | [git-and-ci.md](docs/git-and-ci.md) | Branches, Conventional Commits, CI |
 | [pilot-ngo.md](docs/pilot-ngo.md) | Pilot NGO selection/onboarding |
+| [ui-patterns.md](docs/ui-patterns.md) | Toasts, language, auth chrome |
 
 </details>
-
-> Detailed roadmap and Kanban are kept locally and are not part of this repository.
 
 ---
 

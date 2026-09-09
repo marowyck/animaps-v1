@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
@@ -178,13 +179,13 @@ export function Header() {
       ref={containerRef}
       className="pointer-events-none fixed inset-x-0 top-0 z-50 flex items-start justify-between gap-2 p-3 sm:gap-3 sm:p-4 md:p-6"
     >
-      <a
+      <Link
         href="/#top"
         className="pointer-events-auto flex max-w-[42%] cursor-pointer items-center gap-1.5 rounded-full bg-white/90 px-2.5 py-1.5 text-base font-semibold text-ink shadow-sm backdrop-blur-sm sm:max-w-none sm:gap-2 sm:px-3 sm:py-2 sm:text-lg"
       >
         <PawPrint size={18} className="shrink-0 text-brand-pink sm:size-5" fill="currentColor" />
         <span className="font-display truncate tracking-tight">ANIMAPS</span>
-      </a>
+      </Link>
 
       <div ref={clusterRef} className="pointer-events-auto relative max-w-[58%] sm:max-w-none">
         <div className="flex items-center gap-1 rounded-full border border-white/70 bg-white/90 p-1 shadow-md backdrop-blur-md sm:gap-1.5 sm:p-1.5">
@@ -238,7 +239,7 @@ export function Header() {
           {nav.map((item, index) => {
             const Icon = item.Icon;
             return (
-              <a
+              <Link
                 key={item.href}
                 href={item.href}
                 ref={(el) => {
@@ -253,7 +254,7 @@ export function Header() {
               >
                 <span>{item.label}</span>
                 <Icon size={18} className="shrink-0 opacity-80" aria-hidden />
-              </a>
+              </Link>
             );
           })}
 

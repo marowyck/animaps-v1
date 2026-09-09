@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/Button";
 import { useT } from "@/i18n";
@@ -34,9 +35,9 @@ export function CookieBanner() {
     >
       <p className="text-sm font-bold text-ink-muted">
         {t.cookies.body}{" "}
-        <a href="/#privacy" className="underline underline-offset-2">
+        <Link href="/#privacy" className="underline underline-offset-2">
           {t.cookies.learnMore}
-        </a>
+        </Link>
         .
       </p>
       <div className="mt-4 flex flex-wrap gap-3">

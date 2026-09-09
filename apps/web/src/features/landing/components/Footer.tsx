@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { PawPrint } from "lucide-react";
 import { LocaleSwitcher } from "@/components/LocaleSwitcher";
 import { useT } from "@/i18n";
@@ -126,13 +127,13 @@ export function Footer({
       <div className="relative z-10 mx-auto max-w-6xl px-4 pt-10 pb-8 md:px-6 md:pt-14 md:pb-12">
         <div className="grid grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-3 lg:grid-cols-5">
           <div className="col-span-2 sm:col-span-3 lg:col-span-1">
-            <a
+            <Link
               href="/#top"
               className="inline-flex items-center gap-2 text-white/90 transition-colors hover:text-white"
             >
               <PawPrint size={18} aria-hidden />
               <span className="text-sm font-semibold tracking-wide">ANIMAPS</span>
-            </a>
+            </Link>
             <p className="mt-4 text-xs leading-relaxed text-white/45">
               © {year} Animaps
             </p>
@@ -150,13 +151,13 @@ export function Footer({
               <ul className="mt-4 space-y-2.5">
                 {col.links.map((link) => (
                   <li key={link.href}>
-                    <a
+                    <Link
                       id={"id" in link ? link.id : undefined}
                       href={link.href}
                       className="text-sm text-white/45 transition-colors hover:text-white/80"
                     >
                       {link.label}
-                    </a>
+                    </Link>
                   </li>
                 ))}
               </ul>

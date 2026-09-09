@@ -31,7 +31,7 @@ animaps/
 
 | Package | Role |
 |---|---|
-| `@animaps/web` | Landing + waitlist + auth UI (`/register`, `/login`) + cookie consent |
+| `@animaps/web` | Landing + waitlist + auth UI + onboarding + dashboard shells + cookie consent |
 
 ## Web feature layout
 
@@ -41,16 +41,28 @@ apps/web/src/
 │   ├── api/waitlist/    # Temporary Route Handler (moves to apps/api in Wave 2)
 │   ├── register/        # Two-step create-account UI (waitlist backend)
 │   ├── login/           # Login UI placeholder (real auth later)
-│   └── providers.tsx    # Locale + Toast + Lenis / GSAP
+│   ├── verify-email/    # Email OTP UI (mock verify)
+│   ├── onboarding/[step]/ # Dynamic multi-type onboarding
+│   ├── dashboard/       # Type-aware home (ONG/clinic); PERSON → discover
+│   ├── discover/        # Discovery cards (mocks)
+│   └── providers.tsx    # Locale + Toast + OnboardingProvider + Lenis / GSAP
 ├── features/
 │   ├── landing/         # Marketing sections + clay mascots (web-only)
-│   ├── auth/            # Split layout, register/login forms, password rules
+│   ├── auth/            # Split layout, register/login, verify-email form
 │   ├── waitlist/        # Form UI + client/server validation + types
-│   └── consent/         # Cookie banner (web-only localStorage)
-└── components/          # Shared primitives (Button, Input, Select, Toast, LocaleSwitcher…)
+│   ├── consent/         # Cookie banner (web-only localStorage)
+│   ├── user-types/      # PublicUserType helpers + DB mapping
+│   ├── permissions/     # UI capability catalog (hasPermission)
+│   ├── onboarding/      # Config-driven flows, draft, forms, VerificationFlow
+│   ├── verification/    # Mock selfie helper (+ legacy SelfieVerificationStep)
+│   ├── dashboard/       # DynamicDashboard, RoleBasedNavigation, shells
+│   └── discover/        # Card stack, actions, mocks
+└── components/          # Shared primitives (Button, Modal→portal, SelectableCard, …)
 ```
 
 Import other features only through their `index.ts` public API.
+
+Product UX docs: [user-flow.md](user-flow.md) · [onboarding.md](onboarding.md) · [user-types.md](user-types.md) · [conventions.md](conventions.md) · [roadmap.md](roadmap.md) · [docs/README.md](README.md).
 
 ## Dependency rules
 
@@ -59,24 +71,33 @@ Import other features only through their `index.ts` public API.
 3. `apps/api` (future) never depends on web or mobile.
 4. Features must not import another feature’s internal files.
 5. Do not put browser storage or Next Route Handler logic in shared packages (when they exist).
+6. Follow [conventions.md](conventions.md) for UserType / onboarding / permissions patterns.
 
 ## Domains
 
 | Domain | Where it lives today | Future |
 |---|---|---|
 | landing | `apps/web` features/landing | web-only |
-| auth UI | `apps/web` features/auth (`/register`, `/login`) | Nest `identity` (real auth later) |
+| auth UI | `apps/web` features/auth (`/register`, `/login`, `/verify-email`) | Nest `identity` (real auth later) |
+| onboarding | `features/onboarding` (dynamic flows by `UserType`, localStorage draft) | Nest `identity` prefs + intentions + profiles |
+| user types / permissions | `features/user-types`, `features/permissions` (UI gating) | Nest guards + `UserType` |
+| verification | `VerificationFlow` + `features/verification` mock helper | Nest + provider via `verification_requests` |
+| dashboard / discover | web shells + mocks | Nest reads + matching service |
 | waitlist / marketing | web feature + Next `/api/waitlist` | Nest `marketing` module |
 | consent | web features/consent | web-only; mobile will use native privacy UX |
 | identity, adoption, occurrence, notifications, analytics | docs only | `apps/api` modules |
 
-## Authentication (design — not implemented)
+## How to add a user type (summary)
+
+See the full checklist in [conventions.md](conventions.md). Minimum: enum + profile (if needed) + `ONBOARDING_FLOWS` + `DASHBOARD_CONFIGS` + permissions + i18n (pt/en/es) + docs (Prisma/DBML/dictionary).
+
+## Authorization (design)
 
 - Access JWT (short-lived) + refresh token (hashed at rest).
 - Same Nest auth endpoints for web and mobile.
 - Web: prefer httpOnly cookie for refresh (or memory + rotation); access in memory.
 - Mobile: Secure Store for refresh; access in memory.
-- Authorization: roles + verification flags from `identity` ([permissions-matrix.md](permissions-matrix.md)).
+- Authorization: `UserType` + verification flags from `identity` ([permissions-matrix.md](permissions-matrix.md)). UI gating alone is never enough ([permissions.md](permissions.md)).
 
 ## Environment variables
 
