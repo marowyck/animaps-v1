@@ -1,21 +1,32 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/Button";
 import { Input } from "@/components/Input";
 import { useToast } from "@/components/Toast";
+import { useOnboarding } from "@/features/onboarding";
 import { useT } from "@/i18n";
 import { GoogleAuthButton } from "./GoogleAuthButton";
 
 export function LoginForm() {
   const t = useT();
   const { toast } = useToast();
+  const router = useRouter();
+  const { patch } = useOnboarding();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   function onSubmit(e: FormEvent) {
     e.preventDefault();
+    if (!email.trim()) {
+      toast({ message: t.auth.login.soon, tone: "info" });
+      return;
+    }
+    // Frontend-only: skip real auth and enter email OTP → onboarding path.
+    patch({ email: email.trim() });
     toast({ message: t.auth.login.soon, tone: "info" });
+    router.push(`/verify-email?email=${encodeURIComponent(email.trim())}`);
   }
 
   return (

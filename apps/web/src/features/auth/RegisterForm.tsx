@@ -1,11 +1,13 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/Button";
 import { Input } from "@/components/Input";
 import { useToast } from "@/components/Toast";
 import { WaitlistForm, type WaitlistFormState } from "@/features/waitlist";
 import { submitWaitlist } from "@/features/waitlist/submitWaitlist";
+import { useOnboarding } from "@/features/onboarding";
 import { useT } from "@/i18n";
 import { GoogleAuthButton } from "./GoogleAuthButton";
 import {
@@ -19,6 +21,8 @@ type RegisterStep = 1 | 2;
 export function RegisterForm() {
   const t = useT();
   const { toast } = useToast();
+  const router = useRouter();
+  const { patch } = useOnboarding();
   const [step, setStep] = useState<RegisterStep>(1);
   const [profile, setProfile] = useState<WaitlistFormState | null>(null);
   const [password, setPassword] = useState("");
@@ -50,11 +54,14 @@ export function RegisterForm() {
       // Password is validated client-side for the UX flow; waitlist API
       // still stores the lead only until real auth ships.
       await submitWaitlist(profile);
+      patch({
+        email: profile.email,
+        displayName: profile.name,
+        userType: profile.profileType || "PERSON",
+      });
       toast({ message: t.form.success, tone: "success" });
-      setPassword("");
-      setConfirmPassword("");
-      setProfile(null);
-      setStep(1);
+      const email = encodeURIComponent(profile.email);
+      router.push(`/verify-email?email=${email}`);
     } catch (err) {
       toast({
         message:

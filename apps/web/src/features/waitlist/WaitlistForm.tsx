@@ -1,14 +1,16 @@
 "use client";
 
-import { FormEvent, useMemo, useState } from "react";
+import Link from "next/link";
+import { FormEvent, useState } from "react";
 import { Button } from "@/components/Button";
 import { Checkbox } from "@/components/Checkbox";
 import { Input } from "@/components/Input";
-import { Select } from "@/components/Select";
 import { useToast } from "@/components/Toast";
 import { useT } from "@/i18n";
+import { UserTypeSelector } from "@/features/onboarding";
+import type { PublicUserType } from "@/features/user-types";
 import { submitWaitlist } from "./submitWaitlist";
-import type { ProfileType, WaitlistFormState } from "./types";
+import type { WaitlistFormState } from "./types";
 import { validateWaitlistFormClient } from "./validation";
 
 const INITIAL: WaitlistFormState = {
@@ -44,17 +46,6 @@ export function WaitlistForm({
     initialValues ?? INITIAL,
   );
   const [status, setStatus] = useState<"idle" | "loading">("idle");
-
-  const profileOptions = useMemo(
-    () =>
-      [
-        { value: "guardian", label: t.form.profiles.guardian },
-        { value: "ngo", label: t.form.profiles.ngo },
-        { value: "clinic", label: t.form.profiles.clinic },
-        { value: "other", label: t.form.profiles.other },
-      ] as const,
-    [t],
-  );
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
@@ -122,18 +113,16 @@ export function WaitlistForm({
           required
         />
 
-        <Select
-          className="col-span-2"
-          compact={embedded}
-          label={t.form.profileType}
-          name="profileType"
-          options={[...profileOptions]}
-          value={form.profileType}
-          onChange={(v) =>
-            setForm({ ...form, profileType: v as ProfileType | "" })
-          }
-          required
-        />
+        <div className="col-span-2 space-y-1.5">
+          <p className="text-xs font-bold text-ink">{t.form.profileType}</p>
+          <UserTypeSelector
+            compact={embedded}
+            value={form.profileType}
+            onChange={(v: PublicUserType) =>
+              setForm({ ...form, profileType: v })
+            }
+          />
+        </div>
 
         <Input
           compact={embedded}
@@ -161,12 +150,12 @@ export function WaitlistForm({
         label={
           <>
             {t.form.privacyBefore}{" "}
-            <a
+            <Link
               href="/#privacy"
               className="font-bold underline underline-offset-2"
             >
               {t.form.privacyLink}
-            </a>{" "}
+            </Link>{" "}
             {t.form.privacyAfter}
           </>
         }

@@ -1,5 +1,11 @@
 import {
+  DB_TO_USER_TYPE,
+  normalizeUserType,
+  type PublicUserType,
+} from "@/features/user-types";
+import {
   PROFILE_TYPE_VALUES,
+  toDbProfileType,
   type ProfileType,
   type WaitlistBody,
   type WaitlistFormState,
@@ -21,7 +27,14 @@ export function validateWaitlistFormClient(
   return null;
 }
 
-const PROFILE_TYPES = new Set<string>(PROFILE_TYPE_VALUES);
+const PROFILE_TYPES = new Set<string>([
+  ...PROFILE_TYPE_VALUES,
+  ...Object.keys(DB_TO_USER_TYPE),
+  "PERSON",
+  "ONG",
+  "VETERINARY_CLINIC",
+  "OTHER",
+]);
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export type ParseWaitlistResult =
@@ -30,14 +43,14 @@ export type ParseWaitlistResult =
 
 /**
  * Server-side waitlist payload validation.
- * Preserves existing API error messages and status codes (PT).
+ * Accepts SCREAMING_SNAKE (UI) or snake_case (DB) profileType values.
  */
 export function parseWaitlistBody(body: WaitlistBody): ParseWaitlistResult {
   const name = body.name?.trim() ?? "";
   const email = body.email?.trim().toLowerCase() ?? "";
-  const profileType = body.profileType ?? "";
+  const rawType = body.profileType ?? "";
 
-  if (!name || !email || !PROFILE_TYPES.has(profileType)) {
+  if (!name || !email || !PROFILE_TYPES.has(rawType)) {
     return {
       ok: false,
       message: "Campos obrigatórios inválidos.",
@@ -60,6 +73,9 @@ export function parseWaitlistBody(body: WaitlistBody): ParseWaitlistResult {
       status: 400,
     };
   }
+
+  const userType = normalizeUserType(rawType) as PublicUserType;
+  const profileType = toDbProfileType(userType);
 
   return {
     ok: true,

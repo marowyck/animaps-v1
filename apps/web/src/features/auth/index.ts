@@ -4,6 +4,7 @@ export { GoogleAuthButton } from "./GoogleAuthButton";
 export { GoogleIcon } from "./GoogleIcon";
 export { LoginForm } from "./LoginForm";
 export { RegisterForm } from "./RegisterForm";
+export { VerifyEmailForm } from "./VerifyEmailForm";
 export { AUTH_SLIDES } from "./slides";
 export type { AuthSlideId } from "./slides";
 export {
