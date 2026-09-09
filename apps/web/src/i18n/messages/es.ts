@@ -26,7 +26,7 @@ export const es: Messages = {
     body: "Crea tu cuenta en ANIMAPS y te ayudamos a encontrar el Match ideal — el animal que de verdad encaja con tu rutina, tu espacio y tu forma de cuidar. Y si alguien necesita ayuda ahora, el mapa de ocurrencias está aquí para eso.",
     ctaAccount: "Crear cuenta",
     ctaHow: "Ver cómo funciona",
-    imageAlt: "Gato y perro juntos, listos para encontrar un hogar",
+    imageAlt: "Cachorrito de plastilina — listo para el match ideal",
   },
   solution: {
     eyebrow: "Con cariño",

@@ -11,16 +11,16 @@ import {
   Footer,
 } from "@/features/landing";
 import { CookieBanner } from "@/features/consent";
-import { ClickSpark, CurvedLoop } from "@/components/bits";
+import { CurvedLoop } from "@/components/bits";
 import { useT } from "@/i18n";
 
 export default function HomePage() {
   const t = useT();
 
   return (
-    <ClickSpark sparkColor="#e07a96" sparkSize={10} sparkRadius={18} sparkCount={9}>
+    <>
       <Header />
-      <main className="flex-1">
+      <main className="relative flex-1 overflow-x-clip">
         <Hero />
         <SolutionSection />
         <HowItWorks />
@@ -49,6 +49,6 @@ export default function HomePage() {
       </main>
       <Footer showDivider={false} />
       <CookieBanner />
-    </ClickSpark>
+    </>
   );
 }

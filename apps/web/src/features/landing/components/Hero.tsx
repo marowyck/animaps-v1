@@ -1,206 +1,253 @@
 "use client";
 
 import { useRef } from "react";
-import Image from "next/image";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { SplitText as GSAPSplitText } from "gsap/SplitText";
 import { useGSAP } from "@gsap/react";
-import { UserPlus, ArrowDown, PawPrint } from "lucide-react";
+import { UserPlus, ArrowDown } from "lucide-react";
 import { Button } from "@/components/Button";
-import {
-  DotGrid,
-  ScrollReveal,
-  TiltedCard,
-  updateDotGridVars,
-} from "@/components/bits";
-import { OrganicBlob } from "./OrganicBlob";
 import { useT } from "@/i18n";
+import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
+import { ClayFigure } from "./ClayFigure";
 
-gsap.registerPlugin(ScrollTrigger);
+gsap.registerPlugin(ScrollTrigger, GSAPSplitText);
 
-const PAW_MARKS = [
-  { top: "8%", left: "5%", size: 34, rotate: -18, opacity: 0.28, color: "pink" },
-  { top: "14%", left: "22%", size: 22, rotate: 14, opacity: 0.2, color: "green" },
-  { top: "10%", left: "48%", size: 28, rotate: -8, opacity: 0.22, color: "pink" },
-  { top: "16%", left: "72%", size: 40, rotate: 24, opacity: 0.26, color: "pink" },
-  { top: "12%", left: "90%", size: 24, rotate: -30, opacity: 0.2, color: "green" },
-  { top: "28%", left: "8%", size: 26, rotate: 20, opacity: 0.24, color: "green" },
-  { top: "32%", left: "30%", size: 18, rotate: -22, opacity: 0.18, color: "pink" },
-  { top: "26%", left: "58%", size: 32, rotate: 10, opacity: 0.22, color: "green" },
-  { top: "34%", left: "84%", size: 36, rotate: -16, opacity: 0.28, color: "pink" },
-  { top: "44%", left: "3%", size: 42, rotate: 8, opacity: 0.22, color: "pink" },
-  { top: "48%", left: "18%", size: 20, rotate: 28, opacity: 0.2, color: "green" },
-  { top: "42%", left: "40%", size: 24, rotate: -12, opacity: 0.16, color: "pink" },
-  { top: "50%", left: "66%", size: 30, rotate: 18, opacity: 0.24, color: "pink" },
-  { top: "46%", left: "92%", size: 28, rotate: -26, opacity: 0.26, color: "green" },
-  { top: "60%", left: "10%", size: 22, rotate: -14, opacity: 0.22, color: "green" },
-  { top: "64%", left: "28%", size: 36, rotate: 32, opacity: 0.26, color: "pink" },
-  { top: "58%", left: "52%", size: 18, rotate: -6, opacity: 0.18, color: "green" },
-  { top: "62%", left: "76%", size: 34, rotate: -20, opacity: 0.24, color: "pink" },
-  { top: "70%", left: "4%", size: 30, rotate: 12, opacity: 0.2, color: "pink" },
-  { top: "74%", left: "38%", size: 26, rotate: -28, opacity: 0.24, color: "green" },
-  { top: "78%", left: "58%", size: 38, rotate: 16, opacity: 0.28, color: "pink" },
-  { top: "72%", left: "88%", size: 22, rotate: 8, opacity: 0.2, color: "green" },
-  { top: "86%", left: "16%", size: 28, rotate: 22, opacity: 0.22, color: "pink" },
-  { top: "88%", left: "48%", size: 24, rotate: -10, opacity: 0.2, color: "green" },
-  { top: "84%", left: "70%", size: 32, rotate: 30, opacity: 0.26, color: "pink" },
-  { top: "90%", left: "92%", size: 20, rotate: -18, opacity: 0.18, color: "green" },
-] as const;
-
-function prefersReducedMotion(): boolean {
-  if (typeof window === "undefined") return false;
-  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-}
-
+/**
+ * White Hero with soft brand atmosphere — pets frame the copy as one composition.
+ */
 export function Hero() {
   const t = useT();
   const containerRef = useRef<HTMLElement>(null);
-  const blobRef = useRef<HTMLDivElement>(null);
+  const sceneRef = useRef<HTMLDivElement>(null);
+  const uiRef = useRef<HTMLDivElement>(null);
+  const titleRef = useRef<HTMLHeadingElement>(null);
+  const reduced = usePrefersReducedMotion();
 
   useGSAP(
     () => {
-      if (prefersReducedMotion()) return;
+      const container = containerRef.current;
+      const scene = sceneRef.current;
+      const ui = uiRef.current;
+      if (!container || !scene || !ui) return;
 
-      const tl = gsap.timeline();
-      tl.from(".hero-text", {
-        x: -36,
-        opacity: 0,
-        duration: 0.65,
-        ease: "power3.out",
-      })
-        .from(
-          ".hero-blob",
-          {
-            scale: 0.85,
-            opacity: 0,
-            duration: 0.9,
-            ease: "elastic.out(1, 0.75)",
-          },
-          "-=0.45",
-        )
-        .from(
-          ".hero-image",
-          {
+      let split: GSAPSplitText | undefined;
+      const layers = {
+        wash: scene.querySelector<HTMLElement>(".layer-wash"),
+        clayLeft: scene.querySelector<HTMLElement>(".clay-left"),
+        clayRight: scene.querySelector<HTMLElement>(".clay-right"),
+        ui,
+      };
+
+      const mouse = { x: 0, y: 0 };
+      const target = { x: 0, y: 0 };
+      let raf = 0;
+
+      const applyLayerTransforms = () => {
+        if (layers.wash) {
+          gsap.set(layers.wash, { x: mouse.x * -8, y: mouse.y * -5 });
+        }
+        if (layers.clayLeft) {
+          gsap.set(layers.clayLeft, { x: mouse.x * 16, y: mouse.y * 9 });
+        }
+        if (layers.clayRight) {
+          gsap.set(layers.clayRight, { x: mouse.x * -16, y: mouse.y * 9 });
+        }
+        gsap.set(layers.ui, { x: mouse.x * 5, y: mouse.y * 4 });
+      };
+
+      const runIntro = () => {
+        const tl = gsap.timeline({ defaults: { ease: "back.out(1.6)" } });
+
+        if (titleRef.current) {
+          split = new GSAPSplitText(titleRef.current, {
+            type: "words",
+            wordsClass: "hero-word inline-block",
+          });
+          tl.from(split.words, {
+            y: 40,
             scale: 0.9,
             opacity: 0,
             duration: 0.6,
-            ease: "back.out(1.5)",
-          },
-          "-=0.6",
-        )
-        .from(
-          ".hero-cta",
-          {
-            y: 20,
-            opacity: 0,
-            duration: 0.45,
-            ease: "power2.out",
-          },
-          "-=0.3",
-        );
+            stagger: 0.04,
+          });
+        }
 
-      if (blobRef.current) {
-        gsap.to(blobRef.current, {
-          yPercent: -6,
+        tl.from(
+          ".hero-body",
+          { y: 16, opacity: 0, duration: 0.4, ease: "power2.out" },
+          "-=0.28",
+        )
+          .from(
+            ".hero-cta > *",
+            {
+              y: 12,
+              scale: 0.94,
+              opacity: 0,
+              duration: 0.35,
+              stagger: 0.06,
+              ease: "back.out(1.7)",
+            },
+            "-=0.18",
+          )
+          .from(
+            ".clay-companion",
+            {
+              y: 40,
+              opacity: 0,
+              scale: 0.9,
+              duration: 0.6,
+              stagger: 0.12,
+              ease: "power2.out",
+            },
+            "-=0.4",
+          );
+      };
+
+      if (document.fonts?.status === "loaded") runIntro();
+      else document.fonts?.ready.then(runIntro);
+
+      const onMove = (e: MouseEvent) => {
+        if (reduced) return;
+        const rect = container.getBoundingClientRect();
+        if (rect.bottom < 0 || rect.top > window.innerHeight) return;
+        target.x = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
+        target.y = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
+      };
+
+      const tick = () => {
+        mouse.x += (target.x - mouse.x) * 0.08;
+        mouse.y += (target.y - mouse.y) * 0.08;
+        if (!reduced) applyLayerTransforms();
+        raf = requestAnimationFrame(tick);
+      };
+
+      if (!reduced) {
+        window.addEventListener("mousemove", onMove, { passive: true });
+        raf = requestAnimationFrame(tick);
+      }
+
+      let fadeTween: gsap.core.Tween | undefined;
+      if (!reduced) {
+        fadeTween = gsap.to(container, {
+          opacity: 0,
           ease: "none",
           scrollTrigger: {
-            trigger: containerRef.current,
+            trigger: container,
             start: "top top",
             end: "bottom top",
-            scrub: 0.6,
+            scrub: 0.4,
           },
         });
       }
+
+      return () => {
+        cancelAnimationFrame(raf);
+        window.removeEventListener("mousemove", onMove);
+        fadeTween?.scrollTrigger?.kill();
+        fadeTween?.kill();
+        try {
+          split?.revert();
+        } catch {
+          /* ignore */
+        }
+      };
     },
-    { scope: containerRef },
+    { scope: containerRef, dependencies: [reduced, t.hero.titleLine1] },
   );
 
   return (
     <section
       id="top"
       ref={containerRef}
-      className="relative flex min-h-[88vh] flex-col justify-center overflow-x-hidden px-4 pb-28 pt-32 md:min-h-[92vh] md:pb-32 md:pt-36"
-      onMouseMove={(e) => {
-        if (containerRef.current) {
-          updateDotGridVars(containerRef.current, e.clientX, e.clientY);
-        }
-      }}
+      className="relative flex min-h-[100svh] w-full flex-col items-center justify-center overflow-hidden bg-white"
     >
-      <DotGrid opacity={0.5} gap={28} proximity={130} />
-
-      <div
-        className="pointer-events-none absolute inset-0 z-[1] overflow-hidden"
-        aria-hidden
-      >
-        {PAW_MARKS.map((paw, i) => (
-          <PawPrint
-            key={i}
-            size={paw.size}
-            fill="currentColor"
-            strokeWidth={0}
-            className={`absolute ${paw.color === "green" ? "text-brand-green" : "text-brand-pink"}`}
-            style={{
-              top: paw.top,
-              left: paw.left,
-              opacity: paw.opacity,
-              transform: `rotate(${paw.rotate}deg)`,
-            }}
+      <div ref={sceneRef} className="absolute inset-0 z-0">
+        {/* Soft brand atmosphere on white */}
+        <div className="layer-wash pointer-events-none absolute inset-0 will-change-transform">
+          <div
+            className="absolute -left-24 top-[-10%] h-[55vmax] w-[55vmax] rounded-full bg-pastel-pink/70 blur-3xl"
+            aria-hidden
           />
-        ))}
-      </div>
-
-      <div ref={blobRef} className="pointer-events-none absolute inset-0 z-[1]">
-        <OrganicBlob
-          color="pink"
-          className="hero-blob -right-8 top-[8%] h-[280px] w-[280px] opacity-40 blur-3xl md:h-[400px] md:w-[400px]"
-        />
-        <OrganicBlob
-          color="green"
-          className="bottom-[18%] left-[-4%] h-44 w-44 opacity-35 blur-2xl md:h-64 md:w-64"
-        />
-      </div>
-
-      <div className="relative z-10 mx-auto grid w-full max-w-6xl grid-cols-1 items-center gap-10 md:grid-cols-2 md:gap-12">
-        <div className="hero-text min-w-0 text-left">
-          <h1 className="font-display mb-4 text-4xl leading-[1.12] tracking-tight text-ink md:text-5xl lg:text-6xl">
-            {t.hero.titleLine1} <br />
-            <span className="text-brand-pink">{t.hero.titleHighlight}</span>
-          </h1>
-
-          <ScrollReveal className="mb-8 max-w-md text-base leading-relaxed text-ink-muted md:text-lg">
-            {t.hero.body}
-          </ScrollReveal>
-
-          <div className="hero-cta flex flex-wrap gap-3">
-            <Button href="/register" variant="pink" magnetic={false}>
-              <UserPlus size={18} />
-              {t.hero.ctaAccount}
-            </Button>
-            <Button href="/#how-it-works" variant="white" magnetic={false}>
-              <ArrowDown size={18} />
-              {t.hero.ctaHow}
-            </Button>
-          </div>
+          <div
+            className="absolute -right-20 bottom-[-5%] h-[50vmax] w-[50vmax] rounded-full bg-pastel-green/55 blur-3xl"
+            aria-hidden
+          />
+          <div
+            className="absolute left-1/2 top-[42%] h-[min(55vw,420px)] w-[min(55vw,420px)] -translate-x-1/2 -translate-y-1/2 rounded-full bg-pastel-pink/40 blur-3xl"
+            aria-hidden
+          />
         </div>
 
-        <div className="hero-image relative flex justify-center md:justify-end">
-          <TiltedCard rotateAmplitude={8} scaleOnHover={1.03}>
-            <div className="relative">
-              <div className="absolute inset-0 scale-105 rotate-6 rounded-[60%_40%_30%_70%/60%_30%_70%_40%] bg-brand-green/40" />
-              <div className="relative z-10 h-[340px] w-[340px] overflow-hidden rounded-[60%_40%_30%_70%/60%_30%_70%_40%] border-[6px] border-white shadow-xl md:h-[460px] md:w-[460px]">
-                <Image
-                  src="/images/hero-pet.jpg"
-                  alt={t.hero.imageAlt}
-                  fill
-                  priority
-                  quality={95}
-                  className="object-cover"
-                  style={{ objectPosition: "68% 52%" }}
-                  sizes="(max-width: 768px) 680px, 920px"
-                />
-              </div>
-            </div>
-          </TiltedCard>
+        {/* Pets as large companions framing the brand */}
+        <div className="pointer-events-none absolute inset-0 z-[2]">
+          <div className="clay-companion clay-left absolute bottom-[8%] left-0 flex flex-col items-center sm:left-[2%] md:bottom-[10%] md:left-[4%] lg:left-[7%]">
+            <div
+              className="absolute bottom-6 left-1/2 h-44 w-44 -translate-x-1/2 rounded-full bg-pastel-pink/80 blur-2xl sm:h-56 sm:w-56 md:h-64 md:w-64"
+              aria-hidden
+            />
+            <ClayFigure
+              name="puppy"
+              size={300}
+              sizes="(max-width: 768px) 200px, (max-width: 1024px) 260px, 320px"
+              priority
+              className="relative z-[1] !w-[160px] sm:!w-[210px] md:!w-[260px] lg:!w-[300px]"
+            />
+            <div
+              className="relative z-[1] mt-[-12px] h-6 w-[75%] rounded-[100%] bg-brand-pink/20 blur-[8px]"
+              aria-hidden
+            />
+          </div>
+
+          <div className="clay-companion clay-right absolute bottom-[7%] right-0 flex flex-col items-center sm:right-[2%] md:bottom-[9%] md:right-[4%] lg:right-[7%]">
+            <div
+              className="absolute bottom-6 left-1/2 h-40 w-40 -translate-x-1/2 rounded-full bg-pastel-green/70 blur-2xl sm:h-52 sm:w-52 md:h-60 md:w-60"
+              aria-hidden
+            />
+            <ClayFigure
+              name="cat"
+              size={280}
+              sizes="(max-width: 768px) 180px, (max-width: 1024px) 240px, 300px"
+              priority
+              className="relative z-[1] !w-[150px] sm:!w-[190px] md:!w-[240px] lg:!w-[280px]"
+            />
+            <div
+              className="relative z-[1] mt-[-10px] h-6 w-[70%] rounded-[100%] bg-brand-green/20 blur-[8px]"
+              aria-hidden
+            />
+          </div>
+        </div>
+      </div>
+
+      <div
+        ref={uiRef}
+        className="relative z-10 mx-auto flex w-full max-w-3xl flex-col items-center px-4 text-center will-change-transform md:max-w-4xl"
+      >
+        <p className="hero-eyebrow mb-4 inline-flex items-center rounded-full border border-brand-pink/25 bg-pastel-pink/80 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-brand-pink shadow-[0_8px_24px_-8px_rgba(224,122,150,0.45)]">
+          ANIMAPS
+        </p>
+
+        <h1
+          ref={titleRef}
+          className="font-display mb-4 max-w-3xl text-5xl leading-[1.05] tracking-tight text-ink sm:text-6xl md:mb-5 md:text-7xl lg:text-[5.75rem]"
+        >
+          {t.hero.titleLine1}{" "}
+          <span className="text-brand-pink">{t.hero.titleHighlight}</span>
+        </h1>
+
+        <p className="hero-body mb-8 max-w-lg text-base leading-relaxed text-ink-muted md:text-lg">
+          {t.hero.body}
+        </p>
+
+        <div className="hero-cta flex flex-wrap items-center justify-center gap-3">
+          <Button href="/register" variant="pink" magnetic={false}>
+            <UserPlus size={18} />
+            {t.hero.ctaAccount}
+          </Button>
+          <Button href="/#how-it-works" variant="white" magnetic={false}>
+            <ArrowDown size={18} />
+            {t.hero.ctaHow}
+          </Button>
         </div>
       </div>
     </section>

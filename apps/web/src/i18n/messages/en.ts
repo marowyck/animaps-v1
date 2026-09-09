@@ -26,7 +26,7 @@ export const en: Messages = {
     body: "Create your ANIMAPS account and we’ll help you find your Ideal Match — the animal that truly fits your routine, your space, and the way you care. And if someone needs help right now, the occurrence map is here for that.",
     ctaAccount: "Create account",
     ctaHow: "See how it works",
-    imageAlt: "A cat and a dog together, ready to find a home",
+    imageAlt: "A clay puppy — ready for the right match",
   },
   solution: {
     eyebrow: "With care",

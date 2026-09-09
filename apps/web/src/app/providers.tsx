@@ -102,13 +102,13 @@ function SmoothScrollInner({ children }: { children: ReactNode }) {
     <ReactLenis
       root
       options={{
-        lerp: 0.16,
-        duration: 1,
+        lerp: 0.1,
+        duration: 1.1,
         easing: easeOutExpo,
         smoothWheel: true,
         syncTouch: false,
-        touchMultiplier: 1.4,
-        wheelMultiplier: 1.2,
+        touchMultiplier: 1.2,
+        wheelMultiplier: 1,
         autoRaf: false,
         anchors: {
           offset: ANCHOR_OFFSET,
