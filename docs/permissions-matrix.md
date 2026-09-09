@@ -1,14 +1,16 @@
 # ANIMAPS — Permissions matrix
 
 Phase 0 artifact (basis for NestJS guards in Phase 2).  
-Roles: `guardian`, `ngo`, `clinic`, `public_agency`, `biologist`.  
-Flags: `verified` (NGO/clinic), `isRescuer` (guardian).
+**UserType** (DB `snake_case`): `person`, `ong`, `veterinary_clinic`, `other`, `public_agency`, `biologist`.  
+Public signup uses the first four; `public_agency` and `biologist` are admin-assigned.
+
+Flags: `verified` (ONG / clinic), `isRescuer` (person).
 
 **Values:** `allow` · `deny` · `cond` (see condition).
 
 **Auth:** `anon` = no login · `auth` = any authenticated user · `own` = resource owner.
 
-Related: [`bounded-contexts.md`](bounded-contexts.md) · [`data-dictionary.md`](data-dictionary.md).
+Related: [permissions.md](permissions.md) (UI capability catalog) · [user-types.md](user-types.md) · [bounded-contexts.md](bounded-contexts.md) · [data-dictionary.md](data-dictionary.md).
 
 ---
 
@@ -16,19 +18,19 @@ Related: [`bounded-contexts.md`](bounded-contexts.md) · [`data-dictionary.md`](
 
 | Topic | Rule |
 |---|---|
-| Create `Animal` | NGO `verified` **OR** clinic `verified` **OR** guardian `isRescuer` |
-| `RequestAdoption` | Authenticated guardian + `taxId` set |
+| Create `Animal` | ONG `verified` **OR** clinic `verified` **OR** person `isRescuer` |
+| `RequestAdoption` | Authenticated person + `taxId` set |
 | Parallel requests | Many on same animal; origin chooses |
 | Animal → `in_process` | On first `approved` (not on request) |
 | Create `Occurrence` | Anonymous or authenticated |
-| Validate `Occurrence` | NGO verified / `public_agency`; `biologist` only if `wildlife_sighting` |
+| Validate `Occurrence` | ONG verified / `public_agency`; `biologist` only if `wildlife_sighting` |
 | Clinical report | Verified clinic only |
 
 ---
 
 ## Account / identity
 
-| Action | anon | guardian | ngo | clinic | public_agency | biologist |
+| Action | anon | person | ong | veterinary_clinic | public_agency | biologist |
 |---|---|---|---|---|---|---|
 | `RegisterUser` | allow | deny* | deny* | deny* | deny* | deny* |
 | `EditOwnProfile` | deny | allow | allow | allow | allow | allow |
@@ -36,14 +38,14 @@ Related: [`bounded-contexts.md`](bounded-contexts.md) · [`data-dictionary.md`](
 | `VerifyNgo` (admin) | deny | deny | deny | deny | cond¹ | deny |
 | `VerifyClinic` (admin) | deny | deny | deny | deny | cond¹ | deny |
 
-\* Already authenticated does not re-register the same role in MVP (separate flow if needed).  
+\* Already authenticated does not re-register the same type in MVP (separate flow if needed).  
 ¹ MVP: `public_agency` may verify institutions; or internal manual process — document operator.
 
 ---
 
 ## Animal / adoption
 
-| Action | anon | guardian | ngo | clinic | public_agency | biologist |
+| Action | anon | person | ong | veterinary_clinic | public_agency | biologist |
 |---|---|---|---|---|---|---|
 | `ListAvailableAnimals` | allow | allow | allow | allow | allow | allow |
 | `GetAnimalPublic` | allow | allow | allow | allow | allow | allow |
@@ -59,17 +61,17 @@ Related: [`bounded-contexts.md`](bounded-contexts.md) · [`data-dictionary.md`](
 ² `isRescuer = true`  
 ³ `verified = true`  
 ⁴ `verified = true`  
-⁵ Is animal origin (`ngoId` / `guardianId` / `clinicId` = self)  
-⁶ Role guardian + `taxId` set + animal `available` (or still accepting requests)  
+⁵ Is animal origin (`organizationId` / `personId` / `veterinaryId` = self)  
+⁶ Role person + `taxId` set + animal `available` (or still accepting requests)  
 ⁷ Is origin of the animal linked to the adoption  
-⁸ Adoption requester (guardian) **or** animal origin  
+⁸ Adoption requester (person) **or** animal origin  
 ⁹ Own score vs animal; origin sees candidate scores
 
 ---
 
 ## Occurrence
 
-| Action | anon | guardian | ngo | clinic | public_agency | biologist |
+| Action | anon | person | ong | veterinary_clinic | public_agency | biologist |
 |---|---|---|---|---|---|---|
 | `ListOccurrencesNearby` | allow* | allow* | allow* | allow* | allow* | allow* |
 | `GetOccurrencePublic` | allow* | allow* | allow* | allow* | allow* | allow* |
@@ -82,7 +84,7 @@ Related: [`bounded-contexts.md`](bounded-contexts.md) · [`data-dictionary.md`](
 
 \* No author PII; geo may be approximate in public listings (LGPD E0.6).  
 ¹⁰ Only if `userId` still null  
-¹¹ NGO verified or public_agency (and follower/care origin)  
+¹¹ ONG verified or public_agency (and follower/care origin)  
 ¹² `wildlife_sighting` only (limited operational status)  
 ¹³ Only if `type = wildlife_sighting`
 
@@ -90,7 +92,7 @@ Related: [`bounded-contexts.md`](bounded-contexts.md) · [`data-dictionary.md`](
 
 ## Clinic / analytics / admin
 
-| Action | anon | guardian | ngo | clinic | public_agency | biologist |
+| Action | anon | person | ong | veterinary_clinic | public_agency | biologist |
 |---|---|---|---|---|---|---|
 | `UpdateOwnClinicServices` | deny | deny | deny | allow | deny | deny |
 | `IssueHealthReport` | deny | deny | deny | cond⁴ | deny | deny |
@@ -105,20 +107,20 @@ Related: [`bounded-contexts.md`](bounded-contexts.md) · [`data-dictionary.md`](
 
 ```text
 canCreateAnimal(user) =
-  (role=ngo AND ngo.verified)
-  OR (role=clinic AND clinic.verified)
-  OR (role=guardian AND guardian.isRescuer)
+  (userType=ong AND organization.verified)
+  OR (userType=veterinary_clinic AND veterinary.verified)
+  OR (userType=person AND person.isRescuer)
 
 canRequestAdoption(user) =
-  role=guardian AND guardian.taxId IS NOT NULL
+  userType=person AND person.taxId IS NOT NULL
 
 canValidateOccurrence(user, occurrence) =
-  (role=ngo AND ngo.verified)
-  OR (role=public_agency)
-  OR (role=biologist AND occurrence.type = wildlife_sighting)
+  (userType=ong AND organization.verified)
+  OR (userType=public_agency)
+  OR (userType=biologist AND occurrence.type = wildlife_sighting)
 
 canReviewAdoption(user, adoption) =
-  user.id IN { animal.ngoId, animal.guardianId, animal.clinicId }
+  user.id IN { animal.organizationId, animal.personId, animal.veterinaryId }
 ```
 
 ---
@@ -128,3 +130,10 @@ canReviewAdoption(user, adoption) =
 - NestJS guards: `RolesGuard` + `ResourceOwnerGuard` + `verified` / `isRescuer` checks
 - Rate limit on `CreateOccurrence` (anon by IP) — infrastructure, Phase 4
 - Public listings never return `email`, `phone`, `taxId`, `passwordHash`
+
+---
+
+## Decision log
+
+- **2025-09 / 2026-09:** Renamed role columns `guardian` → `person`, `ngo` → `ong`, `clinic` → `veterinary_clinic` to align with `UserType` enum and profile table names (`PersonProfile`, `OrganizationProfile`, `VeterinaryProfile`). Animal FKs: `organizationId` / `personId` / `veterinaryId`. `public_agency` and `biologist` unchanged.
+- Frontend UI gating documented separately in [permissions.md](permissions.md); this matrix remains the authoritative action-level spec.

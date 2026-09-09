@@ -4,15 +4,26 @@
 
 Project animaps {
   database_type: 'PostgreSQL'
-  Note: 'Responsible adoption + georeferenced animal occurrences. /register is two-step UI: waitlist_entries stores the lead only; password hashes belong on users.password_hash when identity auth ships (never on waitlist).'
+  Note: 'Responsible adoption + georeferenced animal occurrences. UserType (person/ong/veterinary_clinic/other/…) on users; type-specific 1:1 profiles. /register is two-step UI: waitlist_entries stores the lead only; password hashes belong on users.password_hash when identity auth ships (never on waitlist).'
 }
 
-Enum user_role {
-  guardian
-  ngo
-  clinic
+Enum user_type {
+  person
+  ong
+  veterinary_clinic
+  other
   public_agency
   biologist
+}
+
+Enum other_role {
+  independent_protector
+  foster_home
+  volunteer
+  animal_professional
+  animal_business
+  community_member
+  other
 }
 
 Enum available_space {
@@ -86,9 +97,9 @@ Enum occurrence_status {
 }
 
 Enum waitlist_profile_type {
-  guardian
-  ngo
-  clinic
+  person
+  ong
+  veterinary_clinic
   other
 }
 
@@ -106,8 +117,8 @@ Enum push_platform {
 
 Enum notification_type {
   user_registered
-  ngo_verified
-  clinic_verified
+  organization_verified
+  veterinary_verified
   adoption_requested
   adoption_completed
   animal_registered_for_matching
@@ -119,9 +130,9 @@ Enum notification_type {
 }
 
 Enum audit_action {
-  ngo_verified
-  clinic_verified
-  role_changed
+  organization_verified
+  veterinary_verified
+  user_type_changed
   account_deleted
   data_exported
   occurrence_validated
@@ -138,8 +149,11 @@ Table users {
   id uuid [pk]
   name varchar [not null]
   email varchar [unique, not null]
+  username varchar [unique, note: 'Optional public handle']
   password_hash varchar [note: 'Email/password register hash (strong password in UI). Nullable for Google/OAuth — app rule: hash OR external identity. Never plaintext.']
-  role user_role [not null]
+  user_type user_type [not null]
+  avatar_url varchar
+  status varchar [default: 'active']
   phone varchar
   city varchar
   state varchar
@@ -155,7 +169,7 @@ Table users {
   }
 }
 
-Table guardian_profiles {
+Table person_profiles {
   user_id uuid [pk, ref: - users.id]
   available_space available_space
   available_time available_time
@@ -163,35 +177,65 @@ Table guardian_profiles {
   has_other_pets boolean [not null, default: false]
   preferred_size preferred_size
   preferred_species preferred_species
-  is_rescuer boolean [not null, default: false, note: 'Allows guardian to register animals']
+  is_rescuer boolean [not null, default: false, note: 'Allows person to register animals']
   tax_id varchar [note: 'Individual tax id (e.g. CPF in BR)']
   updated_at timestamp [not null]
 }
 
-Table ngo_profiles {
+Table organization_profiles {
   user_id uuid [pk, ref: - users.id]
   company_tax_id varchar [not null]
   trade_name varchar [not null]
+  description text
+  phone varchar
+  email varchar
+  website varchar
+  social_links jsonb
+  city varchar
+  state varchar
+  animal_types_served "varchar[]" [default: '{}']
+  has_shelter boolean [not null, default: false]
+  does_adoptions boolean [not null, default: false]
+  does_rescues boolean [not null, default: false]
+  accepts_volunteers boolean [not null, default: false]
+  accepts_donations boolean [not null, default: false]
   service_area_radius_km decimal [note: 'PostGIS polygon later; radius is MVP']
   service_capacity int
   verified boolean [not null, default: false]
   updated_at timestamp [not null]
 }
 
-Table clinic_profiles {
+Table veterinary_profiles {
   user_id uuid [pk, ref: - users.id]
   company_tax_id varchar [not null]
+  trade_name varchar
+  description text
+  phone varchar
+  email varchar
+  website varchar
+  address text
   services_offered "varchar[]" [note: 'vaccination, neutering, emergency_care, grooming']
   business_hours text
-  verified boolean [not null, default: false, note: 'Manual validation - same as NGO']
+  is_24h boolean [not null, default: false]
+  emergency_care boolean [not null, default: false]
+  home_service boolean [not null, default: false]
+  animals_served "varchar[]" [default: '{}']
+  verified boolean [not null, default: false, note: 'Manual validation - same as organization']
+  updated_at timestamp [not null]
+}
+
+Table other_profiles {
+  user_id uuid [pk, ref: - users.id]
+  other_role other_role
+  notes text
   updated_at timestamp [not null]
 }
 
 Table animals {
   id uuid [pk]
-  ngo_id uuid [ref: > users.id, note: 'NGO owner user id when applicable']
-  guardian_id uuid [ref: > users.id, note: 'Rescuer guardian when applicable']
-  clinic_id uuid [ref: > users.id, note: 'Clinic that registered when applicable']
+  organization_id uuid [ref: > users.id, note: 'Organization owner user id when applicable']
+  person_id uuid [ref: > users.id, note: 'Rescuer person when applicable']
+  veterinary_id uuid [ref: > users.id, note: 'Veterinary clinic that registered when applicable']
   name varchar [not null]
   species animal_species [not null]
   breed varchar
@@ -215,8 +259,8 @@ Table animals {
 Table adoptions {
   id uuid [pk]
   animal_id uuid [not null, ref: > animals.id]
-  guardian_id uuid [not null, ref: > users.id]
-  ngo_id uuid [ref: > users.id, note: 'Origin NGO when applicable']
+  person_id uuid [not null, ref: > users.id]
+  organization_id uuid [ref: > users.id, note: 'Origin organization when applicable']
   compatibility_score decimal [note: '0-100 at request time']
   status adoption_status [not null, default: 'requested']
   requested_at timestamp [not null, default: `now()`]
@@ -224,9 +268,9 @@ Table adoptions {
   updated_at timestamp [not null]
 
   indexes {
-    (animal_id, guardian_id) [unique]
+    (animal_id, person_id) [unique]
     (animal_id, status)
-    guardian_id
+    person_id
   }
 }
 
@@ -238,7 +282,7 @@ Table occurrences {
   location geography [not null, note: 'PostGIS geography(Point, 4326); GIST index via raw SQL']
   photos "text[]"
   status occurrence_status [not null, default: 'open']
-  validated_by uuid [ref: > users.id, note: 'NGO or public_agency user id']
+  validated_by uuid [ref: > users.id, note: 'Organization or public_agency user id']
   created_at timestamp [not null, default: `now()`]
   updated_at timestamp [not null]
 
@@ -250,7 +294,7 @@ Table occurrences {
 
 Table occurrence_followers {
   occurrence_id uuid [not null, ref: > occurrences.id]
-  user_id uuid [not null, ref: > users.id, note: 'NGO / public_agency / biologist following the case']
+  user_id uuid [not null, ref: > users.id, note: 'Organization / public_agency / biologist following the case']
   created_at timestamp [not null, default: `now()`]
 
   indexes {
@@ -376,9 +420,10 @@ Table occurrence_reports {
 
 TableGroup identity {
   users
-  guardian_profiles
-  ngo_profiles
-  clinic_profiles
+  person_profiles
+  organization_profiles
+  veterinary_profiles
+  other_profiles
   refresh_tokens
   email_verification_tokens
   password_reset_tokens

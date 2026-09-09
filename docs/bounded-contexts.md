@@ -11,11 +11,11 @@ NestJS modular monolith (DDD). Entities: [`ANIMAPS_Roadmap.md`](../ANIMAPS_Roadm
 | Decision | Detail |
 |---|---|
 | Cross-context integration | In-process domain events (NestJS pub/sub). BullMQ later. |
-| Who creates `Animal` | Verified `ngo`, verified `clinic`, or `guardian` with `isRescuer = true` |
+| Who creates `Animal` | Verified `ong`, verified `veterinary_clinic`, or `person` with `isRescuer = true` |
 | `Occurrence` registration | Anonymous allowed (`userId` nullable). `ClaimOccurrence` links later. IP rate limit (Phase 4). |
 | Validate Occurrence | NGO verified / `public_agency`; `biologist` only for `wildlife_sighting` |
 | Parallel adoption | Many requests per animal; origin chooses; `in_process` on first `approved` |
-| Guardian `taxId` | Optional at signup; required for `RequestAdoption` |
+| Person `taxId` | Optional at signup; required for `RequestAdoption` |
 | Soft delete | `User.deletedAt`, `Animal.deletedAt` — see [`schema-evolution.md`](schema-evolution.md) |
 
 ---
@@ -24,7 +24,7 @@ NestJS modular monolith (DDD). Entities: [`ANIMAPS_Roadmap.md`](../ANIMAPS_Roadm
 
 | Context | Folder | Entities | Role |
 |---|---|---|---|
-| `identity` | `modules/identity/` | `User`, `GuardianProfile`, `NgoProfile`, `ClinicProfile`, `RefreshToken`, `EmailVerificationToken`, `PasswordResetToken`, `DevicePushToken` | Accounts, profiles, auth, institutional verification, push tokens |
+| `identity` | `modules/identity/` | `User`, `PersonProfile`, `OrganizationProfile`, `VeterinaryProfile`, `OtherProfile`, `RefreshToken`, `EmailVerificationToken`, `PasswordResetToken`, `DevicePushToken` | Accounts, profiles, auth, institutional verification, push tokens |
 | `adoption` | `modules/adoption/` | `Animal`, `Adoption` | Animal listing, matching, adoption flow |
 | `occurrence` | `modules/occurrence/` | `Occurrence`, `OccurrenceFollower`, `OccurrenceReport` | Geo occurrences, moderation, claim, reports |
 | `notifications` | `modules/notifications/` | `Notification` | Preferences, delivery, history |
@@ -33,7 +33,7 @@ NestJS modular monolith (DDD). Entities: [`ANIMAPS_Roadmap.md`](../ANIMAPS_Roadm
 
 `AuditLog` is **cross-cutting** (shared port): written by `identity`, `occurrence`, `analytics` on sensitive actions — not its own bounded context in the MVP.
 
-`identity` is the **source of truth** for users and profiles. Other contexts reference `userId` / `ngoId` / `guardianId` / `clinicId` **without** duplicating profile data.
+`identity` is the **source of truth** for users and profiles. Other contexts reference `userId` / `organizationId` / `personId` / `veterinaryId` **without** duplicating profile data.
 
 ---
 
@@ -74,17 +74,21 @@ Identity, auth, profile authorization, institutional verification.
 
 ### Ubiquitous language
 
-- **User** — authenticable account with a `role`
-- **Guardian** — adopter/caretaker; may be **rescuer** (`isRescuer`)
-- **NGO** — organization; needs **verified** for privileged actions
-- **Clinic** — partner veterinary clinic
-- **Public agency / Biologist** — validation and aggregated-data roles
+- **User** — authenticable account with a `user_type` (`UserType` enum)
+- **Person** — adopter/caretaker (`PERSON`); may be **rescuer** (`isRescuer`) via `PersonProfile`
+- **Organization (ONG)** — institution (`ONG`); needs **verified** for privileged actions via `OrganizationProfile`
+- **Veterinary clinic** — partner clinic (`VETERINARY_CLINIC`) via `VeterinaryProfile`
+- **Other** — catch-all public signup (`OTHER`) via `OtherProfile`
+- **Public agency / Biologist** — admin-assigned types for validation and aggregated-data roles
+
+Legacy names: `GuardianProfile` → `PersonProfile`, `NgoProfile` → `OrganizationProfile`, `ClinicProfile` → `VeterinaryProfile`. See [user-types.md](user-types.md).
 
 ### Entities
 
-- `User` (soft delete via `deletedAt`)
-- `GuardianProfile` (`isRescuer`)
-- `NgoProfile` / `ClinicProfile` (`verified`)
+- `User` (soft delete via `deletedAt`; carries `user_type`)
+- `PersonProfile` (`isRescuer`)
+- `OrganizationProfile` / `VeterinaryProfile` (`verified`)
+- `OtherProfile` (role metadata for `OTHER`)
 - `RefreshToken`, `EmailVerificationToken`, `PasswordResetToken` (hash only)
 - `DevicePushToken` (APNs/FCM — mobile Wave 3)
 
@@ -92,17 +96,17 @@ Identity, auth, profile authorization, institutional verification.
 
 | Use case | Description |
 |---|---|
-| `RegisterUser` | Signup with `role` + LGPD consent |
+| `RegisterUser` | Signup with `user_type` + LGPD consent |
 | `LoginUser` | Issues access + refresh |
 | `RefreshAccessToken` | Rotates access via valid refresh |
 | `RevokeRefreshToken` / `LogoutUser` | Revokes refresh |
 | `VerifyEmail` | Consumes `EmailVerificationToken` |
 | `RequestPasswordReset` / `ResetPassword` | `PasswordResetToken` flow |
-| `UpdateGuardianProfile` | Preferences + `isRescuer` |
-| `UpdateNgoProfile` / `SubmitNgoDocuments` | Institutional data |
-| `VerifyNgo` | Manual approval → `NgoVerified` + `AuditLog` |
-| `UpdateClinicProfile` | Services and hours |
-| `SubmitClinicDocuments` / `VerifyClinic` | Manual approval → `ClinicVerified` + `AuditLog` |
+| `UpdatePersonProfile` | Preferences + `isRescuer` |
+| `UpdateOrganizationProfile` / `SubmitOrganizationDocuments` | Institutional data |
+| `VerifyOrganization` | Manual approval → `OrganizationVerified` + `AuditLog` |
+| `UpdateVeterinaryProfile` | Services and hours |
+| `SubmitVeterinaryDocuments` / `VerifyVeterinary` | Manual approval → `VeterinaryVerified` + `AuditLog` |
 | `DeleteAccount` | Soft-delete + right to be forgotten + `AuditLog` (hard purge PII at T+90d) |
 | `RegisterDevicePushToken` | Upsert `DevicePushToken` (Wave 3) |
 
@@ -128,26 +132,26 @@ Available animals, compatibility matching, adoption request/approval.
 ### Ubiquitous language
 
 - **Animal** — individual listed for adoption (soft delete via `deletedAt`)
-- **Adoption** — process between guardian and animal origin
+- **Adoption** — process between person and animal origin
 - **Compatibility score** — 0–100 at request time
-- **Rescuer** — guardian allowed to register animals
+- **Rescuer** — person allowed to register animals (`PersonProfile.isRescuer`)
 
 ### Entities
 
-- `Animal` (origin: `ngoId` and/or `guardianId` and/or `clinicId`)
+- `Animal` (origin: `organizationId` and/or `personId` and/or `veterinaryId`)
 - `Adoption`
 
 ### Who may create `Animal`
 
 | Actor | Condition |
 |---|---|
-| `ngo` | `NgoProfile.verified = true` |
-| `clinic` | `ClinicProfile.verified = true` |
-| `guardian` | `GuardianProfile.isRescuer = true` |
+| `ong` | `OrganizationProfile.verified = true` |
+| `veterinary_clinic` | `VeterinaryProfile.verified = true` |
+| `person` | `PersonProfile.isRescuer = true` |
 
 **Parallel requests:** multiple `Adoption` in `requested` / `under_review` allowed; origin chooses. Animal → `in_process` on first `approved` (not on `requested`).
 
-**`RequestAdoption`:** authenticated guardian with `taxId` set.
+**`RequestAdoption`:** authenticated person with `taxId` set.
 
 ### Main use cases
 

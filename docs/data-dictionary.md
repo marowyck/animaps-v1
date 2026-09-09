@@ -1,6 +1,6 @@
 # ANIMAPS — Data dictionary
 
-Sources: [`der.dbml`](der.dbml) · [`schema.prisma`](schema.prisma) · [`bounded-contexts.md`](bounded-contexts.md) · [`schema-evolution.md`](schema-evolution.md).
+Sources: [`der.dbml`](der.dbml) · [`schema.prisma`](schema.prisma) · [`bounded-contexts.md`](bounded-contexts.md) · [`schema-evolution.md`](schema-evolution.md) · [`user-types.md`](user-types.md) · [`profiles.md`](profiles.md).
 
 **Convention:** DB column = `snake_case` · API/TypeScript = `camelCase` · enums = `snake_case`.
 
@@ -12,12 +12,12 @@ Sources: [`der.dbml`](der.dbml) · [`schema.prisma`](schema.prisma) · [`bounded
 
 | Rule | Where |
 |---|---|
-| Guardian `tax_id` optional at signup; **required** on `RequestAdoption` | Application (`adoption`) |
-| Only verified `ngo` / verified `clinic` / guardian with `is_rescuer` create `Animal` | Application + authz |
+| Person `tax_id` optional at signup; **required** on `RequestAdoption` | Application (`adoption`) |
+| Only verified `ong` / verified `veterinary_clinic` / person with `is_rescuer` create `Animal` | Application + authz |
 | Parallel `adoptions` on the same animal; origin chooses | Application (`adoption`) |
 | Animal → `in_process` on first `approved` (not on `requested`) | Application (`adoption`) |
 | `occurrences.user_id` nullable (anonymous); claim later | Schema + application |
-| At least one of `ngo_id` / `guardian_id` / `clinic_id` on `animals` | Application (optional future DB CHECK) |
+| At least one of `organization_id` / `person_id` / `veterinary_id` on `animals` | Application (optional future DB CHECK) |
 | Soft-deleted users/animals excluded from public lists | Application (`deleted_at IS NULL`) |
 
 ---
@@ -26,7 +26,8 @@ Sources: [`der.dbml`](der.dbml) · [`schema.prisma`](schema.prisma) · [`bounded
 
 | Enum | Values |
 |---|---|
-| `user_role` | `guardian`, `ngo`, `clinic`, `public_agency`, `biologist` |
+| `user_type` | `person`, `ong`, `veterinary_clinic`, `other`, `public_agency`, `biologist` |
+| `other_role` | `independent_protector`, `foster_home`, `volunteer`, `animal_professional`, `animal_business`, `community_member`, `other` |
 | `available_space` | `small_apartment`, `large_apartment`, `house_with_yard`, `farm` |
 | `available_time` | `low`, `moderate`, `high` |
 | `preferred_size` | `small`, `medium`, `large`, `any` |
@@ -37,13 +38,13 @@ Sources: [`der.dbml`](der.dbml) · [`schema.prisma`](schema.prisma) · [`bounded
 | `adoption_status` | `requested`, `under_review`, `approved`, `rejected`, `completed`, `cancelled` |
 | `occurrence_type` | `abandonment`, `mistreatment`, `vehicle_collision`, `wildlife_sighting`, `lost_animal`, `found_animal` |
 | `occurrence_status` | `open`, `in_progress`, `resolved`, `invalid` |
-| `waitlist_profile_type` | `guardian`, `ngo`, `clinic`, `other` |
+| `waitlist_profile_type` | `person`, `ong`, `veterinary_clinic`, `other` |
 | `client_type` | `web`, `mobile_ios`, `mobile_android`, `unknown` |
 | `push_platform` | `ios`, `android` |
-| `notification_type` | `user_registered`, `ngo_verified`, `clinic_verified`, `adoption_requested`, `adoption_completed`, `animal_registered_for_matching`, `new_compatible_animal_available`, `occurrence_created`, `occurrence_status_changed`, `occurrence_resolved`, `generic` |
-| `clinic_service` (array values) | `vaccination`, `neutering`, `emergency_care`, `grooming` |
+| `notification_type` | `user_registered`, `organization_verified`, `veterinary_verified`, `adoption_requested`, `adoption_completed`, `animal_registered_for_matching`, `new_compatible_animal_available`, `occurrence_created`, `occurrence_status_changed`, `occurrence_resolved`, `generic` |
+| `veterinary_service` (array values) | `vaccination`, `neutering`, `emergency_care`, `grooming`, `consultation`, `surgery`, `imaging`, `hospitalization` |
 | `temperament_tag` (array values) | open controlled list (`docile`, `playful`, …) |
-| `audit_action` | `ngo_verified`, `clinic_verified`, `role_changed`, `account_deleted`, `data_exported`, `occurrence_validated` |
+| `audit_action` | `organization_verified`, `veterinary_verified`, `user_type_changed`, `account_deleted`, `data_exported`, `occurrence_validated` |
 | `occurrence_report_reason` | `spam`, `duplicate`, `false_information`, `inappropriate_content` |
 
 ---
@@ -55,8 +56,11 @@ Sources: [`der.dbml`](der.dbml) · [`schema.prisma`](schema.prisma) · [`bounded
 | `id` | `id` | uuid | yes | gen | PK |
 | `name` | `name` | varchar | yes | — | |
 | `email` | `email` | varchar | yes | — | UNIQUE · **PII** |
+| `username` | `username` | varchar | no | null | UNIQUE · public handle |
 | `password_hash` | — | varchar | no* | null | Never expose · **PII** · email/password register (hashed) **or** external identity (Google/OAuth). Never store on `waitlist_entries`. |
-| `role` | `role` | `user_role` | yes | — | |
+| `user_type` | `userType` | `user_type` | yes | — | See [`user-types.md`](user-types.md) |
+| `avatar_url` | `avatarUrl` | varchar | no | null | Object-storage URL |
+| `status` | `status` | varchar | no | `active` | Account lifecycle |
 | `phone` | `phone` | varchar | no | null | **PII** |
 | `city` | `city` | varchar | no | null | |
 | `state` | `state` | varchar | no | null | |
@@ -67,11 +71,11 @@ Sources: [`der.dbml`](der.dbml) · [`schema.prisma`](schema.prisma) · [`bounded
 | `created_at` | `createdAt` | timestamptz | yes | now() | |
 | `updated_at` | `updatedAt` | timestamptz | yes | — | |
 
-**Indexes:** UNIQUE (`email`); (`deleted_at`).
+**Indexes:** UNIQUE (`email`); UNIQUE (`username`); (`deleted_at`).
 
 ---
 
-## `guardian_profiles`
+## `person_profiles`
 
 | DB | API | Type | Req | Default | Notes |
 |---|---|---|---|---|---|
@@ -88,13 +92,26 @@ Sources: [`der.dbml`](der.dbml) · [`schema.prisma`](schema.prisma) · [`bounded
 
 ---
 
-## `ngo_profiles`
+## `organization_profiles`
 
 | DB | API | Type | Req | Default | Notes |
 |---|---|---|---|---|---|
 | `user_id` | `userId` | uuid | yes | — | PK, FK → `users.id` |
 | `company_tax_id` | `companyTaxId` | varchar | yes | — | **PII** |
 | `trade_name` | `tradeName` | varchar | yes | — | |
+| `description` | `description` | text | no | null | |
+| `phone` | `phone` | varchar | no | null | **PII** |
+| `email` | `email` | varchar | no | null | **PII** |
+| `website` | `website` | varchar | no | null | |
+| `social_links` | `socialLinks` | jsonb | no | null | |
+| `city` | `city` | varchar | no | null | |
+| `state` | `state` | varchar | no | null | |
+| `animal_types_served` | `animalTypesServed` | varchar[] | no | {} | |
+| `has_shelter` | `hasShelter` | boolean | yes | false | |
+| `does_adoptions` | `doesAdoptions` | boolean | yes | false | |
+| `does_rescues` | `doesRescues` | boolean | yes | false | |
+| `accepts_volunteers` | `acceptsVolunteers` | boolean | yes | false | |
+| `accepts_donations` | `acceptsDonations` | boolean | yes | false | |
 | `service_area_radius_km` | `serviceAreaRadiusKm` | decimal | no | null | PostGIS polygon later |
 | `service_capacity` | `serviceCapacity` | int | no | null | |
 | `verified` | `verified` | boolean | yes | false | Manual |
@@ -102,15 +119,36 @@ Sources: [`der.dbml`](der.dbml) · [`schema.prisma`](schema.prisma) · [`bounded
 
 ---
 
-## `clinic_profiles`
+## `veterinary_profiles`
 
 | DB | API | Type | Req | Default | Notes |
 |---|---|---|---|---|---|
 | `user_id` | `userId` | uuid | yes | — | PK, FK → `users.id` |
 | `company_tax_id` | `companyTaxId` | varchar | yes | — | **PII** |
-| `services_offered` | `servicesOffered` | varchar[] | no | {} | `clinic_service` values |
+| `trade_name` | `tradeName` | varchar | no | null | |
+| `description` | `description` | text | no | null | |
+| `phone` | `phone` | varchar | no | null | **PII** |
+| `email` | `email` | varchar | no | null | **PII** |
+| `website` | `website` | varchar | no | null | |
+| `address` | `address` | text | no | null | **PII** |
+| `services_offered` | `servicesOffered` | varchar[] | no | {} | `veterinary_service` values |
 | `business_hours` | `businessHours` | text | no | null | |
-| `verified` | `verified` | boolean | yes | false | Manual — same as NGO |
+| `is_24h` | `is24h` | boolean | yes | false | |
+| `emergency_care` | `emergencyCare` | boolean | yes | false | |
+| `home_service` | `homeService` | boolean | yes | false | |
+| `animals_served` | `animalsServed` | varchar[] | no | {} | |
+| `verified` | `verified` | boolean | yes | false | Manual — same as organization |
+| `updated_at` | `updatedAt` | timestamptz | yes | — | |
+
+---
+
+## `other_profiles`
+
+| DB | API | Type | Req | Default | Notes |
+|---|---|---|---|---|---|
+| `user_id` | `userId` | uuid | yes | — | PK, FK → `users.id` |
+| `other_role` | `otherRole` | `other_role` | no | null | See catalog · [profiles.md](profiles.md) |
+| `notes` | `notes` | text | no | null | Freeform |
 | `updated_at` | `updatedAt` | timestamptz | yes | — | |
 
 ---
@@ -120,9 +158,9 @@ Sources: [`der.dbml`](der.dbml) · [`schema.prisma`](schema.prisma) · [`bounded
 | DB | API | Type | Req | Default | Notes |
 |---|---|---|---|---|---|
 | `id` | `id` | uuid | yes | gen | PK |
-| `ngo_id` | `ngoId` | uuid | no* | null | FK → `users.id` |
-| `guardian_id` | `guardianId` | uuid | no* | null | FK → `users.id` (rescuer) |
-| `clinic_id` | `clinicId` | uuid | no* | null | FK → `users.id` |
+| `organization_id` | `organizationId` | uuid | no* | null | FK → `users.id` |
+| `person_id` | `personId` | uuid | no* | null | FK → `users.id` (rescuer) |
+| `veterinary_id` | `veterinaryId` | uuid | no* | null | FK → `users.id` |
 | `name` | `name` | varchar | yes | — | |
 | `species` | `species` | enum | yes | — | |
 | `breed` | `breed` | varchar | no | null | |
@@ -136,7 +174,7 @@ Sources: [`der.dbml`](der.dbml) · [`schema.prisma`](schema.prisma) · [`bounded
 | `created_at` | `createdAt` | timestamptz | yes | now() | |
 | `updated_at` | `updatedAt` | timestamptz | yes | — | |
 
-\* Application: at least one of `ngo_id`, `guardian_id`, `clinic_id`.
+\* Application: at least one of `organization_id`, `person_id`, `veterinary_id`.
 
 **Indexes:** (`status`), (`species`, `size`), (`deleted_at`).
 
@@ -148,17 +186,17 @@ Sources: [`der.dbml`](der.dbml) · [`schema.prisma`](schema.prisma) · [`bounded
 |---|---|---|---|---|---|
 | `id` | `id` | uuid | yes | gen | PK |
 | `animal_id` | `animalId` | uuid | yes | — | FK → `animals.id` |
-| `guardian_id` | `guardianId` | uuid | yes | — | FK → `users.id` |
-| `ngo_id` | `ngoId` | uuid | no | null | Origin NGO when applicable |
+| `person_id` | `personId` | uuid | yes | — | FK → `users.id` |
+| `organization_id` | `organizationId` | uuid | no | null | Origin organization when applicable |
 | `compatibility_score` | `compatibilityScore` | decimal | no | null | 0–100 |
 | `status` | `status` | enum | yes | `requested` | |
 | `requested_at` | `requestedAt` | timestamptz | yes | now() | |
 | `completed_at` | `completedAt` | timestamptz | no | null | |
 | `updated_at` | `updatedAt` | timestamptz | yes | — | |
 
-**Indexes:** UNIQUE (`animal_id`, `guardian_id`); (`animal_id`, `status`); (`guardian_id`).
+**Indexes:** UNIQUE (`animal_id`, `person_id`); (`animal_id`, `status`); (`person_id`).
 
-**Parallelism:** multiple rows per animal allowed for different guardians; one row per guardian–animal pair.
+**Parallelism:** multiple rows per animal allowed for different persons; one row per person–animal pair.
 
 ---
 
@@ -266,7 +304,7 @@ Marketing lead from **`/register` step 1** (profile + LGPD). **Step 2 password i
 | `id` | `id` | uuid | yes | gen | PK |
 | `name` | `name` | varchar | yes | — | **PII** |
 | `email` | `email` | varchar | yes | — | UNIQUE · **PII** |
-| `profile_type` | `profileType` | `waitlist_profile_type` | yes | — | Register step 1 (`guardian` / `ngo` / `clinic` / `other`) |
+| `profile_type` | `profileType` | `waitlist_profile_type` | yes | — | Register step 1 (`person` / `ong` / `veterinary_clinic` / `other`) |
 | `city` | `city` | varchar | no | null | |
 | `state` | `state` | varchar | no | null | |
 | `lgpd_consent_at` | `lgpdConsentAt` | timestamptz | yes | — | Consent timestamp |
@@ -313,9 +351,9 @@ Marketing lead from **`/register` step 1** (profile + LGPD). **Step 2 password i
 
 | Table | Index | Why |
 |---|---|---|
-| `users` | UNIQUE `email`; `deleted_at` | Login · soft delete |
+| `users` | UNIQUE `email`; UNIQUE `username`; `deleted_at` | Login · handle · soft delete |
 | `occurrences` | GIST `location` | `ST_DWithin` |
-| `adoptions` | UNIQUE (`animal_id`, `guardian_id`) | One request per pair |
+| `adoptions` | UNIQUE (`animal_id`, `person_id`) | One request per pair |
 | `device_push_tokens` | UNIQUE `token` | Push delivery |
 | `waitlist_entries` | UNIQUE `email` | Lead dedupe |
 | Token tables | UNIQUE `token_hash` | Auth |

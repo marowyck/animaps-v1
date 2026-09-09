@@ -17,12 +17,24 @@ datasource db {
   extensions = [postgis]
 }
 
-enum UserRole {
-  guardian
-  ngo
-  clinic
+enum UserType {
+  person
+  ong
+  veterinary_clinic
+  other
   public_agency
   biologist
+}
+
+/// Catch-all signup path roles (OTHER user type). Add values only.
+enum OtherRole {
+  independent_protector
+  foster_home
+  volunteer
+  animal_professional
+  animal_business
+  community_member
+  other
 }
 
 enum AvailableSpace {
@@ -96,9 +108,9 @@ enum OccurrenceStatus {
 }
 
 enum AuditAction {
-  ngo_verified
-  clinic_verified
-  role_changed
+  organization_verified
+  veterinary_verified
+  user_type_changed
   account_deleted
   data_exported
   occurrence_validated
@@ -111,12 +123,12 @@ enum OccurrenceReportReason {
   inappropriate_content
 }
 
-/// Waitlist lead profile from `/register` step 1 — distinct from UserRole (product accounts).
+/// Waitlist lead profile from `/register` step 1 — distinct from UserType (product accounts).
 /// Do not store passwords here; credentials belong on `User.passwordHash` when identity auth ships.
 enum WaitlistProfileType {
-  guardian
-  ngo
-  clinic
+  person
+  ong
+  veterinary_clinic
   other
 }
 
@@ -135,8 +147,8 @@ enum PushPlatform {
 /// Starter set aligned to bounded-context domain events — add values only.
 enum NotificationType {
   user_registered
-  ngo_verified
-  clinic_verified
+  organization_verified
+  veterinary_verified
   adoption_requested
   adoption_completed
   animal_registered_for_matching
@@ -151,11 +163,14 @@ model User {
   id              String    @id @default(uuid()) @db.Uuid
   name            String
   email           String    @unique
+  username        String?   @unique
   /// Hashed credential for email/password register (UI: min 8, uppercase, special).
   /// Nullable for Google/OAuth — app rule: passwordHash OR external identity required.
   /// Never store plaintext; never put passwords on WaitlistEntry.
   passwordHash    String?   @map("password_hash")
-  role            UserRole
+  userType        UserType  @map("user_type")
+  avatarUrl       String?   @map("avatar_url")
+  status          String?   @default("active")
   phone           String?
   city            String?
   state           String?
@@ -166,15 +181,16 @@ model User {
   createdAt       DateTime  @default(now()) @map("created_at")
   updatedAt       DateTime  @updatedAt @map("updated_at")
 
-  guardianProfile GuardianProfile?
-  ngoProfile      NgoProfile?
-  clinicProfile   ClinicProfile?
+  personProfile       PersonProfile?
+  organizationProfile OrganizationProfile?
+  veterinaryProfile   VeterinaryProfile?
+  otherProfile        OtherProfile?
 
-  animalsAsNgo           Animal[]               @relation("AnimalNgo")
-  animalsAsGuardian      Animal[]               @relation("AnimalGuardian")
-  animalsAsClinic        Animal[]               @relation("AnimalClinic")
-  adoptionsAsGuardian    Adoption[]             @relation("AdoptionGuardian")
-  adoptionsAsNgo         Adoption[]             @relation("AdoptionNgo")
+  animalsAsOrganization Animal[]               @relation("AnimalOrganization")
+  animalsAsPerson       Animal[]               @relation("AnimalPerson")
+  animalsAsVeterinary   Animal[]               @relation("AnimalVeterinary")
+  adoptionsAsPerson     Adoption[]             @relation("AdoptionPerson")
+  adoptionsAsOrganization Adoption[]           @relation("AdoptionOrganization")
   occurrences            Occurrence[]           @relation("OccurrenceAuthor")
   validatedOccurrences   Occurrence[]           @relation("OccurrenceValidator")
   occurrenceFollows      OccurrenceFollower[]
@@ -190,7 +206,7 @@ model User {
   @@map("users")
 }
 
-model GuardianProfile {
+model PersonProfile {
   userId                String            @id @map("user_id") @db.Uuid
   availableSpace        AvailableSpace?   @map("available_space")
   availableTime         AvailableTime?    @map("available_time")
@@ -204,13 +220,26 @@ model GuardianProfile {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@map("guardian_profiles")
+  @@map("person_profiles")
 }
 
-model NgoProfile {
+model OrganizationProfile {
   userId              String   @id @map("user_id") @db.Uuid
   companyTaxId        String   @map("company_tax_id")
   tradeName           String   @map("trade_name")
+  description         String?
+  phone               String?
+  email               String?
+  website             String?
+  socialLinks         Json?    @map("social_links")
+  city                String?
+  state               String?
+  animalTypesServed   String[] @default([]) @map("animal_types_served")
+  hasShelter          Boolean  @default(false) @map("has_shelter")
+  doesAdoptions       Boolean  @default(false) @map("does_adoptions")
+  doesRescues         Boolean  @default(false) @map("does_rescues")
+  acceptsVolunteers   Boolean  @default(false) @map("accepts_volunteers")
+  acceptsDonations    Boolean  @default(false) @map("accepts_donations")
   serviceAreaRadiusKm Decimal? @map("service_area_radius_km") @db.Decimal(10, 2)
   serviceCapacity     Int?     @map("service_capacity")
   verified            Boolean  @default(false)
@@ -218,27 +247,48 @@ model NgoProfile {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@map("ngo_profiles")
+  @@map("organization_profiles")
 }
 
-model ClinicProfile {
+model VeterinaryProfile {
   userId          String   @id @map("user_id") @db.Uuid
   companyTaxId    String   @map("company_tax_id")
+  tradeName       String?  @map("trade_name")
+  description     String?
+  phone           String?
+  email           String?
+  website         String?
+  address         String?
   servicesOffered String[] @default([]) @map("services_offered")
   businessHours   String?  @map("business_hours")
+  is24h           Boolean  @default(false) @map("is_24h")
+  emergencyCare   Boolean  @default(false) @map("emergency_care")
+  homeService     Boolean  @default(false) @map("home_service")
+  animalsServed   String[] @default([]) @map("animals_served")
   verified        Boolean  @default(false)
   updatedAt       DateTime @updatedAt @map("updated_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@map("clinic_profiles")
+  @@map("veterinary_profiles")
+}
+
+model OtherProfile {
+  userId    String     @id @map("user_id") @db.Uuid
+  otherRole OtherRole? @map("other_role")
+  notes     String?
+  updatedAt DateTime   @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("other_profiles")
 }
 
 model Animal {
   id            String        @id @default(uuid()) @db.Uuid
-  ngoId         String?       @map("ngo_id") @db.Uuid
-  guardianId    String?       @map("guardian_id") @db.Uuid
-  clinicId      String?       @map("clinic_id") @db.Uuid
+  organizationId String?      @map("organization_id") @db.Uuid
+  personId      String?       @map("person_id") @db.Uuid
+  veterinaryId  String?       @map("veterinary_id") @db.Uuid
   name          String
   species       AnimalSpecies
   breed         String?
@@ -253,10 +303,10 @@ model Animal {
   createdAt     DateTime      @default(now()) @map("created_at")
   updatedAt     DateTime      @updatedAt @map("updated_at")
 
-  ngo       User?      @relation("AnimalNgo", fields: [ngoId], references: [id])
-  guardian  User?      @relation("AnimalGuardian", fields: [guardianId], references: [id])
-  clinic    User?      @relation("AnimalClinic", fields: [clinicId], references: [id])
-  adoptions Adoption[]
+  organization User?      @relation("AnimalOrganization", fields: [organizationId], references: [id])
+  person       User?      @relation("AnimalPerson", fields: [personId], references: [id])
+  veterinary   User?      @relation("AnimalVeterinary", fields: [veterinaryId], references: [id])
+  adoptions    Adoption[]
 
   @@index([status])
   @@index([species, size])
@@ -267,21 +317,21 @@ model Animal {
 model Adoption {
   id                 String         @id @default(uuid()) @db.Uuid
   animalId           String         @map("animal_id") @db.Uuid
-  guardianId         String         @map("guardian_id") @db.Uuid
-  ngoId              String?        @map("ngo_id") @db.Uuid
+  personId           String         @map("person_id") @db.Uuid
+  organizationId     String?        @map("organization_id") @db.Uuid
   compatibilityScore Decimal?       @map("compatibility_score") @db.Decimal(5, 2)
   status             AdoptionStatus @default(requested)
   requestedAt        DateTime       @default(now()) @map("requested_at")
   completedAt        DateTime?      @map("completed_at")
   updatedAt          DateTime       @updatedAt @map("updated_at")
 
-  animal   Animal @relation(fields: [animalId], references: [id])
-  guardian User   @relation("AdoptionGuardian", fields: [guardianId], references: [id])
-  ngo      User?  @relation("AdoptionNgo", fields: [ngoId], references: [id])
+  animal       Animal @relation(fields: [animalId], references: [id])
+  person       User   @relation("AdoptionPerson", fields: [personId], references: [id])
+  organization User?  @relation("AdoptionOrganization", fields: [organizationId], references: [id])
 
-  @@unique([animalId, guardianId])
+  @@unique([animalId, personId])
   @@index([animalId, status])
-  @@index([guardianId])
+  @@index([personId])
   @@map("adoptions")
 }
 
