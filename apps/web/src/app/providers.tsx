@@ -6,6 +6,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { LocaleProvider } from "@/i18n";
 import { ToastProvider } from "@/components/Toast";
+import { OnboardingProvider } from "@/features/onboarding";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -128,7 +129,9 @@ export function SmoothScrollProvider({ children }: { children: ReactNode }) {
   return (
     <LocaleProvider>
       <ToastProvider>
-        <SmoothScrollInner>{children}</SmoothScrollInner>
+        <OnboardingProvider>
+          <SmoothScrollInner>{children}</SmoothScrollInner>
+        </OnboardingProvider>
       </ToastProvider>
     </LocaleProvider>
   );
