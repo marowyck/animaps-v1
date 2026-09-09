@@ -200,13 +200,29 @@ body {
   animation: curved-loop-marquee linear infinite;
 }
 
+@keyframes clay-float {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -8px, 0);
+  }
+}
+
+.clay-float {
+  animation: clay-float 3.2s ease-in-out infinite;
+  will-change: transform;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html.lenis,
   html.lenis body {
     scroll-behavior: auto !important;
   }
 
-  .curved-loop-track {
+  .curved-loop-track,
+  .clay-float {
     animation: none !important;
   }
 }
