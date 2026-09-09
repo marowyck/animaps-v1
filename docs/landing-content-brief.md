@@ -76,14 +76,14 @@ Copy source of truth: [`apps/web/src/i18n/messages/pt.ts`](../apps/web/src/i18n/
 
 Canonical public order (matches `apps/web/src/app/page.tsx`):
 
-1. **Hero** — emotional line (*“O seu melhor amigo espera.”*) + CTAs “Criar conta” (`/register`) / “Ver como funciona” (`/#how-it-works`) + pet photo; decorative filled paw prints in background.
-2. **The Solution** — product benefits / Ideal Match + occurrence map; plain language (**no Problem section above**).
-3. **How it works** — steps: create account → profile → match/map → adopt; section surface **pastel green** (feeds green CurvedLoop bridge).
+1. **Hero** — emotional line (*“O seu melhor amigo espera.”*) + CTAs “Criar conta” (`/register`) / “Ver como funciona” (`/#how-it-works`); **white full viewport** with clay puppy (left) and calico cat (right) framing the copy (no stock photo, no lucide paw field).
+2. **The Solution** — product benefits / Ideal Match + occurrence map; bento pillars on white (`min-h-[100svh]`); **no Problem section above**.
+3. **How it works** — steps: create account → profile → match/map → adopt; section surface **pastel green** (feeds green CurvedLoop bridge); critter clay beside the title; leash SVG between steps (desktop).
 4. **CurvedLoop (green)** — marquee; `bridgeAbove` continues green into the wave.
-5. **Who it’s for** — cards: Guardian, NGO, Clinic, Public agency / research.
-6. **Differentiators** — ANIMAPS features only (no competitor comparison table required).
+5. **Who it’s for** — polaroid-style cards: Guardian, NGO, Clinic, Public agency / research + large **family** clay figure.
+6. **Differentiators** — ANIMAPS features only (no competitor comparison table required); **pastel yellow** surface + monkey clay.
 7. **FAQ** — launch, free?, Ideal Match, NGOs/clinics, urgency/map, LGPD, coverage, mobile app; surface **pastel pink**; questions use shared `Button` (`cursor-pointer`).
-8. **CurvedLoop (pink)** — marquee; `bridgeAbove` continues pink into the wave.
+8. **CurvedLoop (pink)** — marquee; `bridgeAbove` continues pink into the wave; **`bridgeBelow`** paints into the footer.
 
 **Auth routes (English):**
 
@@ -94,7 +94,7 @@ Canonical public order (matches `apps/web/src/app/page.tsx`):
 
 **Header chrome:** frosted cluster with **Log in** (`/login`, secondary) + **Create account** (`/register`, primary) + menu (sections + register + login + language menu).
 
-**Footer:** brand blurb, platform/account/legal columns, social links (name + icon), **language menu** (`LocaleSwitcher variant="menu"`), oversized ANIMAPS wordmark. No newsletter CTA card. No locale URL prefixes.
+**Footer:** brand blurb, platform/account/legal columns, social links (name + icon), **language menu** (`LocaleSwitcher variant="menu"`), oversized ANIMAPS wordmark. On `/` the organic top wave is **off** (`showDivider={false}`) because the pink CurvedLoop already joins the footer. No newsletter CTA card. No locale URL prefixes.
 
 **Section hashes (English):** `#top`, `#solution`, `#how-it-works`, `#audience`, `#differentials`, `#faq`, `#privacy`, `#terms`.
 
@@ -162,6 +162,7 @@ Execution backlog (§1.7):
 ## 10. Copy checklist before go-live
 
 - [ ] Hero headline + subheadline review (PT / EN / ES dictionaries) — warm, not sparse, not fluffy
+- [ ] Clay mascot alts (PT on `ClayFigure` today; keep locales in mind if wiring i18n)
 - [ ] Section copy with consistent “Ideal Match” / “Match ideal”
 - [ ] No Problem-section scare copy on public `/`
 - [ ] Form microcopy (labels, toasts, password rules) across locales — account-facing where appropriate

@@ -3,7 +3,7 @@
 Technical plan for the ANIMAPS institutional landing.  
 Sources: Phase 1 decisions + visual design round + [`ANIMAPS_Roadmap.md`](../ANIMAPS_Roadmap.md) §1.4–1.6 + content/design briefs.
 
-**Status:** Pink/green friendly landing in [`apps/web`](../apps/web) (Bagel Fat One + Nunito, BubbleMenu, shared `Button` / `LocaleSwitcher` / `Toast`, waves, React Bits, GSAP, client i18n PT/EN/ES). Account capture on **`/register`** (two-step UI → waitlist API); **`/login`** split UI (email/password + Google CTA UI-only). Public `/` is product-only. Header exposes **Log in** + **Create account**.
+**Status:** Pink/green friendly landing in [`apps/web`](../apps/web) (Bagel Fat One + Nunito, clay mascots, BubbleMenu, shared `Button` / `LocaleSwitcher` / `Toast`, waves, React Bits, GSAP, client i18n PT/EN/ES). Public `/` is product-only **fullscreen sections**. Account capture on **`/register`** (two-step UI → waitlist API); **`/login`** split UI (email/password + Google CTA UI-only). Header exposes **Log in** + **Create account**.
 
 ---
 
@@ -14,9 +14,11 @@ Sources: Phase 1 decisions + visual design round + [`ANIMAPS_Roadmap.md`](../ANI
 | Framework | **Next.js** (App Router) + **TypeScript** |
 | Style | **Tailwind CSS v4** (tokens in `app/globals.css` via `@theme`) — **pink + green** brand |
 | Smooth scroll | **`lenis`** (`lenis/react`) — `autoRaf: false` + sync on `gsap.ticker` + **`anchors`** |
-| Animation | **GSAP** + `@gsap/react` + `ScrollTrigger` — easings `back.out` / `elastic.out` |
+| Animation | **GSAP** + `@gsap/react` + `ScrollTrigger` + **`SplitText`** — easings `back.out` / `elastic.out` |
 | Icons | **`lucide-react`** (+ small inline SVGs for social brands in Footer) |
-| UI bits | **React Bits–style** copy in `components/bits/` (ClickSpark, CurvedLoop, DotGrid, TiltedCard, …) |
+| UI bits | **React Bits–style** copy in `components/bits/` (ClickSpark, CurvedLoop, AnimatedContent, …) |
+| WebGL (optional) | **`ogl`** — used by `Aurora` (not composed on `/` today) |
+| Imagery | Clay mascots via `next/image` (`public/images/clay/`, WebP + PNG) |
 | Fonts | **Bagel Fat One** (display) + **Nunito** (body) via `next/font/google` |
 | Monorepo app | `apps/web` (`@animaps/web`) |
 | Hosting | **Vercel** |
@@ -39,29 +41,29 @@ Implementation: [`apps/web/src/app/providers.tsx`](../apps/web/src/app/providers
 
 | Option | Value | Why |
 |---|---|---|
-| `lerp` | `~0.16` | Snappier follow than very low lerp |
-| `duration` | `~1` | Anchor animations |
+| `lerp` | `~0.1` | Heavier smooth follow than a snappy lerp |
+| `duration` | `~1.1` | Anchor animations |
 | `syncTouch` | `false` | Native touch/trackpad feels lighter |
-| `wheelMultiplier` | `~1.2` | Slightly easier vertical travel |
-| `touchMultiplier` | `~1.4` | Same for touch |
+| `wheelMultiplier` | `~1` | Match native wheel distance |
+| `touchMultiplier` | `~1.2` | Slightly easier touch travel |
 | `anchors` | `{ offset: -96, duration: ~1.05, easing }` | Smooth hash navigation matching `scroll-padding-top: 6rem` |
 
 ### GSAP — plugins / patterns
 
 | Item | Use |
 |---|---|
-| `ScrollTrigger` | Bounce entry for cards/steps/FAQ; soft Hero parallax (`scrub: 0.6`); Lenis sync |
-| Hero timeline | Text + blob `elastic.out` + photo `back.out` + CTAs |
+| `ScrollTrigger` | Bounce/pop entry for cards/steps/FAQ (`once`); Hero scroll fade (`scrub: 0.4`); How-it-works leash draw; Lenis sync |
+| Hero timeline | GSAP `SplitText` (words) + body/CTAs/clay `back.out`; pointer parallax via RAF |
 | BubbleMenu | Open/close with `back.out`; pastel link hover |
-| CurvedLoop | Infinite `x` marquee; per-glyph `translateY(sin)` |
+| CurvedLoop | Infinite `x` marquee; per-glyph `translateY(sin)`; optional `bridgeAbove` / `bridgeBelow` |
 
 ### React Bits (`components/bits/`)
 
 Copy-paste style components, brand-reskinned. Always respect `prefers-reduced-motion` where motion is involved.
 
-Notable: **`CurvedLoop`** — continuous ribbon + optional **`bridgeAbove`** fill so section color meets the wave (no white seam under FAQ / HowItWorks).
+Notable: **`CurvedLoop`** — continuous ribbon + **`bridgeAbove`** (section color meets the wave) + **`bridgeBelow`** (pink ribbon paints into footer `#1a1214`). **`AnimatedContent`** defaults to an elastic pop and plays **once** (avoids Lenis leaving nodes at `opacity: 0`). **`ScrollReveal`** has a simple fade and an optional cinematic word-unblur mode.
 
-**Performance note:** avoid `will-change-transform` on every marquee character (hundreds of layers) — keep it on the track only.
+**Performance note:** avoid `will-change-transform` on every marquee character (hundreds of layers) — keep it on the track only. Clay idle motion is CSS (`clay-float`), not a GSAP loop. Large figures go through `next/image` (AVIF/WebP, extra device widths); the family PNG uses `unoptimized` for fidelity. `experimental.optimizePackageImports` covers `lucide-react`, `gsap`, `@gsap/react`.
 
 ---
 
@@ -87,10 +89,13 @@ components/                    # design system (app-wide reuse)
   Checkbox.tsx
   AccordionItem.tsx            # question row composes Button ghost
   bits/                        # React Bits–style motion/décor
-    CurvedLoop.tsx
+    CurvedLoop.tsx             # bridgeAbove + bridgeBelow
     ClickSpark.tsx
+    AnimatedContent.tsx        # elastic pop, once
+    ScrollReveal.tsx
     DotGrid.tsx
     TiltedCard.tsx
+    Aurora.tsx                 # ogl; not on `/` today
     …
 
 i18n/                          # client locale (no path prefixes)
@@ -107,6 +112,8 @@ app/
   login/page.tsx               # Auth split: carousel + login card (Google UI-only)
   api/waitlist/                # temporary Route Handler → Nest marketing Wave 2
 
+public/images/clay/            # mascot WebP + PNG (family PNG unoptimized)
+
 features/auth/                 # shared auth chrome (no landing Header/Footer)
   AuthSplitLayout.tsx
   AuthImageCarousel.tsx
@@ -117,16 +124,20 @@ features/auth/                 # shared auth chrome (no landing Header/Footer)
 
 features/landing/components/
   Header.tsx                   # Log in + Create account + BubbleMenu + LocaleSwitcher
-  Hero.tsx                     # taller viewport + filled PawPrint field
-  SolutionSection.tsx
-  HowItWorks.tsx               # bg-pastel-green (feeds green CurvedLoop bridge)
-  AudienceCards.tsx
-  Differentials.tsx
+  Hero.tsx                     # 100svh white; clay puppy + cat; SplitText + parallax
+  ClayFigure.tsx               # mascot catalog (webp/png) + wiggle + clay-float
+  ClayStage.tsx                # framed podium; not on `/` today
+  SolutionSection.tsx          # bento pillars; AnimatedContent
+  HowItWorks.tsx               # bg-pastel-green; leash SVG; critter clay
+  AudienceCards.tsx            # polaroid cards + family clay
+  Differentials.tsx            # bg-pastel-yellow; monkey clay
   FAQ.tsx                      # bg-pastel-pink (feeds pink CurvedLoop bridge)
   WaitlistSection.tsx          # optional section chrome; form embeds in RegisterForm
-  Footer.tsx                   # columns + LocaleSwitcher menu + social + wordmark
+  Footer.tsx                   # showDivider={false} on `/`; columns + locale + wordmark
   OrganicBlob.tsx
   SectionDivider.tsx
+  PortalScene.tsx              # SVG portal layers; not on `/` today
+  FloatingDecor.tsx            # parallax décor; not on `/` today
 
 features/waitlist/
   WaitlistForm.tsx             # profile fields; optional onContinue for multi-step
@@ -148,12 +159,13 @@ Visual specs: [`landing-design-brief.md`](landing-design-brief.md).
 ### Motion and performance
 
 - Prefer `transform` / `opacity` (compositor-friendly)
-- Check `prefers-reduced-motion` on Hero, BubbleMenu, Select, Accordion, Lenis, CurvedLoop, Button fill
-- Soft Hero parallax only
+- Check `prefers-reduced-motion` on Hero (no parallax / scroll fade / clay-float), BubbleMenu, Select, Accordion, Lenis, CurvedLoop, Button fill, AnimatedContent
 - Disable Lenis under reduced motion; anchors still land with header offset
 - Global custom scrollbar (transparent track, pink thumb); `scroll-padding-top` for fixed header chrome
 - `Button`: `magnetic` does **not** gate fill hover — fill stays on for `md` fill variants; `white` has CSS green hover; compact `pink` uses color/shadow hover **without scale**
 - Toast enter/exit: CSS swipe (translate + opacity)
+- Clay: CSS `clay-float` only; click wiggle is a short GSAP tween
+- Next image: AVIF/WebP, extended `deviceSizes` / `imageSizes` for ~560–720 CSS px figures
 
 ---
 
@@ -266,7 +278,9 @@ Required at launch:
 - [ ] `Button` hovers (esp. `white` secondary CTA green fill; compact pink without scale ghost)
 - [ ] Cookie banner + GA4 only post-consent
 - [ ] Smooth hash scroll (buttons/menu → sections) feels continuous under Lenis
-- [ ] CurvedLoop bridges: no white gap under FAQ (pink) / HowItWorks (green)
+- [ ] CurvedLoop bridges: no white gap under FAQ (pink) / HowItWorks (green); pink ribbon **`bridgeBelow`** meets footer (no double wave)
+- [ ] Clay mascots: puppy + cat in Hero; critter / family / monkey in later sections; crisp on retina; `clay-float` off under reduced motion
+- [ ] Full-viewport sections (`min-h-[100svh]`) read as one scene per scroll on desktop
 - [ ] `prefers-reduced-motion`: usable without animation
 - [ ] Design-brief anti-generic checklist (visual review)
 
@@ -282,11 +296,12 @@ Required at launch:
 6. ~~Shared `Button` / Header chrome polish~~ — **done**
 7. ~~`/register` + `/login`; English section hashes; waitlist off landing~~ — **done**
 8. ~~Auth split UI, two-step register, toasts, language menu, Header Log in~~ — **done**
-9. Final copy polish + assets (logo, social URLs)
-10. Real waitlist persistence + real auth for `/login` (persist password / OAuth)
-11. Cookie banner → GA4 post-consent + events
-12. SEO + Lighthouse >90
-13. Domain + Vercel production deploy
+9. ~~Clay mascots + fullscreen landing restyle~~ — **done**
+10. Final copy polish + assets (logo, social URLs); i18n alts for all clay figures
+11. Real waitlist persistence + real auth for `/login` (persist password / OAuth)
+12. Cookie banner → GA4 post-consent + events
+13. SEO + Lighthouse >90
+14. Domain + Vercel production deploy
 
 **Run locally:** from root, `pnpm dev` (filters `@animaps/web`).
 

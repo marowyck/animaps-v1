@@ -95,7 +95,7 @@ flowchart LR
 
 Details: [`docs/bounded-contexts.md`](docs/bounded-contexts.md) · data model: [`docs/der.dbml`](docs/der.dbml), [`docs/schema.prisma`](docs/schema.prisma) · evolution: [`docs/schema-evolution.md`](docs/schema-evolution.md).
 
-**Naming:** English in code and DB (`camelCase` API / `snake_case` DB); UI Portuguese with i18n (PT + EN) planned.
+**Naming:** English in code and DB (`camelCase` API / `snake_case` DB); UI in **Portuguese (default) + English + Spanish** via client dictionaries (no `/en` or `/es` routes).
 
 ---
 
@@ -111,6 +111,7 @@ Details: [`docs/bounded-contexts.md`](docs/bounded-contexts.md) · data model: [
 | Style | [Tailwind CSS](https://tailwindcss.com/) 4 |
 | Motion | [GSAP](https://gsap.com/) + Lenis |
 | Icons | [lucide-react](https://lucide.dev/) |
+| Imagery | Clay mascots (`next/image`) |
 
 ### Backend & data (planned)
 
@@ -142,10 +143,11 @@ animaps/
 │           ├── app/                 # routes, layout, providers, API routes
 │           │   └── api/waitlist/    # temporary; moves to apps/api in Wave 2
 │           ├── features/
-│           │   ├── landing/
+│           │   ├── landing/         # marketing + clay mascots
+│           │   ├── auth/            # /register + /login
 │           │   ├── waitlist/
 │           │   └── consent/
-│           └── components/          # shared UI primitives
+│           └── components/          # shared UI primitives + bits/
 ├── docs/
 ├── package.json
 └── pnpm-workspace.yaml              # apps/* (packages/ when 2+ consumers need them)
@@ -183,7 +185,7 @@ No required env vars in Phase 1 (waitlist persistence is a placeholder). See [`a
 
 ## Design system
 
-Shared primitives in `apps/web/src/components/`: `Button`, `Input`, `Select`, `Checkbox`, `AccordionItem`.
+Shared primitives in `apps/web/src/components/`: `Button`, `Input`, `Select`, `Checkbox`, `AccordionItem`, `Toast`, `LocaleSwitcher`. Motion kit in `components/bits/`. Clay mascots: `features/landing` (`ClayFigure`) + assets in `apps/web/public/images/clay/`.
 
 Tokens: [`apps/web/src/app/globals.css`](apps/web/src/app/globals.css). Visual brief: [`docs/landing-design-brief.md`](docs/landing-design-brief.md).
 

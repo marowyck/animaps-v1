@@ -3,7 +3,7 @@
 Visual identity and UX for the ANIMAPS institutional landing.  
 Sources: Phase 1 decisions + visual design round + **post-feedback pivots** + [`ANIMAPS_Roadmap.md`](../ANIMAPS_Roadmap.md) §1.3 + [`landing-content-brief.md`](landing-content-brief.md).
 
-**Status:** **friendly / organic / pink+green** direction implemented in `apps/web` (no Figma). Shared `Button` + `LocaleSwitcher` + `Toast`; Header CTA cluster with **Log in** + **Create account** + soft green menu. Public `/` sells the product; **`/register`** and **`/login`** use an immersive split layout (image carousel + form card). Google CTA is UI-only until OAuth ships.
+**Status:** **friendly / organic / pink+green** direction implemented in `apps/web` (no Figma). Public `/` is a **fullscreen-section** landing with **clay mascots** (puppy + cat frame the Hero; family / critter / monkey appear later). Shared `Button` + `LocaleSwitcher` + `Toast`; Header CTA cluster with **Log in** + **Create account** + soft green menu. **`/register`** and **`/login`** use an immersive split layout (image carousel + form card). Google CTA is UI-only until OAuth ships.
 
 ---
 
@@ -24,6 +24,11 @@ Landing now centers **brand pink + brand green** (with soft pastels). Display/bo
 | Problem + SocialProof carousel | **Removed** — solutions/benefits only |
 | Waitlist-first copy | **Account language**; form still waitlist |
 | Newsletter-heavy footer | **Clean Tinder-inspired footer** + social text links |
+| Stock pet photo + lucide paw field in Hero | **Clay mascots** framing centered copy on white |
+
+### 3) Stock photo → clay companions
+
+Hero no longer uses a blob-framed photograph. Custom clay figures sit as large companions (puppy left, calico cat right) on a white full-viewport stage with soft pink/green washes. Later sections host family, critter, and monkey figures.
 
 **Personality:** welcoming / human + playful / modern (trustworthy; drop “newspaper” tone).
 
@@ -33,7 +38,7 @@ Landing now centers **brand pink + brand green** (with soft pastels). Display/bo
 
 Convey **trust, warmth, and lightness** — modern, rounded, pastel-colored; human without childish; not AI-generic.
 
-**Direction:** **friendly-organic** — Bagel Fat One + Nunito, blob frames, wave dividers, pink/green, bounce/elastic motion.
+**Direction:** **friendly-organic** — Bagel Fat One + Nunito, clay mascots, wave dividers, pink/green, bounce/elastic motion.
 
 Primary audience: guardians and NGOs (balanced voice). Clinics get a dedicated card; public agencies a light mention.
 
@@ -74,12 +79,12 @@ Final logo **does not exist yet**. Tokens in [`apps/web/src/app/globals.css`](..
 | Decision | Choice |
 |---|---|
 | Overall style | Friendly-organic (rounded, pink/green, bounce) |
-| Imagery | Real photos; **blob** frame (organic `border-radius` + white border + soft shadow) |
+| Imagery | Custom **clay mascots** in [`apps/web/public/images/clay/`](../apps/web/public/images/clay/) (WebP + PNG). Catalog: `ClayFigure` (`puppy`, `cat`, `family`, `critter`, `monkey`) |
 | Hero video | No |
-| Hero décor | Filled `PawPrint` icons (lucide) scattered at low–medium opacity (pink/green); soft pastel blobs |
-| Shadows | Soft on cards/CTAs |
+| Hero décor | Large clay companions framing centered copy on **white**; pastel pink/green washes; CSS `clay-float`; pointer parallax on layers |
+| Shadows | Soft on cards/CTAs; drop-shadow on clay figures |
 | Border-radius | `2rem`–`3rem` on cards; pills on buttons |
-| Dividers | SVG **Wave** (`SectionDivider`) |
+| Dividers | SVG **Wave** (`SectionDivider`); pink CurvedLoop also **`bridgeBelow`** into the footer |
 | Iconography | `lucide-react` in colored circles/badges; footer social = name + icon |
 
 ---
@@ -91,15 +96,15 @@ No Figma. Source of truth: this brief + code in `apps/web`.
 ### Page order (`app/page.tsx`)
 
 1. Header (BubbleMenu)  
-2. Hero (taller ~88–92vh; paw field; photo + CTAs → `/register` + `/#how-it-works`)  
-3. Solution  
-4. How it works (`bg-pastel-green`)  
+2. Hero (full `100svh` white; clay puppy + cat; CTAs → `/register` + `/#how-it-works`)  
+3. Solution (white; bento pillars; `min-h-[100svh]`)  
+4. How it works (`bg-pastel-green`; leash draw + critter clay; `min-h-[100svh]`)  
 5. **CurvedLoop** (green ribbon, `bridgeAbove`)  
-6. Audience  
-7. Differentials  
+6. Audience (`bg-gray-soft`; polaroid cards + family clay; `min-h-[100svh]`)  
+7. Differentials (`bg-pastel-yellow`; feature grid + monkey clay; `min-h-[100svh]`)  
 8. FAQ (`bg-pastel-pink`)  
-9. **CurvedLoop** (pink ribbon, `bridgeAbove`)  
-10. Footer  
+9. **CurvedLoop** (pink ribbon, `bridgeAbove` + **`bridgeBelow`** into footer `#1a1214`)  
+10. Footer (`showDivider={false}` — the ribbon already paints the sine join)  
 
 **Separate routes (English paths):**
 
@@ -166,13 +171,14 @@ Single reusable control for all CTAs and chrome actions — **no ad-hoc `<button
 - Component: [`apps/web/src/components/bits/CurvedLoop.tsx`](../apps/web/src/components/bits/CurvedLoop.tsx)
 - Continuous sine ribbon (stroke) + upright per-letter wave
 - Prop **`bridgeAbove`**: solid fill from the previous section color down to the ribbon’s lower edge (same sine) so there is **no white gap** between FAQ↔pink ribbon or HowItWorks↔green ribbon
+- Prop **`bridgeBelow`**: fill from the ribbon’s lower sine **downward** (footer `#1a1214`) so marquee text rides the join into the dark footer — used on the pink ribbon; Footer then omits its own `SectionDivider`
 - Phase-locked wavelength for seamless `-50%` marquee loop
 
 ### Footer
 
 Model: clean multi-column + oversized cropped brand wordmark (Tinder-like structure, quieter ANIMAPS palette).
 
-- Dark `#1a1214` + wave on top (`SectionDivider` fill `gray-soft`)
+- Dark `#1a1214`. Top wave is **omitted** on `/` (`showDivider={false}`) because the pink CurvedLoop `bridgeBelow` already paints that sine.
 - Columns: brand blurb + language menu · Platform · Account (`/register`, `/login`) · Legal · Social
 - Language switcher: client-only (`localStorage`); **no** `/pt` / `/en` / `/es` routes
 - Social: **text link + icon on the right** (Instagram, TikTok, LinkedIn, YouTube) — no extra CTA card / pill button row
@@ -197,11 +203,17 @@ Model: clean multi-column + oversized cropped brand wordmark (Tinder-like struct
 
 ### Bits (`apps/web/src/components/bits/`)
 
-`ClickSpark`, `AnimatedContent`, `ScrollReveal`, `Magnet`, `TiltedCard`, `DotGrid`, `CurvedLoop`, …
+`ClickSpark`, `AnimatedContent` (elastic pop, `once`), `ScrollReveal` (simple or cinematic word-unblur), `Magnet`, `TiltedCard`, `DotGrid`, `CurvedLoop`, plus kit extras **not required on `/` today**: `Aurora` (WebGL via `ogl`), `SpotlightCard`, `GlareHover`, `GradualBlur`, `SplitText`, `ScrollFloat`, `ScrollStack`.
+
+Hero title splitting uses **GSAP `SplitText`** directly (not the bits wrapper).
 
 ### Marketing (`apps/web/src/features/landing/`)
 
-`Header`, `Hero`, `SolutionSection`, `HowItWorks`, `AudienceCards`, `Differentials`, `FAQ`, `WaitlistSection`, `Footer`, `OrganicBlob`, `SectionDivider`.
+**On `/`:** `Header`, `Hero`, `SolutionSection`, `HowItWorks`, `AudienceCards`, `Differentials`, `FAQ`, `Footer`, `SectionDivider`.
+
+**Clay:** `ClayFigure` (asset catalog + wiggle + `clay-float`) used in Hero / How it works / Audience / Differentials. `ClayStage` is a framed podium helper — exported, not composed on `/` today.
+
+**Available, not in public flow:** `WaitlistSection`, `OrganicBlob`, `PortalScene` (hand-drawn SVG layers), `FloatingDecor` (parallax clouds/paws).
 
 ### Auth (`apps/web/src/features/auth/`)
 
@@ -230,11 +242,17 @@ Intensity: **expressive and playful**, without competing with reading. Lenis kep
 
 | Effect | Where | Tool |
 |---|---|---|
-| Entry timeline | Hero | GSAP |
+| Word intro | Hero `h1` | GSAP `SplitText` (words) + `back.out` |
+| Entry timeline | Hero body / CTAs / clay | GSAP `back.out` / `power2.out` |
+| Pointer parallax | Hero washes + clay + UI | RAF lerp (skipped if reduced motion) |
+| Scroll fade | Whole Hero | ScrollTrigger `scrub: 0.4` |
+| Idle float | Clay figures | CSS `@keyframes clay-float` |
+| Click wiggle | Clay figures / How-it-works cards | GSAP rotate yoyo |
 | Bubble menu | Header | GSAP `back.out`; panel below cluster |
-| Scroll-in bounce | Cards / steps / FAQ | ScrollTrigger + `back.out` |
+| Scroll-in pop | Solution / How it works / Differentials cards | `AnimatedContent` (`back.out`, `once`) |
+| Polaroid pop-in | Audience cards | ScrollTrigger + `back.out` |
 | Accordion height | FAQ | GSAP height |
-| Light parallax | Hero blobs | ScrollTrigger `scrub: 0.6` |
+| Leash draw | How it works (desktop) | SVG `strokeDashoffset` + ScrollTrigger scrub |
 | Marquee ribbons | CurvedLoop | GSAP `x` loop |
 | Magnetic / fill hover | `Button` | pointer pull optional; clipPath fill on `md` fill variants; CSS hover on `white` / compact `pink` (no scale on `sm` pink) |
 | Toast enter/exit | Toast stack | CSS translate + opacity swipe |
@@ -247,10 +265,10 @@ Required: `prefers-reduced-motion` (Lenis off + timelines skip + native anchor f
 ## 7. Anti “AI-generic” checklist
 
 - [ ] No cliché purple/indigo SaaS gradients — **pink + green** solid brand
-- [ ] No generic 3D illustrations
+- [ ] No generic 3D / Midjourney pet illustrations — **custom clay mascots** only
 - [ ] No Inter/Roboto as primary face
 - [ ] No identical floating white cards without hierarchy/color
-- [ ] Lucide OK in colored badges / intentional décor (filled paws in Hero); toast icons from Lucide (no emoji)
+- [ ] Lucide OK in colored badges / interactive cards; toast icons from Lucide (no emoji)
 - [ ] Header chrome stays pastel pink/green — avoid heavy black icon buttons on the frosted cluster
 
 ---
@@ -258,7 +276,7 @@ Required: `prefers-reduced-motion` (Lenis off + timelines skip + native anchor f
 ## 8. Minimum a11y (MVP required)
 
 - [ ] WCAG AA contrast (saturated on text/CTA)
-- [ ] Photo `alt`; visible focus; input labels
+- [ ] Photo / clay `alt`; visible focus; input labels
 - [ ] Password reveal buttons expose show/hide aria labels
 - [ ] `prefers-reduced-motion`
 - [ ] Correct `lang`; touch targets ≥44px
@@ -273,15 +291,17 @@ Required: `prefers-reduced-motion` (Lenis off + timelines skip + native anchor f
 | Friendly pivot + pink/green + Bagel/Nunito | Done in code |
 | BubbleMenu + waves + bits (CurvedLoop, etc.) | Done in code |
 | Continuous ribbon bridges (`bridgeAbove`) | Done |
+| Pink ribbon `bridgeBelow` into footer (no extra Footer wave) | Done |
 | Header Log in + Create account + soft green menu + in-menu locale | Done |
 | `/register` + `/login` split layout (carousel + Google UI CTA) | Done |
 | Register two-step + password reveal + toasts | Done |
 | Shared `Button` + `LocaleSwitcher` + `Toast` | Done |
 | Clean footer + social links + language menu | Done |
-| Hero paw field + taller viewport | Done |
+| Full-viewport white Hero + clay companions (puppy / cat) | Done |
+| Clay figures in How it works / Audience / Differentials | Done |
 | Design system primitives | Done |
 | Logo + favicon | Pending |
-| Final stock photos | Hero photo present; refine as needed |
+| Clay alt text | Portuguese on `ClayFigure` catalog today; `hero.imageAlt` exists in i18n (puppy) |
 | Figma prototype | Cancelled |
 
 ---

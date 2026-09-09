@@ -43,7 +43,7 @@ apps/web/src/
 │   ├── login/           # Login UI placeholder (real auth later)
 │   └── providers.tsx    # Locale + Toast + Lenis / GSAP
 ├── features/
-│   ├── landing/         # Marketing sections (web-only)
+│   ├── landing/         # Marketing sections + clay mascots (web-only)
 │   ├── auth/            # Split layout, register/login forms, password rules
 │   ├── waitlist/        # Form UI + client/server validation + types
 │   └── consent/         # Cookie banner (web-only localStorage)
