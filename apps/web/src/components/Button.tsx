@@ -205,9 +205,9 @@ export function Button({
     variant === "pink" && resolvedSize === "sm";
   /** Soft fill hover for compact CTAs — no scale (avoids shadow/radius ghost). */
   const base = [
-    "group relative inline-flex cursor-pointer items-center gap-2 overflow-hidden rounded-full transition-[transform,background-color,box-shadow,color,border-color] duration-200 ease-out",
+    "group relative inline-flex cursor-pointer items-center gap-2 overflow-hidden rounded-full transition-[transform,background-color,box-shadow,color,border-color] duration-200 ease-out active:scale-[0.98]",
     "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-pink",
-    "disabled:cursor-not-allowed disabled:opacity-60",
+    "disabled:cursor-not-allowed disabled:opacity-60 disabled:active:scale-100",
     showFill ? "shadow-md" : "",
     pinkSm
       ? "shadow-[0_6px_16px_-4px_rgba(224,122,150,0.55)] hover:bg-brand-pink-hover hover:shadow-[0_10px_22px_-6px_rgba(224,122,150,0.55)] active:brightness-95"

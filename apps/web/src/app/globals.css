@@ -35,6 +35,11 @@
   --background: var(--gray-soft);
   --foreground: var(--ink);
 
+  /* Semantic feedback — prefer these over raw red/amber in product UI */
+  --success: var(--brand-green);
+  --warning: #d97706;
+  --error: #dc2626;
+
   --radius-lg: 2.5rem;
   --radius-md: 1.5rem;
   --radius-sm: 1rem;
@@ -66,6 +71,10 @@
   --color-pastel-green: var(--pastel-green);
   --color-pastel-purple: var(--pastel-purple);
   --color-pastel-sky: var(--pastel-sky);
+
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-error: var(--error);
 
   --font-sans: var(--font-nunito), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-bagel), ui-rounded, ui-sans-serif, system-ui, sans-serif;
@@ -185,6 +194,64 @@ body {
 
 .organic-blob {
   border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+}
+
+@keyframes fade-in-up {
+  0% {
+    opacity: 0;
+    transform: translateY(12px) scale(0.99);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  will-change: transform, opacity;
+}
+
+@keyframes modal-in {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.97);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-modal-in {
+  animation: modal-in 0.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  will-change: transform, opacity;
+}
+
+@keyframes fade-in {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out forwards;
+}
+
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-gradient-shift {
+  background-size: 200% 200%;
+  animation: gradient-shift 6s ease infinite;
 }
 
 @keyframes curved-loop-marquee {

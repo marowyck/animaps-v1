@@ -71,7 +71,8 @@ export default function ClickSpark({
       });
 
       if (sparksRef.current.length > 0) {
-        requestAnimationFrame(draw);
+        // eslint-disable-next-line react-hooks/immutability
+        requestAnimationFrame((t) => draw(t));
       }
     },
     [duration, sparkColor, sparkRadius, sparkSize],
