@@ -16,12 +16,17 @@ export const INTENTION_IDS: UserIntention[] = [
   "adopt",
   "pet_owner",
   "help_animals",
+  "volunteer",
+  "foster_home",
+  "independent_protector",
+  "animal_professional",
   "report",
   "lost_animal",
   "found_animal",
   "community",
   "explore",
 ];
+
 
 export const OTHER_ROLE_IDS: OtherRole[] = [
   "independent_protector",

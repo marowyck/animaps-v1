@@ -1,11 +1,20 @@
 /** Domain types for progressive onboarding (frontend draft → Wave 2 tables). */
 
+import type {
+  AccountType,
+  InstitutionTypeId,
+  OrganizationType,
+} from "@/features/account-types";
 import type { PublicUserType } from "@/features/user-types";
 
 export type UserIntention =
   | "adopt"
   | "pet_owner"
   | "help_animals"
+  | "volunteer"
+  | "foster_home"
+  | "independent_protector"
+  | "animal_professional"
   | "report"
   | "lost_animal"
   | "found_animal"
@@ -115,10 +124,28 @@ export type VeterinaryDraft = {
   servicesOffered: string[];
 };
 
+/** Soft institution profile collected during INSTITUTION onboarding (mock until API). */
+export type InstitutionDraft = {
+  officialName: string;
+  publicName: string;
+  description: string;
+  email: string;
+  emailDomain: string;
+  phone: string;
+  website: string;
+  responsibleDepartment: string;
+  dataResponsibleArea: string;
+};
+
 export type OnboardingDraft = {
   email: string | null;
   displayName: string | null;
+  /** Wave 2 discriminator — still drives many UI permissions. */
   userType: PublicUserType | null;
+  /** Ecosystem account type (Fase 2) — preferred by `resolveFlowKey`. */
+  accountType: AccountType | null;
+  organizationType: OrganizationType | null;
+  institutionTypeId: InstitutionTypeId | null;
   guidelinesAcceptedAt: string | null;
   intentions: UserIntention[];
   otherRole: OtherRole | null;
@@ -129,6 +156,7 @@ export type OnboardingDraft = {
   additionalInfo: Partial<Record<AdditionalInfoKey, AdditionalInfoEntry>>;
   organization: OrganizationDraft;
   veterinary: VeterinaryDraft;
+  institution: InstitutionDraft;
   selfieStatus: SelfieVerificationStatus;
   selfiePreviewUrl: string | null;
   institutionalVerificationStatus: SelfieVerificationStatus;
@@ -186,6 +214,20 @@ export function createEmptyVeterinary(): VeterinaryDraft {
   };
 }
 
+export function createEmptyInstitution(): InstitutionDraft {
+  return {
+    officialName: "",
+    publicName: "",
+    description: "",
+    email: "",
+    emailDomain: "",
+    phone: "",
+    website: "",
+    responsibleDepartment: "",
+    dataResponsibleArea: "",
+  };
+}
+
 export function createEmptyDraft(
   partial?: Partial<OnboardingDraft>,
 ): OnboardingDraft {
@@ -193,6 +235,9 @@ export function createEmptyDraft(
     email: null,
     displayName: null,
     userType: null,
+    accountType: null,
+    organizationType: null,
+    institutionTypeId: null,
     guidelinesAcceptedAt: null,
     intentions: [],
     otherRole: null,
@@ -203,6 +248,7 @@ export function createEmptyDraft(
     additionalInfo: {},
     organization: createEmptyOrganization(),
     veterinary: createEmptyVeterinary(),
+    institution: createEmptyInstitution(),
     selfieStatus: "pending",
     selfiePreviewUrl: null,
     institutionalVerificationStatus: "pending",
@@ -227,6 +273,10 @@ export function createEmptyDraft(
       ...createEmptyVeterinary(),
       ...partial.veterinary,
     },
+    institution: {
+      ...createEmptyInstitution(),
+      ...partial.institution,
+    },
     animalFilters: {
       ...EMPTY_ANIMAL_FILTERS,
       ...partial.animalFilters,
@@ -247,6 +297,7 @@ export const ALL_ONBOARDING_STEP_IDS = [
   "additional-info",
   "profile",
   "verification",
+  "organization-type",
   "organization-info",
   "location",
   "animal-types",
@@ -254,6 +305,8 @@ export const ALL_ONBOARDING_STEP_IDS = [
   "clinic-info",
   "animals-served",
   "role-selection",
+  "institution-type",
+  "institution-info",
 ] as const;
 
 export type OnboardingStepId = (typeof ALL_ONBOARDING_STEP_IDS)[number];

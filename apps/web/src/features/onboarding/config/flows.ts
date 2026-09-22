@@ -1,9 +1,11 @@
 import type { PublicUserType } from "@/features/user-types";
+import { normalizeUserType } from "@/features/user-types";
 import type { OnboardingDraft, OnboardingStepId } from "../types";
 
 /**
  * Per-type step sequences (guidelines is auto-prepended for every type).
  * Step ids must match the dynamic route `/onboarding/[step]`.
+ * Fase 2: INSTITUTION flow + organization-type for ORGANIZATION accounts.
  */
 export const ONBOARDING_FLOWS: Record<PublicUserType, OnboardingStepId[]> = {
   PERSON: [
@@ -14,6 +16,7 @@ export const ONBOARDING_FLOWS: Record<PublicUserType, OnboardingStepId[]> = {
     "verification",
   ],
   ONG: [
+    "organization-type",
     "organization-info",
     "location",
     "animal-types",
@@ -21,6 +24,7 @@ export const ONBOARDING_FLOWS: Record<PublicUserType, OnboardingStepId[]> = {
     "verification",
   ],
   VETERINARY_CLINIC: [
+    "organization-type",
     "clinic-info",
     "location",
     "services",
@@ -28,6 +32,12 @@ export const ONBOARDING_FLOWS: Record<PublicUserType, OnboardingStepId[]> = {
     "verification",
   ],
   OTHER: ["role-selection", "profile", "additional-info"],
+  INSTITUTION: [
+    "institution-type",
+    "institution-info",
+    "location",
+    "verification",
+  ],
 };
 
 /** Universal first step for all user types. */
@@ -103,6 +113,13 @@ export const STEP_DEFINITIONS: Record<string, StepDefinition> = {
     required: false,
     skippable: true,
   },
+  "organization-type": {
+    id: "organization-type",
+    required: true,
+    skippable: false,
+    // Skip when subtype already chosen at register
+    conditions: (draft) => !draft.organizationType,
+  },
   "organization-info": {
     id: "organization-info",
     required: true,
@@ -138,6 +155,17 @@ export const STEP_DEFINITIONS: Record<string, StepDefinition> = {
     required: true,
     skippable: false,
   },
+  "institution-type": {
+    id: "institution-type",
+    required: true,
+    skippable: false,
+    conditions: (draft) => !draft.institutionTypeId,
+  },
+  "institution-info": {
+    id: "institution-info",
+    required: true,
+    skippable: false,
+  },
 };
 
 /** Map legacy URLs to canonical step ids used in ONBOARDING_FLOWS. */
@@ -149,15 +177,36 @@ export function canonicalStepId(raw: string): OnboardingStepId {
   return (STEP_ALIASES[raw] ?? raw) as OnboardingStepId;
 }
 
+/**
+ * Resolve which ONBOARDING_FLOWS key to use.
+ * Prefer ecosystem `accountType` when set; fall back to Wave 2 `userType`.
+ */
+export function resolveFlowKey(draft: OnboardingDraft): PublicUserType {
+  if (draft.accountType === "INSTITUTION" || draft.userType === "INSTITUTION") {
+    return "INSTITUTION";
+  }
+  if (draft.accountType === "ORGANIZATION") {
+    if (
+      draft.organizationType === "VETERINARY_CLINIC" ||
+      draft.organizationType === "VETERINARY_HOSPITAL"
+    ) {
+      return "VETERINARY_CLINIC";
+    }
+    return "ONG";
+  }
+  return normalizeUserType(draft.userType);
+}
+
 export function buildFlowSteps(userType: PublicUserType): OnboardingStepId[] {
-  return [UNIVERSAL_FIRST_STEP, ...ONBOARDING_FLOWS[userType]];
+  return [UNIVERSAL_FIRST_STEP, ...(ONBOARDING_FLOWS[userType] ?? ONBOARDING_FLOWS.PERSON)];
 }
 
 export function getActiveSteps(
   userType: PublicUserType,
   draft: OnboardingDraft,
 ): OnboardingStepId[] {
-  return buildFlowSteps(userType).filter((id) => {
+  const key = resolveFlowKey(draft) || userType;
+  return buildFlowSteps(key).filter((id) => {
     const def = STEP_DEFINITIONS[id];
     if (!def) return true;
     return def.conditions ? def.conditions(draft) : true;
@@ -173,7 +222,6 @@ export function getStepProgress(
   const canonical = canonicalStepId(currentStep);
   let index = active.indexOf(canonical);
   if (index < 0) {
-    // raw id still in active list (e.g. guidelines)
     index = active.indexOf(currentStep);
   }
   if (index < 0) index = 0;
@@ -204,4 +252,12 @@ export function getAdjacentSteps(
 
 export function hrefForStep(step: OnboardingStepId): string {
   return `/onboarding/${step}`;
+}
+
+/** Post-onboarding home by flow key. */
+export function homeHrefForFlow(userType: PublicUserType): string {
+  if (userType === "ONG" || userType === "VETERINARY_CLINIC" || userType === "INSTITUTION") {
+    return "/dashboard";
+  }
+  return "/discover";
 }

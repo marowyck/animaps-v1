@@ -7,8 +7,14 @@ import { Checkbox } from "@/components/Checkbox";
 import { Input } from "@/components/Input";
 import { useToast } from "@/components/Toast";
 import { useT } from "@/i18n";
-import { UserTypeSelector } from "@/features/onboarding";
-import type { PublicUserType } from "@/features/user-types";
+import type { OrganizationType, InstitutionTypeId } from "@/features/account-types";
+import {
+  AccountTypeSelector,
+  mapSignupOption,
+  OrganizationTypeSelector,
+  InstitutionTypeSelector,
+  type SignupAccountOption,
+} from "@/features/onboarding";
 import { submitWaitlist } from "./submitWaitlist";
 import type { WaitlistFormState } from "./types";
 import { validateWaitlistFormClient } from "./validation";
@@ -16,6 +22,9 @@ import { validateWaitlistFormClient } from "./validation";
 const INITIAL: WaitlistFormState = {
   name: "",
   email: "",
+  accountOption: "",
+  organizationType: "",
+  institutionTypeId: "",
   profileType: "",
   city: "",
   state: "",
@@ -46,6 +55,37 @@ export function WaitlistForm({
     initialValues ?? INITIAL,
   );
   const [status, setStatus] = useState<"idle" | "loading">("idle");
+
+  function applyAccountOption(option: SignupAccountOption) {
+    const mapped = mapSignupOption(option);
+    setForm((prev) => ({
+      ...prev,
+      accountOption: option,
+      organizationType: option === "ORGANIZATION" ? prev.organizationType : "",
+      institutionTypeId: option === "INSTITUTION" ? prev.institutionTypeId : "",
+      // ORGANIZATION needs subtype before profileType is known
+      profileType:
+        option === "ORGANIZATION"
+          ? prev.organizationType === "VETERINARY_CLINIC" ||
+            prev.organizationType === "VETERINARY_HOSPITAL"
+            ? "VETERINARY_CLINIC"
+            : prev.organizationType
+              ? "ONG"
+              : ""
+          : mapped.userType,
+    }));
+  }
+
+  function applyOrganizationType(organizationType: OrganizationType) {
+    const isClinic =
+      organizationType === "VETERINARY_CLINIC" ||
+      organizationType === "VETERINARY_HOSPITAL";
+    setForm((prev) => ({
+      ...prev,
+      organizationType,
+      profileType: isClinic ? "VETERINARY_CLINIC" : "ONG",
+    }));
+  }
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
@@ -114,15 +154,45 @@ export function WaitlistForm({
         />
 
         <div className="col-span-2 space-y-1.5">
-          <p className="text-xs font-bold text-ink">{t.form.profileType}</p>
-          <UserTypeSelector
+          <p className="text-xs font-bold text-ink">{t.form.accountType}</p>
+          <AccountTypeSelector
             compact={embedded}
-            value={form.profileType}
-            onChange={(v: PublicUserType) =>
-              setForm({ ...form, profileType: v })
-            }
+            value={form.accountOption}
+            onChange={applyAccountOption}
           />
         </div>
+
+        {form.accountOption === "ORGANIZATION" ? (
+          <div className="col-span-2 space-y-1.5">
+            <p className="text-xs font-bold text-ink">
+              {t.onboarding.organizationType.title}
+            </p>
+            <OrganizationTypeSelector
+              compact={embedded}
+              value={form.organizationType || null}
+              onChange={applyOrganizationType}
+            />
+          </div>
+        ) : null}
+
+        {form.accountOption === "INSTITUTION" ? (
+          <div className="col-span-2 space-y-1.5">
+            <p className="text-xs font-bold text-ink">
+              {t.onboarding.institutionType.title}
+            </p>
+            <InstitutionTypeSelector
+              compact={embedded}
+              value={form.institutionTypeId || null}
+              onChange={(institutionTypeId: InstitutionTypeId) =>
+                setForm((prev) => ({
+                  ...prev,
+                  institutionTypeId,
+                  profileType: "INSTITUTION",
+                }))
+              }
+            />
+          </div>
+        ) : null}
 
         <Input
           compact={embedded}

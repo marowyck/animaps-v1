@@ -5,14 +5,15 @@ import { EmptyState } from "@/components/StateBlocks";
 import { useToast } from "@/components/Toast";
 import { useT } from "@/i18n";
 import { DiscoverCard } from "./DiscoverCard";
-import { MOCK_DISCOVER_ITEMS } from "./mockDiscoverItems";
+import { getMockDiscoverItems } from "./mockDiscoverItems";
 import type { DiscoverAction } from "./types";
 
 export function DiscoverStack() {
   const t = useT();
   const { toast } = useToast();
   const [index, setIndex] = useState(0);
-  const item = MOCK_DISCOVER_ITEMS[index];
+  const items = getMockDiscoverItems(t);
+  const item = items[index];
 
   if (!item) {
     return (

@@ -3,6 +3,6 @@ export type {
   DiscoverEntityKind,
   DiscoverItem,
 } from "./types";
-export { MOCK_DISCOVER_ITEMS } from "./mockDiscoverItems";
+export { getMockDiscoverItems } from "./mockDiscoverItems";
 export { DiscoverCard } from "./DiscoverCard";
 export { DiscoverStack } from "./DiscoverStack";

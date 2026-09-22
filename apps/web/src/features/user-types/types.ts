@@ -5,6 +5,7 @@ export const PUBLIC_USER_TYPES = [
   "ONG",
   "VETERINARY_CLINIC",
   "OTHER",
+  "INSTITUTION",
 ] as const;
 
 export type PublicUserType = (typeof PUBLIC_USER_TYPES)[number];
@@ -24,6 +25,7 @@ export const USER_TYPE_TO_DB: Record<PublicUserType, string> = {
   ONG: "ong",
   VETERINARY_CLINIC: "veterinary_clinic",
   OTHER: "other",
+  INSTITUTION: "institution",
 };
 
 export const DB_TO_USER_TYPE: Record<string, PublicUserType> = {
@@ -31,6 +33,7 @@ export const DB_TO_USER_TYPE: Record<string, PublicUserType> = {
   ong: "ONG",
   veterinary_clinic: "VETERINARY_CLINIC",
   other: "OTHER",
+  institution: "INSTITUTION",
   // legacy waitlist values
   guardian: "PERSON",
   ngo: "ONG",

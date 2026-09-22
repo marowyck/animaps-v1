@@ -11,9 +11,17 @@ import {
 } from "react";
 import type { PublicUserType } from "@/features/user-types";
 import { normalizeUserType } from "@/features/user-types";
+import {
+  accountTypeFromUserType,
+  type AccountType,
+  type InstitutionTypeId,
+  type OrganizationType,
+} from "@/features/account-types";
+import { resolveFlowKey } from "./config";
 import { readOnboardingDraft, writeOnboardingDraft } from "./storage";
 import {
   createEmptyDraft,
+  createEmptyInstitution,
   createEmptyOrganization,
   createEmptyVeterinary,
   MAX_INTERESTS,
@@ -22,6 +30,7 @@ import {
   type AnimalFilterPreferences,
   type AnimalSizePreference,
   type AnimalTypePreference,
+  type InstitutionDraft,
   type LocationPermission,
   type OnboardingDraft,
   type OrganizationDraft,
@@ -35,6 +44,9 @@ type Action =
   | { type: "hydrate"; draft: OnboardingDraft }
   | { type: "patch"; patch: Partial<OnboardingDraft> }
   | { type: "setUserType"; userType: PublicUserType }
+  | { type: "setAccountType"; accountType: AccountType }
+  | { type: "setOrganizationType"; organizationType: OrganizationType }
+  | { type: "setInstitutionTypeId"; institutionTypeId: InstitutionTypeId }
   | { type: "setIntentions"; intentions: UserIntention[] }
   | { type: "toggleIntention"; intention: UserIntention }
   | { type: "setOtherRole"; otherRole: OtherRole }
@@ -52,6 +64,7 @@ type Action =
     }
   | { type: "patchOrganization"; patch: Partial<OrganizationDraft> }
   | { type: "patchVeterinary"; patch: Partial<VeterinaryDraft> }
+  | { type: "patchInstitution"; patch: Partial<InstitutionDraft> }
   | { type: "acceptGuidelines" }
   | {
       type: "setSelfie";
@@ -73,7 +86,17 @@ function reducer(state: OnboardingDraft, action: Action): OnboardingDraft {
     case "patch":
       return { ...state, ...action.patch };
     case "setUserType":
-      return { ...state, userType: action.userType };
+      return {
+        ...state,
+        userType: action.userType,
+        accountType: state.accountType ?? accountTypeFromUserType(action.userType),
+      };
+    case "setAccountType":
+      return { ...state, accountType: action.accountType };
+    case "setOrganizationType":
+      return { ...state, organizationType: action.organizationType };
+    case "setInstitutionTypeId":
+      return { ...state, institutionTypeId: action.institutionTypeId };
     case "setIntentions":
       return { ...state, intentions: action.intentions };
     case "toggleIntention":
@@ -167,6 +190,15 @@ function reducer(state: OnboardingDraft, action: Action): OnboardingDraft {
           ...action.patch,
         },
       };
+    case "patchInstitution":
+      return {
+        ...state,
+        institution: {
+          ...createEmptyInstitution(),
+          ...state.institution,
+          ...action.patch,
+        },
+      };
     case "acceptGuidelines":
       return {
         ...state,
@@ -198,6 +230,7 @@ type OnboardingContextValue = {
   dispatch: React.Dispatch<Action>;
   patch: (patch: Partial<OnboardingDraft>) => void;
   userType: PublicUserType;
+  flowKey: PublicUserType;
 };
 
 const OnboardingContext = createContext<OnboardingContextValue | null>(null);
@@ -211,11 +244,15 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const stored = readOnboardingDraft();
     if (stored) {
+      const userType = stored.userType
+        ? normalizeUserType(stored.userType)
+        : stored.userType;
       const migrated = createEmptyDraft({
         ...stored,
-        userType: stored.userType
-          ? normalizeUserType(stored.userType)
-          : stored.userType,
+        userType,
+        accountType:
+          stored.accountType ??
+          (userType ? accountTypeFromUserType(userType) : null),
       });
       dispatch({ type: "hydrate", draft: migrated });
     }
@@ -231,11 +268,12 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
     dispatch({ type: "patch", patch: p });
   }, []);
 
-  const userType = normalizeUserType(draft.userType);
+  const flowKey = resolveFlowKey(draft);
+  const userType = flowKey;
 
   const value = useMemo(
-    () => ({ draft, ready, dispatch, patch, userType }),
-    [draft, ready, patch, userType],
+    () => ({ draft, ready, dispatch, patch, userType, flowKey }),
+    [draft, ready, patch, userType, flowKey],
   );
 
   return (

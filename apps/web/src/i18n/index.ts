@@ -8,6 +8,7 @@ export {
 } from "./locales";
 export type { Messages } from "./types";
 export { LocaleProvider, useLocale, useMessages, useT } from "./LocaleProvider";
+export { formatDateTime } from "./format";
 export { pt } from "./messages/pt";
 export { en } from "./messages/en";
 export { es } from "./messages/es";

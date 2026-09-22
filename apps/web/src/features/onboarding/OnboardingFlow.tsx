@@ -9,14 +9,18 @@ import {
   canonicalStepId,
   getActiveSteps,
   hrefForStep,
+  resolveFlowKey,
 } from "./config";
 import { AdditionalInfoStep } from "./AdditionalInfoStep";
 import { AnimalPreferencesCompositeStep } from "./AnimalPreferencesCompositeStep";
 import { GuidelinesStep } from "./GuidelinesStep";
+import { InstitutionInfoStep } from "./InstitutionInfoStep";
+import { InstitutionTypeStep } from "./InstitutionTypeStep";
 import { IntentionStep } from "./IntentionStep";
 import { InterestsStep } from "./InterestsStep";
 import { LocationStep } from "./LocationStep";
 import { OrganizationStep } from "./OrganizationStep";
+import { OrganizationTypeStep } from "./OrganizationTypeStep";
 import { RoleSelectionStep } from "./RoleSelectionStep";
 import { ServicesStep } from "./ServicesStep";
 import { VeterinaryStep } from "./VeterinaryStep";
@@ -29,17 +33,18 @@ type OnboardingFlowProps = {
 };
 
 /**
- * Resolves `/onboarding/[step]` against the active user-type flow.
+ * Resolves `/onboarding/[step]` against the active account/user-type flow.
  * Legacy aliases (e.g. `intention` → `intentions`) are supported.
  */
 export function OnboardingFlow({ step: rawStep }: OnboardingFlowProps) {
   const t = useT();
   const router = useRouter();
-  const { draft, ready, userType } = useOnboarding();
+  const { draft, ready, flowKey } = useOnboarding();
 
   const step = canonicalStepId(rawStep) as OnboardingStepId;
-  const flow = buildFlowSteps(userType);
-  const active = getActiveSteps(userType, draft);
+  const key = resolveFlowKey(draft) || flowKey;
+  const flow = buildFlowSteps(key);
+  const active = getActiveSteps(key, draft);
   const inFlow = flow.includes(step) || flow.includes(rawStep as OnboardingStepId);
 
   useEffect(() => {
@@ -48,10 +53,10 @@ export function OnboardingFlow({ step: rawStep }: OnboardingFlowProps) {
       router.replace(hrefForStep(active[0] ?? "guidelines"));
       return;
     }
-    // If step is in flow but filtered out by conditions, skip forward
     if (!active.includes(step) && !active.includes(rawStep as OnboardingStepId)) {
       const idx = flow.indexOf(step);
-      const nextActive = active.find((s) => flow.indexOf(s) > idx) ?? active[active.length - 1];
+      const nextActive =
+        active.find((s) => flow.indexOf(s) > idx) ?? active[active.length - 1];
       if (nextActive) router.replace(hrefForStep(nextActive));
     }
   }, [ready, inFlow, step, rawStep, active, flow, router]);
@@ -92,13 +97,14 @@ function OnboardingStepRenderer({
     case "additional-info":
       return <AdditionalInfoStep stepId="additional-info" />;
     case "profile":
-      // PERSON legacy URL used profile for additional-info; OTHER uses profile as its own step
       if (userType === "OTHER" || rawStep === "profile") {
         return <AdditionalInfoStep stepId="profile" />;
       }
       return <AdditionalInfoStep stepId="additional-info" />;
     case "verification":
       return <VerificationFlow />;
+    case "organization-type":
+      return <OrganizationTypeStep />;
     case "organization-info":
       return <OrganizationStep step="organization-info" />;
     case "animal-types":
@@ -113,6 +119,10 @@ function OnboardingStepRenderer({
       return <VeterinaryStep step="animals-served" />;
     case "role-selection":
       return <RoleSelectionStep />;
+    case "institution-type":
+      return <InstitutionTypeStep />;
+    case "institution-info":
+      return <InstitutionInfoStep />;
     default:
       return <GuidelinesStep />;
   }

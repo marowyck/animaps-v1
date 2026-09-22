@@ -29,7 +29,8 @@ export function VerificationFlow({ mode }: VerificationFlowProps) {
   const resolvedMode =
     mode === "institutional" ||
     userType === "ONG" ||
-    userType === "VETERINARY_CLINIC"
+    userType === "VETERINARY_CLINIC" ||
+    userType === "INSTITUTION"
       ? "institutional"
       : "selfie";
 

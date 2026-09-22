@@ -3,6 +3,11 @@ import {
   USER_TYPE_TO_DB,
   type PublicUserType,
 } from "@/features/user-types";
+import type {
+  InstitutionTypeId,
+  OrganizationType,
+} from "@/features/account-types";
+import type { SignupAccountOption } from "@/features/onboarding/components/AccountTypeSelector";
 
 /** Public signup user types (DB snake_case stored on waitlist). */
 export const PROFILE_TYPE_VALUES = [
@@ -10,6 +15,7 @@ export const PROFILE_TYPE_VALUES = [
   "ong",
   "veterinary_clinic",
   "other",
+  "institution",
 ] as const;
 
 export type ProfileType = (typeof PROFILE_TYPE_VALUES)[number];
@@ -34,20 +40,22 @@ export type WaitlistLead = {
   lgpdConsentAt: string;
 };
 
-/** Web form state — empty profileType before selection; UI uses PublicUserType. */
+/** Web form state — Fase 2 AccountType first; profileType derived. */
 export type WaitlistFormState = {
   name: string;
   email: string;
-  /** SCREAMING_SNAKE in UI; converted to snake_case on submit. */
+  /** Ecosystem signup option (PERSON / ORGANIZATION / INSTITUTION / OTHER). */
+  accountOption: SignupAccountOption | "";
+  organizationType: OrganizationType | "";
+  institutionTypeId: InstitutionTypeId | "";
+  /** SCREAMING_SNAKE Wave 2 discriminator; converted to snake_case on submit. */
   profileType: PublicUserType | "";
   city: string;
   state: string;
   lgpdConsent: boolean;
 };
 
-export function toDbProfileType(
-  userType: PublicUserType,
-): ProfileType {
+export function toDbProfileType(userType: PublicUserType): ProfileType {
   return USER_TYPE_TO_DB[userType] as ProfileType;
 }
 

@@ -2,11 +2,12 @@
 
 import { useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { normalizeUserType } from "@/features/user-types";
 import {
   getAdjacentSteps,
   getStepProgress,
+  homeHrefForFlow,
   hrefForStep,
+  resolveFlowKey,
   STEP_DEFINITIONS,
   type StepDefinition,
 } from "./config";
@@ -29,8 +30,8 @@ export function useOnboardingNavigation(
   step: OnboardingStepId,
 ): OnboardingNavigation {
   const router = useRouter();
-  const { draft, dispatch } = useOnboarding();
-  const userType = normalizeUserType(draft.userType);
+  const { draft, dispatch, flowKey } = useOnboarding();
+  const userType = resolveFlowKey(draft) || flowKey;
 
   const { previous, next } = useMemo(
     () => getAdjacentSteps(userType, draft, step),
@@ -46,12 +47,12 @@ export function useOnboardingNavigation(
     (opts?: { complete?: boolean }) => {
       if (opts?.complete || !next) {
         dispatch({ type: "complete" });
-        router.push("/discover");
+        router.push(homeHrefForFlow(userType));
         return;
       }
       router.push(hrefForStep(next));
     },
-    [dispatch, next, router],
+    [dispatch, next, router, userType],
   );
 
   const goBack = useCallback(() => {

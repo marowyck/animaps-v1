@@ -9,6 +9,8 @@ export {
   getStepProgress,
   getAdjacentSteps,
   hrefForStep,
+  resolveFlowKey,
+  homeHrefForFlow,
   type StepCondition,
   type StepDefinition,
 } from "./flows";

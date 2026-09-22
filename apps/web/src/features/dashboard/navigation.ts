@@ -4,6 +4,7 @@ import {
   Gift,
   Heart,
   LayoutDashboard,
+  Map,
   MapPin,
   MessageCircle,
   PawPrint,
@@ -14,6 +15,9 @@ import {
   Users,
   AlertTriangle,
   ClipboardList,
+  BarChart3,
+  GitBranch,
+  Plug,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import type { PublicUserType } from "@/features/user-types";
@@ -36,7 +40,14 @@ export type DashboardNavId =
   | "organization"
   | "services"
   | "location"
-  | "reviews";
+  | "reviews"
+  | "cases"
+  | "map"
+  | "analytics"
+  | "team"
+  | "institution"
+  | "routing"
+  | "integrations";
 
 export type DashboardNavItem = {
   id: DashboardNavId;
@@ -57,7 +68,10 @@ export type SummaryId =
   | "requests"
   | "volunteers"
   | "donations"
-  | "reviews";
+  | "reviews"
+  | "newCases"
+  | "inReview"
+  | "priority";
 
 export type DashboardConfig = {
   nav: DashboardNavItem[];
@@ -70,7 +84,7 @@ const PERSON_NAV: DashboardNavItem[] = [
   { id: "animals", href: "/animals", icon: PawPrint, placeholder: true, permission: "VIEW_ANIMALS" },
   { id: "matches", href: "/matches", icon: Heart, placeholder: true, permission: "ADOPT" },
   { id: "messages", href: "/messages", icon: MessageCircle, placeholder: true, permission: "MESSAGE" },
-  { id: "reports", href: "/reports", icon: AlertTriangle, placeholder: true, permission: "REPORT" },
+  { id: "reports", href: "/cases", icon: AlertTriangle, permission: "REPORT" },
   { id: "favorites", href: "/favorites", icon: Star, placeholder: true },
   { id: "profile", href: "/profile", icon: User, placeholder: true, permission: "CREATE_PROFILE" },
   { id: "settings", href: "/settings", icon: Settings, placeholder: true },
@@ -99,7 +113,7 @@ const ONG_NAV: DashboardNavItem[] = [
     icon: Gift,
     placeholder: true,
   },
-  { id: "reports", href: "/reports", icon: AlertTriangle, placeholder: true },
+  { id: "reports", href: "/cases", icon: AlertTriangle, permission: "REPORT" },
   { id: "messages", href: "/messages", icon: MessageCircle, placeholder: true, permission: "MESSAGE" },
   {
     id: "organization",
@@ -145,10 +159,59 @@ const OTHER_NAV: DashboardNavItem[] = [
   { id: "settings", href: "/settings", icon: Settings, placeholder: true },
 ];
 
+/** Government workspace — Fase 4 modules live; messages stay placeholder. */
+const INSTITUTION_NAV: DashboardNavItem[] = [
+  { id: "dashboard", href: "/dashboard", icon: LayoutDashboard },
+  {
+    id: "cases",
+    href: "/cases",
+    icon: ClipboardList,
+    permission: "VIEW_INCOMING_REPORTS",
+  },
+  {
+    id: "map",
+    href: "/map",
+    icon: Map,
+    permission: "VIEW_MAP",
+  },
+  {
+    id: "analytics",
+    href: "/analytics",
+    icon: BarChart3,
+    permission: "VIEW_ANALYTICS",
+  },
+  {
+    id: "team",
+    href: "/team",
+    icon: Users,
+    permission: "MANAGE_TEAM",
+  },
+  {
+    id: "routing",
+    href: "/routing",
+    icon: GitBranch,
+    permission: "ROUTE_CASE",
+  },
+  {
+    id: "integrations",
+    href: "/integrations",
+    icon: Plug,
+    permission: "MANAGE_INTEGRATION",
+  },
+  {
+    id: "institution",
+    href: "/institution",
+    icon: Building2,
+    permission: "MANAGE_INSTITUTION",
+  },
+  { id: "messages", href: "/messages", icon: MessageCircle, placeholder: true, permission: "MESSAGE" },
+  { id: "settings", href: "/settings", icon: Settings },
+];
+
 export const DASHBOARD_CONFIGS: Record<PublicUserType, DashboardConfig> = {
   PERSON: {
     nav: PERSON_NAV,
-    mobileNavIds: ["discover", "matches", "messages", "favorites", "profile"],
+    mobileNavIds: ["discover", "matches", "reports", "favorites", "profile"],
     summaryOrder: ["nearby", "matches", "favorites", "messages", "region"],
   },
   ONG: {
@@ -165,6 +228,11 @@ export const DASHBOARD_CONFIGS: Record<PublicUserType, DashboardConfig> = {
     nav: OTHER_NAV,
     mobileNavIds: ["discover", "messages", "profile"],
     summaryOrder: ["nearby", "messages", "region"],
+  },
+  INSTITUTION: {
+    nav: INSTITUTION_NAV,
+    mobileNavIds: ["dashboard", "cases", "map", "team", "settings"],
+    summaryOrder: ["newCases", "inReview", "priority", "requests", "region"],
   },
 };
 
@@ -184,6 +252,9 @@ export const SUMMARY_MOCK: Partial<Record<SummaryId, { value: string; icon: Luci
   volunteers: { value: "18", icon: Users },
   donations: { value: "3", icon: Gift },
   reviews: { value: "24", icon: Star },
+  newCases: { value: "42", icon: ClipboardList },
+  inReview: { value: "18", icon: AlertTriangle },
+  priority: { value: "6", icon: Star },
 };
 
 export function getDashboardConfig(userType: PublicUserType): DashboardConfig {

@@ -6,9 +6,11 @@ import { LoadingState } from "@/components/StateBlocks";
 import { useT } from "@/i18n";
 import { useOnboarding } from "@/features/onboarding";
 import { DashboardShell, DynamicDashboard } from "@/features/dashboard";
+import { InstitutionDashboard } from "@/features/institution";
 
 /**
- * PERSON home is Discover; ONG / clinic / other land on type-specific dashboard.
+ * PERSON → Discover; INSTITUTION → government workspace overview;
+ * ONG / clinic / other → DynamicDashboard.
  */
 export default function DashboardPage() {
   const router = useRouter();
@@ -32,7 +34,11 @@ export default function DashboardPage() {
 
   return (
     <DashboardShell displayName={draft.displayName}>
-      <DynamicDashboard userType={userType} displayName={draft.displayName} />
+      {userType === "INSTITUTION" ? (
+        <InstitutionDashboard />
+      ) : (
+        <DynamicDashboard userType={userType} displayName={draft.displayName} />
+      )}
     </DashboardShell>
   );
 }

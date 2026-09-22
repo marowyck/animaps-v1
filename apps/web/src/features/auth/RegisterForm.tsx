@@ -7,7 +7,7 @@ import { Input } from "@/components/Input";
 import { useToast } from "@/components/Toast";
 import { WaitlistForm, type WaitlistFormState } from "@/features/waitlist";
 import { submitWaitlist } from "@/features/waitlist/submitWaitlist";
-import { useOnboarding } from "@/features/onboarding";
+import { mapSignupOption, useOnboarding } from "@/features/onboarding";
 import { useT } from "@/i18n";
 import { GoogleAuthButton } from "./GoogleAuthButton";
 import {
@@ -54,10 +54,16 @@ export function RegisterForm() {
       // Password is validated client-side for the UX flow; waitlist API
       // still stores the lead only until real auth ships.
       await submitWaitlist(profile);
+      const account = profile.accountOption
+        ? mapSignupOption(profile.accountOption)
+        : null;
       patch({
         email: profile.email,
         displayName: profile.name,
-        userType: profile.profileType || "PERSON",
+        userType: profile.profileType || account?.userType || "PERSON",
+        accountType: account?.accountType ?? null,
+        organizationType: profile.organizationType || null,
+        institutionTypeId: profile.institutionTypeId || null,
       });
       toast({ message: t.form.success, tone: "success" });
       const email = encodeURIComponent(profile.email);

@@ -7,6 +7,7 @@ export const PERMISSIONS = [
   "VIEW_ANIMALS",
   "ADOPT",
   "REPORT",
+  "VIEW_REPORT_STATUS",
   "MESSAGE",
   "CREATE_ANIMAL",
   "MANAGE_ANIMALS",
@@ -16,12 +17,32 @@ export const PERMISSIONS = [
   "MANAGE_SERVICES",
   "MANAGE_LOCATION",
   "MANAGE_PROFILE",
+  "VIEW_INCOMING_REPORTS",
+  "ASSIGN_REPORT",
+  "ROUTE_CASE",
+  "FORWARD_CASE",
+  "MANAGE_JURISDICTION",
+  "VIEW_MAP",
+  "VIEW_ANALYTICS",
+  "VIEW_STATISTICS",
+  "MANAGE_TEAM",
+  "MANAGE_INSTITUTION",
+  "EXPORT_DATA",
+  "MANAGE_INTEGRATION",
 ] as const;
 
 export type Permission = (typeof PERMISSIONS)[number];
 
+/** PERSON + CREATE_ANIMAL depends on `isRescuer` at session time — not in this static list. */
 export const PERMISSIONS_BY_USER_TYPE: Record<PublicUserType, Permission[]> = {
-  PERSON: ["CREATE_PROFILE", "VIEW_ANIMALS", "ADOPT", "REPORT", "MESSAGE"],
+  PERSON: [
+    "CREATE_PROFILE",
+    "VIEW_ANIMALS",
+    "ADOPT",
+    "REPORT",
+    "VIEW_REPORT_STATUS",
+    "MESSAGE",
+  ],
   ONG: [
     "CREATE_ANIMAL",
     "MANAGE_ANIMALS",
@@ -29,6 +50,8 @@ export const PERMISSIONS_BY_USER_TYPE: Record<PublicUserType, Permission[]> = {
     "MANAGE_VOLUNTEERS",
     "MANAGE_ORGANIZATION",
     "MESSAGE",
+    "REPORT",
+    "VIEW_REPORT_STATUS",
   ],
   VETERINARY_CLINIC: [
     "MANAGE_SERVICES",
@@ -36,8 +59,26 @@ export const PERMISSIONS_BY_USER_TYPE: Record<PublicUserType, Permission[]> = {
     "MANAGE_PROFILE",
     "MESSAGE",
     "VIEW_ANIMALS",
+    "CREATE_ANIMAL",
   ],
   OTHER: ["CREATE_PROFILE", "MESSAGE", "VIEW_ANIMALS"],
+  INSTITUTION: [
+    "VIEW_INCOMING_REPORTS",
+    "VIEW_REPORT_STATUS",
+    "ASSIGN_REPORT",
+    "ROUTE_CASE",
+    "FORWARD_CASE",
+    "MANAGE_JURISDICTION",
+    "VIEW_MAP",
+    "VIEW_ANALYTICS",
+    "VIEW_STATISTICS",
+    "MANAGE_TEAM",
+    "MANAGE_INSTITUTION",
+    "EXPORT_DATA",
+    "MANAGE_INTEGRATION",
+    "MESSAGE",
+    "REPORT",
+  ],
 };
 
 export function hasPermission(

@@ -1,6 +1,6 @@
 "use client";
 
-import { Building2, HelpCircle, PawPrint, Stethoscope } from "lucide-react";
+import { Building2, HelpCircle, Landmark, PawPrint, Stethoscope } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { SelectableCard } from "@/components/SelectableCard";
 import { useT } from "@/i18n";
@@ -14,13 +14,18 @@ const ICONS: Record<PublicUserType, LucideIcon> = {
   ONG: Building2,
   VETERINARY_CLINIC: Stethoscope,
   OTHER: HelpCircle,
+  INSTITUTION: Landmark,
 };
 
-const PROFILE_I18N_KEY: Record<PublicUserType, "person" | "ong" | "veterinary_clinic" | "other"> = {
+const PROFILE_I18N_KEY: Record<
+  PublicUserType,
+  "person" | "ong" | "veterinary_clinic" | "other" | "institution"
+> = {
   PERSON: "person",
   ONG: "ong",
   VETERINARY_CLINIC: "veterinary_clinic",
   OTHER: "other",
+  INSTITUTION: "institution",
 };
 
 type UserTypeSelectorProps = {
@@ -30,6 +35,7 @@ type UserTypeSelectorProps = {
   className?: string;
 };
 
+/** Legacy Wave 2 selector — prefer `AccountTypeSelector` for new signup UI. */
 export function UserTypeSelector({
   value,
   onChange,

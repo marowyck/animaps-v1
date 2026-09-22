@@ -12,13 +12,26 @@ import {
   type WaitlistLead,
 } from "./types";
 
-export type WaitlistFormErrorKey = "requiredFields" | "lgpdRequired";
+export type WaitlistFormErrorKey =
+  | "requiredFields"
+  | "lgpdRequired"
+  | "organizationTypeRequired"
+  | "institutionTypeRequired";
 
 /** Client-side form checks — map keys via i18n in the form UI. */
 export function validateWaitlistFormClient(
   form: WaitlistFormState,
 ): WaitlistFormErrorKey | null {
-  if (!form.name.trim() || !form.email.trim() || !form.profileType) {
+  if (!form.name.trim() || !form.email.trim() || !form.accountOption) {
+    return "requiredFields";
+  }
+  if (form.accountOption === "ORGANIZATION" && !form.organizationType) {
+    return "organizationTypeRequired";
+  }
+  if (form.accountOption === "INSTITUTION" && !form.institutionTypeId) {
+    return "institutionTypeRequired";
+  }
+  if (!form.profileType) {
     return "requiredFields";
   }
   if (!form.lgpdConsent) {
@@ -34,6 +47,7 @@ const PROFILE_TYPES = new Set<string>([
   "ONG",
   "VETERINARY_CLINIC",
   "OTHER",
+  "INSTITUTION",
 ]);
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
