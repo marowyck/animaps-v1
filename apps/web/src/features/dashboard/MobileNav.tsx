@@ -23,10 +23,10 @@ export function MobileNav({ userType = "PERSON" }: MobileNavProps) {
 
   const itemClass = (active: boolean, placeholder = false) =>
     [
-      "flex flex-1 flex-col items-center gap-1 rounded-2xl px-1 py-2 text-[10px] font-bold transition-all duration-200 active:scale-95",
+      "flex flex-1 flex-col items-center gap-1 rounded-full px-1 py-1.5 text-[10px] font-semibold transition-colors duration-150",
       active
-        ? "text-brand-pink"
-        : "text-ink-muted hover:text-ink hover:bg-pastel-pink/20",
+        ? "bg-primary-soft text-(--pink-700)"
+        : "text-text-muted hover:text-text",
       placeholder ? "opacity-45 pointer-events-none" : "",
     ]
       .filter(Boolean)
@@ -34,12 +34,16 @@ export function MobileNav({ userType = "PERSON" }: MobileNavProps) {
 
   return (
     <nav
-      className="fixed inset-x-0 bottom-0 z-40 border-t-2 border-border-soft bg-white/95 px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2 backdrop-blur lg:hidden"
-      aria-label="Mobile"
+      className="fixed inset-x-0 bottom-0 z-40 bg-background px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2 lg:hidden"
+      aria-label={t.chrome.mobileNav}
     >
       <ul className="mx-auto flex max-w-lg items-stretch justify-between gap-1">
         <li className="flex-1">
-          <Link href="/" className={itemClass(false)} aria-label={t.dashboard.exit}>
+          <Link
+            href="/"
+            className="flex flex-1 flex-col items-center gap-1 rounded-full bg-danger-soft px-1 py-1.5 text-[10px] font-semibold text-(--coral-700)"
+            aria-label={t.dashboard.exit}
+          >
             <LogOut className="size-5" aria-hidden />
             {t.dashboard.exit}
           </Link>

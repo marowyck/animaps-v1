@@ -9,6 +9,7 @@ export {
 export type { Messages } from "./types";
 export { LocaleProvider, useLocale, useMessages, useT } from "./LocaleProvider";
 export { formatDateTime } from "./format";
+export { labelIntention, labelUserType } from "./labels";
 export { pt } from "./messages/pt";
 export { en } from "./messages/en";
 export { es } from "./messages/es";

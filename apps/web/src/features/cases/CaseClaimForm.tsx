@@ -47,8 +47,8 @@ export function CaseClaimForm({ defaultEmail }: CaseClaimFormProps) {
       className="mx-auto flex max-w-md flex-col gap-4"
     >
       <div>
-        <h1 className="font-display text-3xl text-ink">{t.cases.claim.title}</h1>
-        <p className="mt-1 text-sm text-ink-muted">{t.cases.claim.subtitle}</p>
+        <h1 className="text-h1 text-text">{t.cases.claim.title}</h1>
+        <p className="mt-2 text-body-sm text-text-secondary">{t.cases.claim.subtitle}</p>
       </div>
       <Input
         label={t.cases.claim.token}
@@ -65,7 +65,7 @@ export function CaseClaimForm({ defaultEmail }: CaseClaimFormProps) {
         required
       />
       <div className="flex flex-wrap gap-2">
-        <Button type="submit" variant="pink" disabled={submitting}>
+        <Button type="submit" variant="primary" disabled={submitting}>
           {submitting ? t.common.loading : t.cases.claim.submit}
         </Button>
         <Button type="button" variant="ghost" href="/cases">

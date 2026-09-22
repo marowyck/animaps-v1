@@ -1,7 +1,7 @@
 "use client";
 
 import type { LucideIcon } from "lucide-react";
-import { SelectableCard } from "@/components/SelectableCard";
+import { TypeSelector } from "./TypeSelector";
 
 export type IntentionOption<T extends string> = {
   id: T;
@@ -28,28 +28,24 @@ export function IntentionSelector<T extends string>({
   className = "",
 }: IntentionSelectorProps<T>) {
   return (
-    <div
-      className={[
-        "grid grid-cols-2 gap-2 lg:grid-cols-3 lg:gap-2.5",
-        className,
-      ].join(" ")}
-      role={multi ? "group" : "radiogroup"}
-    >
-      {options.map((opt) => {
-        const Icon = opt.icon;
-        const isSelected = selected.includes(opt.id);
-        return (
-          <SelectableCard
-            key={opt.id}
-            compact={compact}
-            title={opt.title}
-            description={opt.description}
-            icon={<Icon className="size-4" />}
-            selected={isSelected}
-            onClick={() => onToggle(opt.id)}
-          />
-        );
+    <TypeSelector
+      multi={multi}
+      layout="dense"
+      compact={compact}
+      className={className}
+      selected={selected}
+      onToggle={onToggle}
+      value={multi ? undefined : selected[0]}
+      onChange={multi ? undefined : onToggle}
+      options={options.map((option) => {
+        const Icon = option.icon;
+        return {
+          id: option.id,
+          title: option.title,
+          description: option.description,
+          icon: <Icon className="size-4" />,
+        };
       })}
-    </div>
+    />
   );
 }

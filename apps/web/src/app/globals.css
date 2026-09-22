@@ -1,57 +1,210 @@
 @import "tailwindcss";
 @import "lenis/dist/lenis.css";
 
+/*
+ * ANIMAPS design tokens.
+ * Semantic names are the source of truth. Legacy brand-* / pastel-* names
+ * alias into them so existing utilities inherit the same identity.
+ * A future dark theme overrides only the semantic block under [data-theme="dark"].
+ */
 :root {
-  /* Neutrals — mint-cream */
-  --gray-soft: #f5faf6;
-  --ink: #243028;
-  --ink-muted: #5c6b62;
-  --white: #ffffff;
-  --border-soft: #d8e8dc;
+  /* Primitives — not for direct use in components */
+  --pink-700: #c7407b;
+  --pink-600: #ff7faa;
+  --pink-500: #ff9bbd;
+  --pink-100: #ffe3ed;
+  --pink-50: #fff1f6;
+  --lilac-700: #7c5fc4;
+  --lilac-600: #9b7fe0;
+  --lilac-500: #b39aec;
+  --lilac-100: #ece3fb;
+  --sky-700: #2f7eae;
+  --sky-600: #5fb8e8;
+  --sky-100: #dff1fc;
+  --mint-700: #2f8f62;
+  --mint-600: #57c08c;
+  --mint-100: #def7e9;
+  --honey-700: #b07a1e;
+  --honey-600: #f2b84b;
+  --honey-100: #fff1d6;
+  --coral-700: #d4564d;
+  --coral-600: #ff8177;
+  --coral-100: #ffe4e1;
+  --cream-50: #fff9f2;
+  --cream-100: #fdf3e7;
+  --cream-200: #f6eadc;
+  --cream-300: #eadcce;
+  --paper: #ffffff;
+  --plum-ink-900: #3a2e4d;
+  --plum-ink-700: #645878;
+  --plum-ink-500: #9086a0;
 
-  /* Brand — pink heart + green care */
-  --brand-pink: #e07a96;
-  --brand-pink-hover: #c96682;
-  --brand-green: #5faf6a;
-  --brand-green-hover: #4e9858;
-  --brand-blue: #5aafc4;
-  --brand-blue-hover: #4899ae;
-  --brand-yellow: #e8c85a;
-  --brand-purple: #a87aaa;
+  /* Semantic color */
+  --primary: var(--pink-600);
+  --primary-hover: var(--pink-700);
+  --primary-active: #a82d66;
+  --primary-soft: var(--pink-100);
 
-  /* Orange aliases → pink (legacy class names) */
-  --brand-orange: var(--brand-pink);
-  --brand-orange-hover: var(--brand-pink-hover);
+  --secondary: var(--lilac-600);
+  --secondary-hover: var(--lilac-700);
+  --secondary-soft: var(--lilac-100);
 
-  /* Pastel tints */
-  --pastel-pink: #f8d9e4;
-  --pastel-green: #d4edd8;
-  --pastel-blue: #d2eaf1;
-  --pastel-yellow: #f5ecc0;
-  --pastel-purple: #ecd9ea;
-  --pastel-sky: #e6f3e9;
-  --pastel-orange: var(--pastel-pink);
+  --background: var(--cream-50);
+  --background-secondary: var(--cream-200);
+  --foreground: var(--plum-ink-900);
 
-  --background: var(--gray-soft);
-  --foreground: var(--ink);
+  --surface: var(--paper);
+  --surface-hover: var(--pink-50);
+  --surface-elevated: #ffffff;
+  --surface-accent: var(--lilac-100);
 
-  /* Semantic feedback — prefer these over raw red/amber in product UI */
-  --success: var(--brand-green);
-  --warning: #d97706;
-  --error: #dc2626;
+  --text: var(--plum-ink-900);
+  --text-secondary: var(--plum-ink-700);
+  --text-muted: var(--plum-ink-500);
 
-  --radius-lg: 2.5rem;
-  --radius-md: 1.5rem;
-  --radius-sm: 1rem;
+  --border: var(--cream-300);
+  --border-subtle: var(--cream-200);
+
+  --success: var(--mint-600);
+  --success-soft: var(--mint-100);
+  --warning: var(--honey-600);
+  --warning-soft: var(--honey-100);
+  --warning-border: color-mix(in srgb, var(--warning) 42%, var(--surface));
+  --danger: var(--coral-600);
+  --danger-soft: var(--coral-100);
+  --error: var(--danger);
+  --info: var(--sky-600);
+  --info-soft: var(--sky-100);
+
+  /* Legacy aliases — keep class names, new meaning */
+  --gray-soft: var(--background);
+  --ink: var(--text);
+  --ink-muted: var(--text-secondary);
+  --white: var(--surface);
+  --border-soft: var(--border);
+
+  --brand-pink: var(--primary);
+  --brand-pink-hover: var(--primary-hover);
+  --brand-orange: var(--secondary);
+  --brand-orange-hover: var(--secondary-hover);
+  --brand-green: var(--success);
+  --brand-green-hover: var(--mint-700);
+  --brand-blue: var(--info);
+  --brand-blue-hover: var(--sky-700);
+  --brand-yellow: var(--warning);
+  --brand-purple: var(--lilac-600);
+
+  --pastel-pink: var(--primary-soft);
+  --pastel-green: var(--success-soft);
+  --pastel-blue: var(--info-soft);
+  --pastel-yellow: var(--warning-soft);
+  --pastel-purple: var(--lilac-100);
+  --pastel-sky: var(--sky-100);
+  --pastel-orange: var(--secondary-soft);
+
+  --footer: var(--plum-ink-900);
+
+  /* Radius */
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.25rem;
+  --radius-2xl: 1.75rem;
+  --radius-3xl: 2rem;
+  --radius-pill: 9999px;
+
+  /* Elevation — ink-tinted, never heavy drop shadows */
+  --shadow-sm: 0 1px 2px color-mix(in srgb, var(--plum-ink-900) 6%, transparent);
+  --shadow-md: 0 8px 24px -16px color-mix(in srgb, var(--plum-ink-900) 22%, transparent);
+  --shadow-lg: 0 24px 48px -28px color-mix(in srgb, var(--plum-ink-900) 26%, transparent);
+  --shadow-glow-primary: 0 12px 32px -18px color-mix(in srgb, var(--primary) 45%, transparent);
+  --shadow-glow-secondary: 0 16px 36px -18px color-mix(in srgb, var(--secondary) 40%, transparent);
+  --shadow-clay: var(--shadow-md);
+
+  /* Spacing scale (4–128). Prefer Tailwind spacing utilities that match it. */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+  --space-32: 8rem;
+
+  /* Type scale */
+  --font-size-display: clamp(2.75rem, 6vw, 5.25rem);
+  --font-size-h1: clamp(2rem, 3.2vw, 3rem);
+  --font-size-h2: clamp(1.75rem, 2.4vw, 2.25rem);
+  --font-size-h3: 1.25rem;
+  --font-size-h4: 1.125rem;
+  --font-size-body-lg: 1.125rem;
+  --font-size-body: 1rem;
+  --font-size-body-sm: 0.875rem;
+  --font-size-label: 0.75rem;
+  --font-size-caption: 0.75rem;
+
+  /* Motion */
+  --duration-fast: 150ms;
+  --duration-base: 250ms;
+  --duration-slow: 400ms;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Stacking */
+  --z-header: 50;
+  --z-overlay: 80;
+  --z-modal: 100;
+  --z-toast: 120;
+}
+
+[data-theme="dark"] {
+  --background: #241c30;
+  --background-secondary: #2e243c;
+  --foreground: #f6eef8;
+  --surface: #2e243c;
+  --surface-hover: #3a2e4c;
+  --surface-elevated: #362a4a;
+  --surface-accent: #3d2c52;
+  --text: #f6eef8;
+  --text-secondary: #cbbfd8;
+  --text-muted: #9b8eac;
+  --border: #4a3c5e;
+  --border-subtle: #3a2e4c;
+  --primary-soft: #4a2740;
+  --secondary-soft: #3a2c58;
+  --success-soft: #1d3a30;
+  --warning-soft: #3d3018;
+  --danger-soft: #432424;
+  --info-soft: #1c3344;
+  --footer: #1a1324;
+
+  --gray-soft: var(--background);
+  --ink: var(--text);
+  --ink-muted: var(--text-secondary);
+  --white: var(--surface);
+  --border-soft: var(--border);
+  --pastel-pink: var(--primary-soft);
+  --pastel-green: var(--success-soft);
+  --pastel-blue: var(--info-soft);
+  --pastel-yellow: var(--warning-soft);
+  --pastel-orange: var(--secondary-soft);
+  --pastel-sky: var(--surface-accent);
 }
 
 @theme inline {
   --color-background: var(--background);
+  --color-background-secondary: var(--background-secondary);
   --color-foreground: var(--foreground);
   --color-gray-soft: var(--gray-soft);
   --color-ink: var(--ink);
   --color-ink-muted: var(--ink-muted);
   --color-border-soft: var(--border-soft);
+  --color-border: var(--border);
+  --color-border-subtle: var(--border-subtle);
 
   --color-brand-pink: var(--brand-pink);
   --color-brand-pink-hover: var(--brand-pink-hover);
@@ -73,39 +226,85 @@
   --color-pastel-sky: var(--pastel-sky);
 
   --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
   --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-warning-border: var(--warning-border);
   --color-error: var(--error);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
 
-  --font-sans: var(--font-nunito), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-bagel), ui-rounded, ui-sans-serif, system-ui, sans-serif;
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-active: var(--primary-active);
+  --color-primary-soft: var(--primary-soft);
+  --color-secondary: var(--secondary);
+  --color-secondary-hover: var(--secondary-hover);
+  --color-secondary-soft: var(--secondary-soft);
+  --color-surface: var(--surface);
+  --color-surface-hover: var(--surface-hover);
+  --color-surface-elevated: var(--surface-elevated);
+  --color-surface-accent: var(--surface-accent);
+  --color-honey-600: var(--honey-600);
+  --color-text: var(--text);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+  --color-footer: var(--footer);
 
-  --radius-lg: 2.5rem;
-  --radius-md: 1.5rem;
-  --radius-sm: 1rem;
+  --font-sans: var(--font-sans-face), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-display-face), ui-serif, Georgia, serif;
+
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.25rem;
+  --radius-2xl: 1.75rem;
+  --radius-3xl: 2rem;
+
+  --shadow-sm: 0 1px 2px color-mix(in srgb, var(--plum-ink-900) 6%, transparent);
+  --shadow-md: 0 8px 24px -16px color-mix(in srgb, var(--plum-ink-900) 22%, transparent);
+  --shadow-lg: 0 24px 48px -28px color-mix(in srgb, var(--plum-ink-900) 26%, transparent);
+
+  --ease-out-product: var(--ease-out);
 }
 
 html {
-  scroll-padding-top: 6rem;
+  scroll-padding-top: 5.5rem;
   scrollbar-width: thin;
-  scrollbar-color: var(--brand-pink) transparent;
+  scrollbar-color: var(--primary) transparent;
 }
 
 body {
+  background-color: var(--background);
+  background-image:
+    radial-gradient(
+      ellipse 70% 45% at 0% -10%,
+      color-mix(in srgb, var(--primary) 9%, transparent),
+      transparent 60%
+    ),
+    radial-gradient(
+      ellipse 50% 40% at 100% 0%,
+      color-mix(in srgb, var(--secondary) 8%, transparent),
+      transparent 55%
+    );
+  color: var(--foreground);
+  font-family: var(--font-sans);
   scrollbar-width: thin;
-  scrollbar-color: var(--brand-pink) transparent;
+  scrollbar-color: var(--primary) transparent;
 }
 
-/* Native scrollbar: pink thumb only — no white track (Win/Chrome included). */
 * {
   scrollbar-width: thin;
-  scrollbar-color: var(--brand-pink) transparent;
+  scrollbar-color: var(--primary) transparent;
 }
 
 *::-webkit-scrollbar,
 html::-webkit-scrollbar,
 body::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
   background: transparent;
 }
 
@@ -114,29 +313,20 @@ body::-webkit-scrollbar {
 html::-webkit-scrollbar-track,
 body::-webkit-scrollbar-track {
   background: transparent !important;
-  border: none;
-  box-shadow: none;
 }
 
 *::-webkit-scrollbar-thumb,
 html::-webkit-scrollbar-thumb,
 body::-webkit-scrollbar-thumb {
-  background-color: var(--brand-pink);
-  background-clip: padding-box;
-  border-radius: 999px;
-  border: none;
-  box-shadow: none;
+  background-color: color-mix(in srgb, var(--primary) 55%, transparent);
+  border-radius: var(--radius-pill);
 }
 
-*::-webkit-scrollbar-thumb:hover,
-html::-webkit-scrollbar-thumb:hover,
-body::-webkit-scrollbar-thumb:hover {
-  background-color: var(--brand-pink-hover);
+*::-webkit-scrollbar-thumb:hover {
+  background-color: var(--primary);
 }
 
 *::-webkit-scrollbar-button,
-*::-webkit-scrollbar-button:start:decrement,
-*::-webkit-scrollbar-button:end:increment,
 *::-webkit-scrollbar-corner {
   display: none !important;
   width: 0 !important;
@@ -144,78 +334,148 @@ body::-webkit-scrollbar-thumb:hover {
   background: transparent !important;
 }
 
-.scrollbar-clean {
-  scrollbar-width: thin;
-  scrollbar-color: var(--brand-green) transparent;
-}
-
-.scrollbar-clean::-webkit-scrollbar {
-  height: 6px;
-  width: 6px;
-  background: transparent;
-}
-
-.scrollbar-clean::-webkit-scrollbar-track,
-.scrollbar-clean::-webkit-scrollbar-track-piece {
-  background: transparent !important;
-}
-
-.scrollbar-clean::-webkit-scrollbar-thumb {
-  background: var(--brand-green);
-  border-radius: 999px;
-  border: none;
-}
-
-.scrollbar-clean::-webkit-scrollbar-button {
-  display: none;
-  width: 0;
-  height: 0;
-}
-
-body {
-  background-color: var(--background);
-  background-image: radial-gradient(
-    rgba(95, 175, 106, 0.07) 1.2px,
-    transparent 1.2px
-  );
-  background-size: 28px 28px;
-  color: var(--foreground);
-  font-family: var(--font-sans);
-}
-
 .font-display {
   font-family: var(--font-display);
-  letter-spacing: -0.02em;
+  font-weight: 800;
+  letter-spacing: -0.01em;
 }
 
 .font-sans {
   font-family: var(--font-sans);
 }
 
-.organic-blob {
-  border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+@utility text-display {
+  font-family: var(--font-display);
+  font-size: var(--font-size-display);
+  line-height: 1.05;
+  letter-spacing: -0.015em;
+  font-weight: 800;
+}
+
+@utility text-h1 {
+  font-family: var(--font-display);
+  font-size: var(--font-size-h1);
+  line-height: 1.1;
+  letter-spacing: -0.012em;
+  font-weight: 800;
+}
+
+@utility text-h2 {
+  font-family: var(--font-display);
+  font-size: var(--font-size-h2);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  font-weight: 800;
+}
+
+@utility text-h3 {
+  font-family: var(--font-display);
+  font-size: var(--font-size-h3);
+  line-height: 1.3;
+  font-weight: 700;
+  letter-spacing: -0.005em;
+}
+
+@utility text-h4 {
+  font-family: var(--font-display);
+  font-size: var(--font-size-h4);
+  line-height: 1.35;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+@utility text-body-lg {
+  font-size: var(--font-size-body-lg);
+  line-height: 1.6;
+}
+
+@utility text-body {
+  font-size: var(--font-size-body);
+  line-height: 1.6;
+}
+
+@utility text-body-sm {
+  font-size: var(--font-size-body-sm);
+  line-height: 1.5;
+}
+
+@utility text-label {
+  font-size: var(--font-size-label);
+  line-height: 1.4;
+  font-weight: 650;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+@utility text-caption {
+  font-size: var(--font-size-caption);
+  line-height: 1.4;
+  font-weight: 600;
+}
+
+@utility rounded-token-xl {
+  border-radius: var(--radius-xl);
+}
+
+@utility rounded-token-2xl {
+  border-radius: var(--radius-2xl);
+}
+
+@utility rounded-pill {
+  border-radius: var(--radius-pill);
+}
+
+.animaps-map .leaflet-container {
+  height: 100%;
+  width: 100%;
+  background: var(--background-secondary);
+  font-family: inherit;
+  z-index: 0;
+}
+
+.map-grid {
+  background-color: var(--surface-accent);
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--primary) 18%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--primary) 18%, transparent) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+@keyframes skeleton-shimmer {
+  0% { background-position: -160% 0; }
+  100% { background-position: 160% 0; }
+}
+
+.skeleton-shimmer {
+  background-image: linear-gradient(
+    100deg,
+    var(--background-secondary) 30%,
+    color-mix(in srgb, var(--primary) 16%, var(--surface)) 50%,
+    var(--background-secondary) 70%
+  );
+  background-size: 220% 100%;
+  animation: skeleton-shimmer 1.6s ease-in-out infinite;
 }
 
 @keyframes fade-in-up {
   0% {
     opacity: 0;
-    transform: translateY(12px) scale(0.99);
+    transform: translateY(12px);
   }
   100% {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: translateY(0);
   }
 }
 
 .animate-fade-in-up {
-  animation: fade-in-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-  will-change: transform, opacity;
+  animation: fade-in-up var(--duration-slow) var(--ease-out) forwards;
 }
 
 @keyframes modal-in {
   0% {
     opacity: 0;
-    transform: translateY(20px) scale(0.97);
+    transform: translateY(16px) scale(0.98);
   }
   100% {
     opacity: 1;
@@ -224,8 +484,7 @@ body {
 }
 
 .animate-modal-in {
-  animation: modal-in 0.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-  will-change: transform, opacity;
+  animation: modal-in var(--duration-base) var(--ease-out) forwards;
 }
 
 @keyframes fade-in {
@@ -234,52 +493,16 @@ body {
 }
 
 .animate-fade-in {
-  animation: fade-in 0.3s ease-out forwards;
+  animation: fade-in var(--duration-base) ease-out forwards;
 }
 
-@keyframes gradient-shift {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
+@keyframes match-pop {
+  0% { opacity: 0; transform: scale(0.92); }
+  100% { opacity: 1; transform: scale(1); }
 }
 
-.animate-gradient-shift {
-  background-size: 200% 200%;
-  animation: gradient-shift 6s ease infinite;
-}
-
-@keyframes curved-loop-marquee {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-50%);
-  }
-}
-
-.curved-loop-track {
-  animation: curved-loop-marquee linear infinite;
-}
-
-@keyframes clay-float {
-  0%,
-  100% {
-    transform: translate3d(0, 0, 0);
-  }
-  50% {
-    transform: translate3d(0, -8px, 0);
-  }
-}
-
-.clay-float {
-  animation: clay-float 3.2s ease-in-out infinite;
-  will-change: transform;
+.animate-match-pop {
+  animation: match-pop 420ms var(--ease-out) forwards;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -288,35 +511,11 @@ body {
     scroll-behavior: auto !important;
   }
 
-  .curved-loop-track,
-  .clay-float {
+  .animate-fade-in-up,
+  .animate-modal-in,
+  .animate-fade-in,
+  .animate-match-pop,
+  .skeleton-shimmer {
     animation: none !important;
   }
-}
-
-/* Final scrollbar pass — defeats UA / Windows white track chrome. */
-html::-webkit-scrollbar,
-body::-webkit-scrollbar,
-*::-webkit-scrollbar {
-  width: 6px !important;
-  height: 6px !important;
-  background-color: rgba(0, 0, 0, 0) !important;
-}
-
-html::-webkit-scrollbar-track,
-html::-webkit-scrollbar-track-piece,
-body::-webkit-scrollbar-track,
-body::-webkit-scrollbar-track-piece,
-*::-webkit-scrollbar-track,
-*::-webkit-scrollbar-track-piece {
-  background-color: rgba(0, 0, 0, 0) !important;
-  background-image: none !important;
-}
-
-html::-webkit-scrollbar-button,
-body::-webkit-scrollbar-button,
-*::-webkit-scrollbar-button {
-  display: none !important;
-  width: 0 !important;
-  height: 0 !important;
 }

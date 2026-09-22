@@ -110,9 +110,9 @@ export function CodeInput({
             className={[
               "size-12 rounded-2xl border-2 text-center text-xl font-bold text-ink sm:size-14",
               "outline-none transition-all duration-200",
-              "focus:border-brand-pink focus:bg-white focus:shadow-[0_0_0_4px_rgba(224,122,150,0.15)] focus:-translate-y-0.5",
+              "focus:border-primary focus:bg-surface focus:shadow-[0_0_0_4px_var(--primary-soft)]",
               error
-                ? "border-error bg-red-50 focus:shadow-[0_0_0_4px_rgba(220,38,38,0.15)]"
+                ? "border-error bg-danger-soft focus:shadow-[0_0_0_4px_var(--danger-soft)]"
                 : digit
                   ? "border-brand-green/30 bg-white shadow-sm"
                   : "border-border-soft bg-gray-soft",

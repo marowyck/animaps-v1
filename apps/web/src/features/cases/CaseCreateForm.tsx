@@ -97,9 +97,9 @@ export function CaseCreateForm({
   return (
     <form onSubmit={onSubmit} className="mx-auto flex max-w-2xl flex-col gap-5">
       <div>
-        <h1 className="font-display text-3xl text-ink">{t.cases.create.title}</h1>
-        <p className="mt-1 text-sm text-ink-muted">{t.cases.create.subtitle}</p>
-        <p className="mt-2 rounded-2xl border border-border-soft bg-white px-3 py-2 text-xs font-semibold text-ink-muted">
+        <h1 className="text-h1 text-text">{t.cases.create.title}</h1>
+        <p className="mt-2 max-w-xl text-body-sm text-text-secondary">{t.cases.create.subtitle}</p>
+        <p className="mt-3 max-w-xl text-body-sm text-text-secondary">
           {t.cases.create.honesty}
         </p>
       </div>
@@ -132,7 +132,7 @@ export function CaseCreateForm({
           {t.cases.create.descriptionLabel}
         </span>
         <textarea
-          className="min-h-28 w-full rounded-2xl border-2 border-border-soft bg-white px-3 py-2 text-sm text-ink outline-none focus-visible:border-brand-green"
+          className="min-h-28 w-full rounded-[1.4rem] border border-border bg-background px-4 py-3 text-body-sm text-text outline-none focus-visible:border-primary focus-visible:bg-surface"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           required
@@ -174,7 +174,7 @@ export function CaseCreateForm({
       />
 
       <div className="flex flex-wrap gap-2">
-        <Button type="submit" variant="pink" disabled={submitting}>
+        <Button type="submit" variant="primary" disabled={submitting}>
           {submitting ? t.common.loading : t.cases.create.submit}
         </Button>
         <Button

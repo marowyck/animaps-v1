@@ -3,9 +3,9 @@
 import { FormEvent } from "react";
 import { UserPlus } from "lucide-react";
 import { Button } from "@/components/Button";
-import { Card } from "@/components/Card";
-import { Input } from "@/components/Input";
 import { useToast } from "@/components/Toast";
+import { WorkspaceSection } from "../WorkspaceSection";
+import { InviteMemberForm } from "./InviteMemberForm";
 import { useT } from "@/i18n";
 import {
   INSTITUTION_MEMBER_ROLES,
@@ -68,89 +68,28 @@ export function TeamMembersCard({
     t.institution.team.statuses[status];
 
   return (
-    <Card className="space-y-4 p-4">
-      <div className="flex items-center gap-2">
-        <UserPlus className="size-4 text-brand-pink" aria-hidden />
-        <h2 className="text-sm font-bold text-ink">
-          {t.institution.team.membersTitle}
-        </h2>
-      </div>
+    <WorkspaceSection
+      title={t.institution.team.membersTitle}
+      icon={<UserPlus className="size-5" aria-hidden />}
+      tone="primary"
+    >
 
       {canManage ? (
-        <form
-          onSubmit={onInvite}
-          className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3"
-        >
-          <Input
-            label={t.institution.team.inviteEmail}
-            type="email"
-            value={inviteEmail}
-            onChange={(e) => onInviteEmailChange(e.target.value)}
-            required
-          />
-          <Input
-            label={t.institution.team.inviteName}
-            value={inviteName}
-            onChange={(e) => onInviteNameChange(e.target.value)}
-          />
-          <label className="block space-y-1">
-            <span className="text-xs font-bold text-ink">
-              {t.institution.team.inviteRole}
-            </span>
-            <select
-              className="w-full rounded-2xl border-2 border-border-soft bg-white px-3 py-2 text-sm outline-none focus-visible:border-brand-green"
-              value={inviteRole}
-              onChange={(e) =>
-                onInviteRoleChange(e.target.value as InstitutionMemberRole)
-              }
-            >
-              {INSTITUTION_MEMBER_ROLES.map((r) => (
-                <option key={r} value={r}>
-                  {roleLabel(r)}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="block space-y-1">
-            <span className="text-xs font-bold text-ink">
-              {t.institution.team.inviteDept}
-            </span>
-            <select
-              className="w-full rounded-2xl border-2 border-border-soft bg-white px-3 py-2 text-sm outline-none focus-visible:border-brand-green"
-              value={inviteDeptId}
-              onChange={(e) => onInviteDeptIdChange(e.target.value)}
-            >
-              <option value="">{t.institution.team.none}</option>
-              {departments.map((d) => (
-                <option key={d.id} value={d.id}>
-                  {d.name}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="block space-y-1">
-            <span className="text-xs font-bold text-ink">
-              {t.institution.team.inviteTeam}
-            </span>
-            <select
-              className="w-full rounded-2xl border-2 border-border-soft bg-white px-3 py-2 text-sm outline-none focus-visible:border-brand-green"
-              value={inviteTeamId}
-              onChange={(e) => onInviteTeamIdChange(e.target.value)}
-            >
-              <option value="">{t.institution.team.none}</option>
-              {teams.map((tm) => (
-                <option key={tm.id} value={tm.id}>
-                  {tm.name}
-                </option>
-              ))}
-            </select>
-          </label>
-          <div className="flex items-end">
-            <Button type="submit" size="sm" variant="pink">
-              {t.institution.team.sendInvite}
-            </Button>
-          </div>
-        </form>
+        <InviteMemberForm
+          departments={departments}
+          teams={teams}
+          inviteEmail={inviteEmail}
+          inviteName={inviteName}
+          inviteRole={inviteRole}
+          inviteDeptId={inviteDeptId}
+          inviteTeamId={inviteTeamId}
+          onInviteEmailChange={onInviteEmailChange}
+          onInviteNameChange={onInviteNameChange}
+          onInviteRoleChange={onInviteRoleChange}
+          onInviteDeptIdChange={onInviteDeptIdChange}
+          onInviteTeamIdChange={onInviteTeamIdChange}
+          onInvite={onInvite}
+        />
       ) : null}
 
       {members.length === 0 ? (
@@ -270,6 +209,6 @@ export function TeamMembersCard({
           ))}
         </ul>
       )}
-    </Card>
+    </WorkspaceSection>
   );
 }

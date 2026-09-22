@@ -4,7 +4,6 @@ import { useId, useRef, useState, type ReactNode } from "react";
 import { ChevronDown } from "lucide-react";
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
-import { Button } from "@/components/Button";
 
 type AccordionItemProps = {
   question: string;
@@ -68,34 +67,27 @@ export function AccordionItem({
   );
 
   return (
-    <div
-      className={`overflow-hidden rounded-[2rem] border-2 border-border-soft bg-white shadow-sm transition-colors ${
-        open ? "border-brand-pink/40" : ""
-      } ${className}`}
-    >
-      <Button
+    <div className={`overflow-hidden rounded-[1.6rem] bg-surface ${className}`}>
+      <button
         id={buttonId}
         type="button"
-        variant="ghost"
-        size="stretch"
-        magnetic={false}
         aria-expanded={open}
         aria-controls={panelId}
         onClick={() => setOpen((v) => !v)}
-        className="rounded-none shadow-none"
+        className="flex w-full cursor-pointer items-center justify-between gap-4 bg-transparent px-5 py-4 text-left transition-colors duration-200 hover:bg-primary-soft focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
       >
-        <span className="text-base font-black leading-snug text-ink md:text-lg">
+        <span className="text-body font-semibold leading-snug text-text md:text-body-lg">
           {question}
         </span>
         <span
           aria-hidden
-          className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-pastel-pink text-brand-pink transition-transform duration-300 ${
+          className={`flex size-10 shrink-0 items-center justify-center rounded-full bg-primary-soft text-(--pink-700) transition-transform duration-300 ${
             open ? "rotate-180" : ""
           }`}
         >
-          <ChevronDown size={22} strokeWidth={2.5} />
+          <ChevronDown size={20} strokeWidth={2.5} />
         </span>
-      </Button>
+      </button>
       <div
         id={panelId}
         ref={panelRef}
@@ -103,10 +95,7 @@ export function AccordionItem({
         aria-labelledby={buttonId}
         className="h-0 overflow-hidden"
       >
-        <div
-          ref={innerRef}
-          className="px-6 pb-6 text-base font-bold leading-relaxed text-ink-muted"
-        >
+        <div ref={innerRef} className="text-body px-5 pb-5 leading-relaxed text-text-secondary">
           {children}
         </div>
       </div>

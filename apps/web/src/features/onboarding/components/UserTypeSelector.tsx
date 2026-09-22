@@ -2,8 +2,8 @@
 
 import { Building2, HelpCircle, Landmark, PawPrint, Stethoscope } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { SelectableCard } from "@/components/SelectableCard";
 import { useT } from "@/i18n";
+import { TypeSelector } from "./TypeSelector";
 import {
   PUBLIC_USER_TYPES,
   type PublicUserType,
@@ -45,28 +45,20 @@ export function UserTypeSelector({
   const t = useT();
 
   return (
-    <div
-      className={[
-        "grid gap-2",
-        compact ? "grid-cols-1 sm:grid-cols-2" : "grid-cols-1 sm:grid-cols-2",
-        className,
-      ].join(" ")}
-      role="radiogroup"
-      aria-label={t.form.profileType}
-    >
-      {PUBLIC_USER_TYPES.map((id) => {
+    <TypeSelector
+      compact={compact}
+      className={className}
+      ariaLabel={t.form.profileType}
+      value={value}
+      onChange={onChange}
+      options={PUBLIC_USER_TYPES.map((id) => {
         const Icon = ICONS[id];
-        return (
-          <SelectableCard
-            key={id}
-            compact={compact}
-            title={t.form.profiles[PROFILE_I18N_KEY[id]]}
-            icon={<Icon className="size-4" />}
-            selected={value === id}
-            onClick={() => onChange(id)}
-          />
-        );
+        return {
+          id,
+          title: t.form.profiles[PROFILE_I18N_KEY[id]],
+          icon: <Icon className="size-4" />,
+        };
       })}
-    </div>
+    />
   );
 }

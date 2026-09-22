@@ -19,68 +19,69 @@ import {
 import { Button } from "@/components/Button";
 import { LocaleSwitcher } from "@/components/LocaleSwitcher";
 import { useT } from "@/i18n";
+import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
+
+function readToken(name: string): string {
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+}
 
 const NAV_META: {
   href: string;
   key: "home" | "benefits" | "howToStart" | "faq" | "createAccount" | "login";
   rotation: number;
-  hoverBg: string;
-  hoverText: string;
+  /** CSS variable name, resolved at interaction time so GSAP gets a real color. */
+  hoverBg: "--primary" | "--secondary";
   Icon: LucideIcon;
 }[] = [
   {
     href: "/#top",
     key: "home",
     rotation: -3,
-    hoverBg: "#E07A96",
-    hoverText: "#ffffff",
+    hoverBg: "--primary",
     Icon: Home,
   },
   {
     href: "/#solution",
     key: "benefits",
     rotation: -3,
-    hoverBg: "#5FAF6A",
-    hoverText: "#ffffff",
+    hoverBg: "--secondary",
     Icon: Sparkles,
   },
   {
     href: "/#how-it-works",
     key: "howToStart",
     rotation: 3,
-    hoverBg: "#E07A96",
-    hoverText: "#ffffff",
+    hoverBg: "--primary",
     Icon: ListChecks,
   },
   {
     href: "/#faq",
     key: "faq",
     rotation: -2,
-    hoverBg: "#5FAF6A",
-    hoverText: "#ffffff",
+    hoverBg: "--secondary",
     Icon: CircleHelp,
   },
   {
     href: "/register",
     key: "createAccount",
     rotation: 2,
-    hoverBg: "#E07A96",
-    hoverText: "#ffffff",
+    hoverBg: "--primary",
     Icon: UserPlus,
   },
   {
     href: "/login",
     key: "login",
     rotation: -2,
-    hoverBg: "#5FAF6A",
-    hoverText: "#ffffff",
+    hoverBg: "--secondary",
     Icon: LogIn,
   },
 ];
 
 export function Header() {
   const t = useT();
+  const reduced = usePrefersReducedMotion();
   const [isOpen, setIsOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const clusterRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -95,6 +96,16 @@ export function Header() {
     () => {
       const menu = menuRef.current;
       if (!menu) return;
+
+      if (reduced) {
+        gsap.set(menu, {
+          scale: 1,
+          opacity: isOpen ? 1 : 0,
+          pointerEvents: isOpen ? "auto" : "none",
+        });
+        gsap.set(itemsRef.current.filter(Boolean), { y: 0, opacity: 1 });
+        return;
+      }
 
       if (isOpen) {
         gsap.killTweensOf(menu);
@@ -127,8 +138,15 @@ export function Header() {
         });
       }
     },
-    { scope: containerRef, dependencies: [isOpen] },
+    { scope: containerRef, dependencies: [isOpen, reduced] },
   );
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -154,10 +172,11 @@ export function Header() {
     };
   }, [isOpen]);
 
-  function handleMouseEnter(index: number, bg: string, text: string) {
+  function handleMouseEnter(index: number, bgToken: "--primary" | "--secondary") {
+    if (reduced) return;
     gsap.to(itemsRef.current[index], {
-      backgroundColor: bg,
-      color: text,
+      backgroundColor: readToken(bgToken),
+      color: readToken("--surface"),
       scale: 1.02,
       duration: 0.25,
       ease: "power2.out",
@@ -165,9 +184,10 @@ export function Header() {
   }
 
   function handleMouseLeave(index: number) {
+    if (reduced) return;
     gsap.to(itemsRef.current[index], {
       backgroundColor: "transparent",
-      color: "#243028",
+      color: readToken("--text"),
       scale: 1,
       duration: 0.25,
       ease: "power2.out",
@@ -175,21 +195,48 @@ export function Header() {
   }
 
   return (
-    <div
+    <header
       ref={containerRef}
-      className="pointer-events-none fixed inset-x-0 top-0 z-50 flex items-start justify-between gap-2 p-3 sm:gap-3 sm:p-4 md:p-6"
+      className={[
+        "fixed inset-x-0 top-0 z-50 transition-[background-color,box-shadow] duration-200",
+        scrolled || isOpen
+          ? "border-b border-border-subtle bg-surface/90 shadow-sm backdrop-blur-md"
+          : "border-b border-transparent bg-transparent",
+      ].join(" ")}
     >
+      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-5 sm:px-8">
       <Link
         href="/#top"
-        className="pointer-events-auto flex max-w-[42%] cursor-pointer items-center gap-1.5 rounded-full bg-white/90 px-2.5 py-1.5 text-base font-semibold text-ink shadow-sm backdrop-blur-sm sm:max-w-none sm:gap-2 sm:px-3 sm:py-2 sm:text-lg"
+        className="flex min-w-0 items-center gap-2 text-text"
       >
-        <PawPrint size={18} className="shrink-0 text-brand-pink sm:size-5" fill="currentColor" />
-        <span className="font-display truncate tracking-tight">ANIMAPS</span>
+        <span className="flex size-9 items-center justify-center rounded-xl bg-primary text-surface-elevated">
+          <PawPrint size={18} aria-hidden />
+        </span>
+        <span className="font-display truncate text-xl tracking-tight">{t.brand}</span>
       </Link>
 
-      <div ref={clusterRef} className="pointer-events-auto relative max-w-[58%] sm:max-w-none">
-        <div className="flex items-center gap-1 rounded-full border border-white/70 bg-white/90 p-1 shadow-md backdrop-blur-md sm:gap-1.5 sm:p-1.5">
-          {/* Full CTAs from md up — on small screens they live in the bubble menu */}
+      <nav className="hidden items-center gap-1 lg:flex" aria-label={t.nav.menu}>
+        {(
+          [
+            { href: "/#how-it-works", key: "howToStart" },
+            { href: "/#audience-guardians", key: "forPeople" },
+            { href: "/#audience-ngos", key: "forOrganizations" },
+            { href: "/#audience-agencies", key: "forInstitutions" },
+          ] as const
+        ).map((item) => (
+          <a
+            key={item.key}
+            href={item.href}
+            className="rounded-full px-3 py-2 text-body-sm font-semibold text-text-secondary transition-colors hover:bg-surface-hover hover:text-text"
+          >
+            {t.nav[item.key]}
+          </a>
+        ))}
+      </nav>
+
+      <div ref={clusterRef} className="relative">
+        <div className="flex items-center gap-1 rounded-full bg-secondary-soft px-1.5 py-1">
+          <LocaleSwitcher tone="light" variant="menu" />
           <Button
             href="/login"
             variant="white"
@@ -220,7 +267,7 @@ export function Header() {
             aria-controls="bubble-menu"
             aria-label={isOpen ? t.nav.closeMenu : t.nav.openMenu}
             onClick={() => setIsOpen((v) => !v)}
-            className="!size-10 sm:!size-11"
+            className="!size-10 lg:!hidden"
           >
             {isOpen ? <X size={20} strokeWidth={2.25} /> : <Menu size={20} strokeWidth={2.25} />}
           </Button>
@@ -229,7 +276,7 @@ export function Header() {
         <div
           id="bubble-menu"
           ref={menuRef}
-          className="absolute top-[calc(100%+0.65rem)] right-0 z-10 flex min-w-60 origin-top-right scale-95 flex-col items-stretch gap-1 rounded-3xl border border-border-soft bg-white/95 p-4 opacity-0 shadow-xl backdrop-blur-xl"
+          className="absolute top-[calc(100%+0.65rem)] right-0 z-10 flex min-w-64 origin-top-right scale-95 flex-col items-stretch gap-1 rounded-2xl border border-border-subtle bg-surface-elevated p-3 opacity-0 shadow-lg lg:hidden"
           style={{ pointerEvents: "none" }}
           aria-hidden={!isOpen}
         >
@@ -246,9 +293,7 @@ export function Header() {
                   itemsRef.current[index] = el;
                 }}
                 className="flex cursor-pointer items-center justify-between gap-3 rounded-full px-4 py-2.5 text-left text-base font-semibold tracking-tight text-ink"
-                onMouseEnter={() =>
-                  handleMouseEnter(index, item.hoverBg, item.hoverText)
-                }
+                onMouseEnter={() => handleMouseEnter(index, item.hoverBg)}
                 onMouseLeave={() => handleMouseLeave(index)}
                 onClick={() => setIsOpen(false)}
               >
@@ -257,15 +302,9 @@ export function Header() {
               </Link>
             );
           })}
-
-          <div className="mt-2 border-t border-border-soft pt-3">
-            <div className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-ink-muted">
-              {t.nav.language}
-            </div>
-            <LocaleSwitcher tone="light" variant="menu" />
-          </div>
         </div>
       </div>
-    </div>
+      </div>
+    </header>
   );
 }

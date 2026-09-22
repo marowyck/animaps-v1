@@ -1,37 +1,30 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { ArrowLeft, X } from "lucide-react";
+import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/Button";
 import { CODE_INPUT_LENGTH, CodeInput } from "@/components/CodeInput";
-import { IconButton } from "@/components/IconButton";
 import { useToast } from "@/components/Toast";
+import { useOnboarding } from "@/features/onboarding";
 import { useT } from "@/i18n";
-import { useOnboarding } from "@/features/onboarding/OnboardingProvider";
 
 const RESEND_COOLDOWN_SEC = 45;
-/** Demo: accept any 6 digits except 000000; 123456 always works. */
+/** Demo: accept any 6 digits except 000000. */
 const INVALID_DEMO = "000000";
 
-type VerifyPhase =
-  | "idle"
-  | "validating"
-  | "resending"
-  | "success";
+type VerifyPhase = "idle" | "validating" | "resending" | "success";
 
 export function VerifyEmailForm() {
   const t = useT();
   const { toast } = useToast();
   const router = useRouter();
   const params = useSearchParams();
-  const { draft, patch } = useOnboarding();
+  const { draft } = useOnboarding();
 
   const email = useMemo(() => {
     const fromQuery = params.get("email")?.trim();
     if (fromQuery) return fromQuery;
-    if (draft.email) return draft.email;
-    return "usuario@email.com";
+    return draft.email?.trim() || "";
   }, [params, draft.email]);
 
   const [code, setCode] = useState("");
@@ -40,19 +33,15 @@ export function VerifyEmailForm() {
   const [cooldown, setCooldown] = useState(RESEND_COOLDOWN_SEC);
 
   useEffect(() => {
-    patch({ email });
-  }, [email, patch]);
-
-  useEffect(() => {
     if (cooldown <= 0) return;
     const id = window.setInterval(() => {
-      setCooldown((c) => Math.max(0, c - 1));
+      setCooldown((current) => Math.max(0, current - 1));
     }, 1000);
     return () => window.clearInterval(id);
   }, [cooldown]);
 
   const mockVerify = useCallback(async (value: string) => {
-    await new Promise((r) => setTimeout(r, 700));
+    await new Promise((resolve) => setTimeout(resolve, 700));
     if (value === INVALID_DEMO) return { ok: false as const, reason: "invalid" as const };
     if (value.length !== CODE_INPUT_LENGTH) {
       return { ok: false as const, reason: "incomplete" as const };
@@ -61,6 +50,7 @@ export function VerifyEmailForm() {
   }, []);
 
   const onContinue = async () => {
+    if (phase === "validating" || phase === "success") return;
     if (code.length < CODE_INPUT_LENGTH) {
       setError(true);
       toast({ message: t.auth.verifyEmail.incomplete, tone: "error" });
@@ -86,10 +76,15 @@ export function VerifyEmailForm() {
     router.push("/onboarding/guidelines");
   };
 
+  const onSubmit = (event: FormEvent) => {
+    event.preventDefault();
+    void onContinue();
+  };
+
   const onResend = async () => {
     if (cooldown > 0 || phase === "resending") return;
     setPhase("resending");
-    await new Promise((r) => setTimeout(r, 600));
+    await new Promise((resolve) => setTimeout(resolve, 600));
     setCooldown(RESEND_COOLDOWN_SEC);
     setPhase("idle");
     setCode("");
@@ -97,42 +92,48 @@ export function VerifyEmailForm() {
     toast({ message: t.auth.verifyEmail.resent, tone: "info" });
   };
 
+  if (!email) {
+    return (
+      <div className="flex w-full flex-col pb-2">
+        <h1 className="font-display text-[1.35rem] leading-tight tracking-tight text-ink sm:text-2xl lg:text-[1.65rem]">
+          {t.auth.verifyEmail.title}
+        </h1>
+        <p className="mt-2 text-body-sm text-ink-muted">
+          {t.auth.verifyEmail.missingEmail}
+        </p>
+        <Button href="/login" variant="pink" size="sm" className="mt-6 !w-full !min-w-0">
+          {t.auth.verifyEmail.missingCta}
+        </Button>
+      </div>
+    );
+  }
+
   const subtitle = t.auth.verifyEmail.subtitle.replace("{email}", email);
 
   return (
-    <div className="relative flex min-h-dvh w-full flex-col px-4 animate-fade-in-up">
-      <header className="absolute inset-x-0 top-0 z-10 flex items-center justify-between px-4 py-4 sm:px-6">
-        <IconButton label={t.auth.verifyEmail.back} onClick={() => router.push("/login")}>
-          <ArrowLeft className="size-5" aria-hidden />
-        </IconButton>
-        <span className="font-display text-lg text-ink">ANIMAPS</span>
-        <IconButton label={t.auth.verifyEmail.close} onClick={() => router.push("/")}>
-          <X className="size-5" aria-hidden />
-        </IconButton>
-      </header>
+    <div className="flex w-full flex-col pb-2">
+      <h1 className="font-display text-[1.35rem] leading-tight tracking-tight text-ink sm:text-2xl lg:text-[1.65rem]">
+        {t.auth.verifyEmail.title}
+      </h1>
+      <p className="mt-1 text-xs leading-snug text-ink-muted">
+        {subtitle.split(email).map((part, index, parts) =>
+          index < parts.length - 1 ? (
+            <span key={index}>
+              {part}
+              <strong className="font-bold text-ink">{email}</strong>
+            </span>
+          ) : (
+            <span key={index}>{part}</span>
+          ),
+        )}
+      </p>
+      <p className="mt-2 text-caption text-ink-muted">{t.auth.verifyEmail.expires}</p>
 
-      <div className="mx-auto flex w-full max-w-md flex-1 flex-col items-center justify-center py-20">
-        <div className="mb-8 w-full space-y-2 text-center">
-          <h1 className="font-display text-3xl text-ink">{t.auth.verifyEmail.title}</h1>
-          <p className="text-base text-ink-muted">
-            {subtitle.split(email).map((part, i, arr) =>
-              i < arr.length - 1 ? (
-                <span key={i}>
-                  {part}
-                  <strong className="font-bold text-ink">{email}</strong>
-                </span>
-              ) : (
-                <span key={i}>{part}</span>
-              ),
-            )}
-          </p>
-          <p className="text-sm text-ink-muted">{t.auth.verifyEmail.expires}</p>
-        </div>
-
+      <form onSubmit={onSubmit} className="mt-5">
         <CodeInput
           value={code}
-          onChange={(v) => {
-            setCode(v);
+          onChange={(value) => {
+            setCode(value);
             setError(false);
           }}
           error={error}
@@ -140,24 +141,24 @@ export function VerifyEmailForm() {
           label={t.auth.verifyEmail.codeLabel}
         />
 
-        <div className="mt-8 w-full space-y-3">
+        <div className="mt-6 w-full space-y-3">
           <Button
+            type="submit"
             variant="pink"
-            size="md"
-            className="w-full"
-            disabled={code.length < CODE_INPUT_LENGTH || phase === "validating"}
-            onClick={onContinue}
+            size="sm"
+            magnetic={false}
+            className="!w-full !min-w-0"
+            disabled={code.length < CODE_INPUT_LENGTH || phase === "validating" || phase === "success"}
           >
-            {phase === "validating"
-              ? t.onboarding.loading
-              : t.auth.verifyEmail.continue}
+            {phase === "validating" ? t.onboarding.loading : t.auth.verifyEmail.continue}
           </Button>
           <Button
+            type="button"
             variant="ghost"
             size="sm"
-            className="w-full"
+            className="!w-full"
             disabled={cooldown > 0 || phase === "resending"}
-            onClick={onResend}
+            onClick={() => void onResend()}
           >
             {phase === "resending"
               ? t.auth.verifyEmail.resending
@@ -166,7 +167,16 @@ export function VerifyEmailForm() {
                 : t.auth.verifyEmail.resend}
           </Button>
         </div>
-      </div>
+      </form>
+
+      <p className="mt-4 text-center text-xs font-semibold text-ink-muted">
+        <a
+          href="/login"
+          className="font-bold text-brand-pink underline-offset-2 hover:underline"
+        >
+          {t.auth.verifyEmail.back}
+        </a>
+      </p>
     </div>
   );
 }

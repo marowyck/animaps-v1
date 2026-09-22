@@ -2,7 +2,6 @@
 
 import { FormEvent, useState } from "react";
 import { Button } from "@/components/Button";
-import { Card } from "@/components/Card";
 import { Input } from "@/components/Input";
 import { VerificationStatusBadge } from "@/components/VerificationStatusBadge";
 import { useToast } from "@/components/Toast";
@@ -38,6 +37,8 @@ export function InstitutionProfile({
   const [dataResponsibleArea, setDataResponsibleArea] = useState(
     inst.dataResponsibleArea,
   );
+  const [city, setCity] = useState(inst.city);
+  const [stateName, setStateName] = useState(inst.state);
 
   const status = draft.institutionalVerificationStatus;
   const copy = t.institution.profile;
@@ -56,6 +57,8 @@ export function InstitutionProfile({
         website,
         responsibleDepartment,
         dataResponsibleArea,
+        city,
+        state: stateName,
       },
     });
     toast({ message: copy.saved, tone: "success" });
@@ -63,12 +66,12 @@ export function InstitutionProfile({
 
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-5">
-      <header className="flex flex-wrap items-start justify-between gap-3">
+      <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="font-display text-3xl text-ink">
+          <h1 className="text-h1 text-text">
             {mode === "settings" ? copy.settingsTitle : copy.title}
           </h1>
-          <p className="mt-1 text-sm text-ink-muted">
+          <p className="mt-2 max-w-xl text-body-sm text-text-secondary">
             {mode === "settings" ? copy.settingsSubtitle : copy.subtitle}
           </p>
         </div>
@@ -80,17 +83,12 @@ export function InstitutionProfile({
 
       {!verified ? <SoftGateBanner /> : null}
 
-      <Card className="space-y-2 p-4">
-        <p className="text-xs font-bold uppercase tracking-wide text-ink-muted">
-          {copy.typeLabel}
-        </p>
-        <p className="font-bold text-ink">
-          {draft.institutionTypeId
-            ? t.onboarding.institutionType.items[draft.institutionTypeId]
-                .title
-            : copy.typeUnknown}
-        </p>
-      </Card>
+      <p className="text-body-sm text-text-secondary">
+        <span className="font-semibold text-text">{copy.typeLabel}: </span>
+        {draft.institutionTypeId
+          ? t.onboarding.institutionType.items[draft.institutionTypeId].title
+          : copy.typeUnknown}
+      </p>
 
       <form onSubmit={onSave} className="flex flex-col gap-4">
         <fieldset className="space-y-3">
@@ -162,21 +160,31 @@ export function InstitutionProfile({
             {copy.sectionJurisdiction}
           </legend>
           <p className="text-xs text-ink-muted">{copy.jurisdictionHint}</p>
+          <Input
+            label={copy.city}
+            value={city}
+            onChange={(e) => setCity(e.target.value)}
+          />
+          <Input
+            label={copy.state}
+            value={stateName}
+            onChange={(e) => setStateName(e.target.value)}
+          />
           <Button href="/routing" size="sm" variant="ghost">
             {t.institution.routing.openConfig}
           </Button>
         </fieldset>
 
-        <Button type="submit" variant="pink">
+        <Button type="submit" variant="primary">
           {copy.save}
         </Button>
       </form>
 
       {mode === "settings" ? (
-        <Card className="space-y-2 p-4">
-          <h2 className="text-sm font-bold text-ink">{copy.policyTitle}</h2>
-          <p className="text-sm text-ink-muted">{copy.policyBody}</p>
-        </Card>
+        <section className="space-y-2 border-t border-border-subtle pt-5">
+          <h2 className="text-h4 text-text">{copy.policyTitle}</h2>
+          <p className="max-w-xl text-body-sm text-text-secondary">{copy.policyBody}</p>
+        </section>
       ) : null}
     </div>
   );

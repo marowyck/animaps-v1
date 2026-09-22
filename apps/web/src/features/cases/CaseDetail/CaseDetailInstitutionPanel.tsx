@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent } from "react";
+import { SoftGateBanner } from "@/features/institution/SoftGateBanner";
 import { Button } from "@/components/Button";
 import { Input } from "@/components/Input";
 import { useToast } from "@/components/Toast";
@@ -45,14 +46,8 @@ export function CaseDetailInstitutionPanel({
 
   return (
     <section className="space-y-3">
-      {!verified ? (
-        <p className="rounded-2xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-semibold text-ink">
-          {t.cases.institution.softGate}
-        </p>
-      ) : null}
-      <h2 className="text-sm font-bold text-ink">
-        {t.cases.detail.internalNotes}
-      </h2>
+      {!verified ? <SoftGateBanner /> : null}
+      <h2 className="text-h4 text-text">{t.cases.detail.internalNotes}</h2>
       <CaseDetailTimeline
         items={internals.map((c) => ({
           id: c.id,
@@ -71,7 +66,7 @@ export function CaseDetailInstitutionPanel({
               onChange={(e) => onBodyChange(e.target.value)}
             />
             <div className="flex flex-wrap gap-2">
-              <Button type="submit" size="sm" variant="pink">
+              <Button type="submit" size="sm" variant="primary">
                 {t.cases.detail.postInternal}
               </Button>
               <Button
@@ -103,9 +98,9 @@ export function CaseDetailInstitutionPanel({
                 tone: "success",
               });
             }}
-            className="flex flex-col gap-2 border-t border-border-soft pt-3"
+            className="flex flex-col gap-2 pt-1"
           >
-            <p className="text-xs text-ink-muted">
+            <p className="text-body-sm text-text-secondary">
               {t.cases.detail.publicFormHint}
             </p>
             <Button type="submit" size="sm" variant="ghost">

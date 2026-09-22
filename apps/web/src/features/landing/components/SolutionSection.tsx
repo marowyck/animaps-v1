@@ -11,8 +11,9 @@ import {
 } from "lucide-react";
 import { gsap } from "gsap";
 import { Button } from "@/components/Button";
-import { AnimatedContent } from "@/components/bits";
+import { AnimatedContent, Blob } from "@/components/bits";
 import { useT } from "@/i18n";
+import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
 import { SectionDivider } from "./SectionDivider";
 
 const PILLAR_META = [
@@ -21,7 +22,7 @@ const PILLAR_META = [
     key: "match" as const,
     span: "md:col-span-7",
     minH: "md:min-h-[200px]",
-    tone: "bg-pastel-pink shadow-[0_18px_48px_-14px_rgba(224,122,150,0.45)]",
+    tone: "bg-pastel-pink shadow-[var(--shadow-glow-primary)]",
     iconTone: "bg-white text-brand-pink",
     tilt: "md:hover:rotate-1",
   },
@@ -30,7 +31,7 @@ const PILLAR_META = [
     key: "ngo" as const,
     span: "md:col-span-5",
     minH: "md:min-h-[200px]",
-    tone: "bg-pastel-green shadow-[0_18px_48px_-14px_rgba(95,175,106,0.45)]",
+    tone: "bg-pastel-green shadow-[var(--shadow-glow-secondary)]",
     iconTone: "bg-white text-brand-green",
     tilt: "md:hover:-rotate-1",
   },
@@ -39,7 +40,7 @@ const PILLAR_META = [
     key: "marketplace" as const,
     span: "md:col-span-4",
     minH: "md:min-h-[160px]",
-    tone: "border border-brand-pink/15 bg-white shadow-[0_18px_48px_-14px_rgba(224,122,150,0.28)]",
+    tone: "border border-brand-pink/15 bg-white shadow-[var(--shadow-glow-primary)]",
     iconTone: "bg-pastel-pink text-brand-pink",
     tilt: "md:hover:-rotate-1",
   },
@@ -48,7 +49,7 @@ const PILLAR_META = [
     key: "geo" as const,
     span: "md:col-span-3",
     minH: "md:min-h-[160px]",
-    tone: "border border-brand-green/15 bg-white shadow-[0_18px_48px_-14px_rgba(95,175,106,0.28)]",
+    tone: "border border-brand-green/15 bg-white shadow-[var(--shadow-glow-secondary)]",
     iconTone: "bg-pastel-sky text-brand-green",
     tilt: "md:hover:rotate-1",
   },
@@ -57,7 +58,7 @@ const PILLAR_META = [
     key: "indicators" as const,
     span: "md:col-span-5",
     minH: "md:min-h-[160px]",
-    tone: "bg-pastel-sky shadow-[0_18px_48px_-14px_rgba(95,175,106,0.4)]",
+    tone: "bg-pastel-sky shadow-[var(--shadow-glow-secondary)]",
     iconTone: "bg-white text-brand-green",
     tilt: "md:hover:rotate-0",
   },
@@ -65,6 +66,7 @@ const PILLAR_META = [
 
 export function SolutionSection() {
   const t = useT();
+  const reduced = usePrefersReducedMotion();
   const sectionRef = useRef<HTMLElement>(null);
   const pillars = PILLAR_META.map((item) => ({
     ...item,
@@ -73,6 +75,7 @@ export function SolutionSection() {
   }));
 
   const sparkle = (el: HTMLElement) => {
+    if (reduced) return;
     gsap.fromTo(
       el.querySelector(".sol-icon"),
       { scale: 1, rotate: 0 },
@@ -91,30 +94,29 @@ export function SolutionSection() {
     <section
       id="solution"
       ref={sectionRef}
-      className="relative z-10 flex min-h-[100svh] flex-col justify-center overflow-x-hidden bg-white py-14 md:py-16"
+      className="relative z-10 flex min-h-[100svh] flex-col justify-center overflow-x-clip bg-white px-5 py-24 sm:px-8 md:py-32"
     >
-      <SectionDivider fill="#ffffff" position="top" />
+      <SectionDivider fill="var(--background)" />
 
-      {/* Soft color fields so white doesn’t feel empty */}
-      <div
-        className="pointer-events-none absolute -right-24 top-24 h-72 w-72 rounded-full bg-pastel-green/50 blur-3xl"
-        aria-hidden
+      <Blob
+        variant={1}
+        className="absolute -right-16 top-20 size-72 text-success/30 sm:size-80"
       />
-      <div
-        className="pointer-events-none absolute -left-20 bottom-20 h-80 w-80 rounded-full bg-pastel-pink/45 blur-3xl"
-        aria-hidden
+      <Blob
+        variant={2}
+        className="absolute -left-16 bottom-16 size-80 text-primary/25 sm:size-96"
       />
 
-      <div className="relative z-10 mx-auto w-full max-w-7xl px-4 pt-8 md:px-8 md:pt-10 xl:max-w-[90rem] xl:px-10">
+      <div className="relative z-10 mx-auto w-full max-w-6xl">
         <div className="mb-10 max-w-3xl">
-          <div className="mb-3 inline-block rounded-full border border-brand-green/25 bg-pastel-green/60 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-brand-green shadow-[0_8px_24px_-8px_rgba(95,175,106,0.4)]">
+          <div className="text-label mb-4 inline-block rounded-full bg-pastel-green/80 px-4 py-1.5 text-(--mint-700)">
             {t.solution.eyebrow}
           </div>
-          <h2 className="font-display mb-3 text-4xl leading-tight tracking-tight text-ink md:text-5xl lg:text-[3.5rem]">
+          <h2 className="text-h1 text-text">
             {t.solution.titleBefore}{" "}
-            <span className="text-brand-green">{t.solution.titleHighlight}</span>
+            <span className="text-(--mint-700)">{t.solution.titleHighlight}</span>
           </h2>
-          <p className="max-w-2xl text-sm leading-relaxed text-ink-muted md:text-base">
+          <p className="text-body mt-4 max-w-2xl text-text-secondary">
             {t.solution.bodyBefore}{" "}
             <span className="font-semibold text-brand-pink">{t.solution.adopters}</span>,{" "}
             <span className="font-semibold text-brand-green">{t.solution.ngos}</span>,{" "}
@@ -127,31 +129,25 @@ export function SolutionSection() {
 
         <ul className="mb-10 grid auto-rows-fr gap-4 sm:grid-cols-2 md:grid-cols-12 md:gap-5">
           {pillars.map((item, i) => (
-            <AnimatedContent
-              key={item.key}
-              delay={i * 0.06}
-              distance={24}
-              className={`h-full ${item.span}`}
-            >
-              <li
-                className={`group flex h-full cursor-pointer flex-col rounded-[2rem] p-6 transition-transform duration-300 hover:-translate-y-1.5 hover:scale-[1.015] md:p-7 ${item.minH} ${item.tone} ${item.tilt}`}
-                onClick={(e) => sparkle(e.currentTarget)}
-              >
-                <div
-                  className={`sol-icon mb-4 flex h-14 w-14 shrink-0 items-center justify-center rounded-full ${item.iconTone} shadow-sm transition-transform duration-300 group-hover:scale-110`}
+            <li key={item.key} className={`h-full ${item.span}`}>
+              <AnimatedContent delay={i * 0.06} distance={24} className="h-full">
+                <button
+                  type="button"
+                  className={`group flex h-full w-full cursor-pointer flex-col rounded-[2rem] p-6 text-left transition-transform duration-300 hover:-translate-y-1.5 hover:scale-[1.015] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-pink md:p-7 ${item.minH} ${item.tone} ${item.tilt}`}
+                  onClick={(e) => sparkle(e.currentTarget)}
                 >
-                  <item.icon size={26} strokeWidth={2.25} />
-                </div>
-                <div className="min-w-0">
-                  <h3 className="mb-1.5 text-xl font-bold tracking-tight text-ink md:text-2xl">
-                    {item.title}
-                  </h3>
-                  <p className="text-sm leading-relaxed text-ink-muted md:text-base">
+                  <div
+                    className={`sol-icon mb-4 flex h-14 w-14 shrink-0 items-center justify-center rounded-full ${item.iconTone} shadow-sm transition-transform duration-300 group-hover:scale-110`}
+                  >
+                    <item.icon size={26} strokeWidth={2.25} aria-hidden />
+                  </div>
+                  <span className="text-h3 mb-1.5 text-text">{item.title}</span>
+                  <span className="text-body-sm text-text-secondary md:text-body">
                     {item.body}
-                  </p>
-                </div>
-              </li>
-            </AnimatedContent>
+                  </span>
+                </button>
+              </AnimatedContent>
+            </li>
           ))}
         </ul>
 

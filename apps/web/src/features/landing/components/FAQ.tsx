@@ -34,12 +34,11 @@ export function FAQ() {
       if (reduced) return;
       gsap.from(".faq-item", {
         scrollTrigger: { trigger: container.current, start: "top 75%" },
-        y: 28,
-        scale: 0.94,
+        y: 20,
         opacity: 0,
-        duration: 0.6,
-        stagger: 0.07,
-        ease: "back.out(1.5)",
+        duration: 0.55,
+        stagger: 0.06,
+        ease: "power2.out",
       });
     },
     { scope: container, dependencies: [t.faq.title, reduced] },
@@ -49,19 +48,17 @@ export function FAQ() {
     <section
       id="faq"
       ref={container}
-      className="relative z-10 bg-pastel-pink px-4 pt-20 pb-10 md:pt-24 md:pb-12"
+      className="relative z-10 bg-pastel-pink px-5 py-24 sm:px-8 md:py-32"
     >
-      <SectionDivider fill="var(--pastel-yellow)" position="top" />
-
-      <div className="relative z-10 mx-auto max-w-3xl pt-12 md:pt-14">
-        <div className="mb-12 text-center">
-          <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-white px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-brand-pink shadow-[0_6px_20px_-4px_rgba(224,122,150,0.4)]">
+      <div className="relative z-10 mx-auto max-w-3xl">
+        <div className="mb-10 text-center">
+          <div className="text-label mb-4 inline-flex items-center gap-2 rounded-full bg-surface px-4 py-1.5 text-(--pink-700)">
             <HelpCircle size={14} /> {t.faq.eyebrow}
           </div>
-          <h2 className="font-display text-4xl tracking-tight text-ink md:text-5xl lg:text-6xl">
+          <h2 className="text-h1 text-text">
             {t.faq.title}
           </h2>
-          <p className="mt-2 text-base text-ink-muted">{t.faq.subtitle}</p>
+          <p className="text-body mt-4 text-text-secondary">{t.faq.subtitle}</p>
         </div>
 
         <div className="space-y-4">
@@ -72,6 +69,7 @@ export function FAQ() {
           ))}
         </div>
       </div>
+      <SectionDivider fill="var(--background)" />
     </section>
   );
 }

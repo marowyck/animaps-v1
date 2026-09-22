@@ -3,13 +3,14 @@
 import Link from "next/link";
 import { useEffect, useMemo } from "react";
 import { Button } from "@/components/Button";
-import { Card } from "@/components/Card";
 import { useToast } from "@/components/Toast";
 import { useCasesStore } from "@/features/cases";
 import { hasPermission } from "@/features/permissions";
 import { useOnboarding } from "@/features/onboarding";
 import { useT } from "@/i18n";
+import { MetricTile } from "../MetricTile";
 import { SoftGateBanner } from "../SoftGateBanner";
+import { WorkspaceHeader } from "../WorkspaceHeader";
 import { isInstitutionOperational } from "../metrics";
 import { InstitutionRoutingConfig } from "./InstitutionRoutingConfig";
 import { useRoutingCatalog } from "./useRoutingCatalog";
@@ -70,34 +71,28 @@ export function InstitutionRoutingShell() {
 
   return (
     <div className="space-y-5">
-      <header>
-        <h1 className="font-display text-3xl text-ink">
-          {t.institution.routing.title}
-        </h1>
-        <p className="mt-1 text-sm text-ink-muted">
-          {t.institution.routing.subtitle}
-        </p>
-      </header>
+      <WorkspaceHeader
+        title={t.institution.routing.title}
+        subtitle={t.institution.routing.subtitle}
+      />
 
       {!verified ? <SoftGateBanner /> : null}
 
       <div className="grid gap-3 sm:grid-cols-2">
-        <Card className="p-4">
-          <p className="text-xs font-bold uppercase tracking-wide text-ink-muted">
-            {t.institution.routing.awaitingLabel}
-          </p>
-          <p className="mt-1 font-display text-3xl text-ink">{awaiting.length}</p>
-        </Card>
-        <Card className="p-4">
-          <p className="text-xs font-bold uppercase tracking-wide text-ink-muted">
-            {t.institution.routing.routedLabel}
-          </p>
-          <p className="mt-1 font-display text-3xl text-ink">{routed.length}</p>
-        </Card>
+        <MetricTile
+          label={t.institution.routing.awaitingLabel}
+          value={awaiting.length}
+          tone={2}
+        />
+        <MetricTile
+          label={t.institution.routing.routedLabel}
+          value={routed.length}
+          tone={3}
+        />
       </div>
 
-      <Card className="space-y-3 p-4">
-        <h2 className="text-sm font-bold text-ink">
+      <section className="space-y-3">
+        <h2 className="text-h4 text-text">
           {t.institution.routing.queueTitle}
         </h2>
         {awaiting.length === 0 ? (
@@ -147,7 +142,7 @@ export function InstitutionRoutingShell() {
             ))}
           </ul>
         )}
-      </Card>
+      </section>
 
       <InstitutionRoutingConfig />
     </div>

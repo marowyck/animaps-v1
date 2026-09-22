@@ -70,7 +70,7 @@ export function AuthImageCarousel() {
         <div
           className="mt-6 flex gap-2"
           role="tablist"
-          aria-label="Slides"
+          aria-label={t.chrome.slides}
         >
           {AUTH_SLIDES.map((s, i) => (
             <button

@@ -14,14 +14,13 @@ export function CaseDetailParticipants({
   if (participants.length === 0) return null;
   return (
     <section>
-      <h2 className="mb-2 text-sm font-bold text-ink">
-        {t.cases.detail.participants}
-      </h2>
-      <ul className="rounded-2xl border border-border-soft bg-white p-3 text-sm">
+      <h2 className="text-h4 mb-3 text-text">{t.cases.detail.participants}</h2>
+      <ul className="space-y-2">
         {participants.map((p) => (
-          <li key={p.id} className="flex justify-between gap-2 py-1">
-            <span>{p.userLabel ?? "—"}</span>
-            <span className="text-xs font-bold text-ink-muted">
+          <li key={p.id} className="flex items-center justify-between gap-3">
+            <span className="h-8 w-1.5 shrink-0 rounded-full bg-secondary" aria-hidden />
+            <span className="min-w-0 flex-1 text-body-sm text-text">{p.userLabel ?? "—"}</span>
+            <span className="text-caption font-semibold text-(--lilac-700)">
               {t.cases.roles[p.role]}
             </span>
           </li>

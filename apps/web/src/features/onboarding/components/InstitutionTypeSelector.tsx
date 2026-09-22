@@ -12,8 +12,8 @@ import {
   Trees,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { SelectableCard } from "@/components/SelectableCard";
 import { useT } from "@/i18n";
+import { TypeSelector } from "./TypeSelector";
 import {
   INSTITUTION_TYPE_IDS,
   type InstitutionTypeId,
@@ -48,25 +48,21 @@ export function InstitutionTypeSelector({
   const t = useT();
 
   return (
-    <div
-      className={["grid gap-2 sm:grid-cols-2", className].join(" ")}
-      role="radiogroup"
-      aria-label={t.onboarding.institutionType.title}
-    >
-      {INSTITUTION_TYPE_IDS.map((id) => {
+    <TypeSelector
+      compact={compact}
+      className={className}
+      ariaLabel={t.onboarding.institutionType.title}
+      value={value}
+      onChange={onChange}
+      options={INSTITUTION_TYPE_IDS.map((id) => {
         const Icon = ICONS[id];
-        return (
-          <SelectableCard
-            key={id}
-            compact={compact}
-            title={t.onboarding.institutionType.items[id].title}
-            description={t.onboarding.institutionType.items[id].description}
-            icon={<Icon className="size-4" />}
-            selected={value === id}
-            onClick={() => onChange(id)}
-          />
-        );
+        return {
+          id,
+          title: t.onboarding.institutionType.items[id].title,
+          description: t.onboarding.institutionType.items[id].description,
+          icon: <Icon className="size-4" />,
+        };
       })}
-    </div>
+    />
   );
 }

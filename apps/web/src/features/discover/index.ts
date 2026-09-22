@@ -6,3 +6,4 @@ export type {
 export { getMockDiscoverItems } from "./mockDiscoverItems";
 export { DiscoverCard } from "./DiscoverCard";
 export { DiscoverStack } from "./DiscoverStack";
+export { useDiscoverActivity } from "./activity";

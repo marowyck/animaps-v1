@@ -1,8 +1,8 @@
 "use client";
 
-import { Card } from "@/components/Card";
 import { formatDateTime, useLocale, useT } from "@/i18n";
 import type { Messages } from "@/i18n";
+import { WorkspaceSection } from "../WorkspaceSection";
 import type { IntegrationConnectionRecord, IntegrationLogRecord } from "./types";
 
 type SyncLogsCardProps = {
@@ -26,13 +26,11 @@ export function SyncLogsCard({ logs, connections }: SyncLogsCardProps) {
   const { locale } = useLocale();
 
   return (
-    <Card className="space-y-3 p-4">
-      <h2 className="text-sm font-bold text-ink">
-        {t.institution.integrations.logsTitle}
-      </h2>
-      <p className="text-xs text-ink-muted">
-        {t.institution.integrations.logsHint}
-      </p>
+    <WorkspaceSection
+      title={t.institution.integrations.logsTitle}
+      hint={t.institution.integrations.logsHint}
+      tone="secondary"
+    >
       {logs.length === 0 ? (
         <p className="text-xs text-ink-muted">
           {t.institution.integrations.noLogs}
@@ -60,6 +58,6 @@ export function SyncLogsCard({ logs, connections }: SyncLogsCardProps) {
           })}
         </ul>
       )}
-    </Card>
+    </WorkspaceSection>
   );
 }

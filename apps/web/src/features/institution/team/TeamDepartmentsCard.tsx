@@ -3,10 +3,10 @@
 import { FormEvent } from "react";
 import { Building2, Trash2 } from "lucide-react";
 import { Button } from "@/components/Button";
-import { Card } from "@/components/Card";
 import { Input } from "@/components/Input";
 import { useToast } from "@/components/Toast";
 import { useT } from "@/i18n";
+import { WorkspaceSection } from "../WorkspaceSection";
 import type { InstitutionDepartmentRecord } from "./types";
 
 type TeamDepartmentsCardProps = {
@@ -30,13 +30,11 @@ export function TeamDepartmentsCard({
   const { toast } = useToast();
 
   return (
-    <Card className="space-y-3 p-4">
-      <div className="flex items-center gap-2">
-        <Building2 className="size-4 text-brand-green" aria-hidden />
-        <h2 className="text-sm font-bold text-ink">
-          {t.institution.team.departmentsTitle}
-        </h2>
-      </div>
+    <WorkspaceSection
+      title={t.institution.team.departmentsTitle}
+      icon={<Building2 className="size-5" aria-hidden />}
+      tone="success"
+    >
       {canManage ? (
         <form onSubmit={onAdd} className="flex flex-wrap gap-2">
           <Input
@@ -80,6 +78,6 @@ export function TeamDepartmentsCard({
           ))}
         </ul>
       )}
-    </Card>
+    </WorkspaceSection>
   );
 }

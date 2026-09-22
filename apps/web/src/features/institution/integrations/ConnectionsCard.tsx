@@ -3,10 +3,10 @@
 import { FormEvent } from "react";
 import { Cable, Trash2 } from "lucide-react";
 import { Button } from "@/components/Button";
-import { Card } from "@/components/Card";
 import { Input } from "@/components/Input";
 import { useToast } from "@/components/Toast";
 import { useT } from "@/i18n";
+import { WorkspaceSection } from "../WorkspaceSection";
 import type {
   IntegrationConnectionRecord,
   IntegrationKind,
@@ -51,16 +51,12 @@ export function ConnectionsCard({
   const { toast } = useToast();
 
   return (
-    <Card className="space-y-3 p-4">
-      <div className="flex items-center gap-2">
-        <Cable className="size-4 text-brand-blue" aria-hidden />
-        <h2 className="text-sm font-bold text-ink">
-          {t.institution.integrations.connectionsTitle}
-        </h2>
-      </div>
-      <p className="text-xs text-ink-muted">
-        {t.institution.integrations.connectionsHint}
-      </p>
+    <WorkspaceSection
+      title={t.institution.integrations.connectionsTitle}
+      hint={t.institution.integrations.connectionsHint}
+      icon={<Cable className="size-5" aria-hidden />}
+      tone="info"
+    >
 
       {canManage ? (
         <form onSubmit={onCreate} className="grid gap-2 sm:grid-cols-2">
@@ -204,6 +200,6 @@ export function ConnectionsCard({
           ))}
         </ul>
       )}
-    </Card>
+    </WorkspaceSection>
   );
 }

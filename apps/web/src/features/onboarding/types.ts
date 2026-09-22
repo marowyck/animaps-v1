@@ -135,6 +135,9 @@ export type InstitutionDraft = {
   website: string;
   responsibleDepartment: string;
   dataResponsibleArea: string;
+  city: string;
+  state: string;
+  areaOfOperation: string;
 };
 
 export type OnboardingDraft = {
@@ -225,6 +228,9 @@ export function createEmptyInstitution(): InstitutionDraft {
     website: "",
     responsibleDepartment: "",
     dataResponsibleArea: "",
+    city: "",
+    state: "",
+    areaOfOperation: "",
   };
 }
 

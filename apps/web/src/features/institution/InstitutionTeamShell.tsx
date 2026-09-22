@@ -6,6 +6,7 @@ import { hasPermission } from "@/features/permissions";
 import { useOnboarding } from "@/features/onboarding";
 import { useT } from "@/i18n";
 import { SoftGateBanner } from "./SoftGateBanner";
+import { WorkspaceHeader } from "./WorkspaceHeader";
 import { isInstitutionOperational } from "./metrics";
 import { TeamDepartmentsCard } from "./team/TeamDepartmentsCard";
 import { TeamMembersCard } from "./team/TeamMembersCard";
@@ -103,17 +104,11 @@ export function InstitutionTeamShell() {
 
   return (
     <div className="space-y-5">
-      <header>
-        <h1 className="font-display text-3xl text-ink">
-          {t.institution.team.title}
-        </h1>
-        <p className="mt-1 text-sm text-ink-muted">
-          {t.institution.team.subtitle}
-        </p>
-        <p className="mt-2 text-xs font-semibold text-ink-muted">
-          {t.institution.team.individualOnly}
-        </p>
-      </header>
+      <WorkspaceHeader
+        title={t.institution.team.title}
+        subtitle={t.institution.team.subtitle}
+        note={t.institution.team.individualOnly}
+      />
 
       {!verified ? <SoftGateBanner /> : null}
       {verified && !canManage ? (

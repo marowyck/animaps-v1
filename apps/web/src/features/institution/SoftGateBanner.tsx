@@ -21,17 +21,17 @@ export function SoftGateBanner({
     return (
       <div
         className={[
-          "rounded-3xl border-2 border-amber-200 bg-amber-50 px-5 py-6",
+          "rounded-3xl border-2 border-warning-border bg-warning-soft px-5 py-6",
           className,
         ].join(" ")}
       >
         <div className="flex items-start gap-3">
-          <AlertTriangle className="mt-0.5 size-5 shrink-0 text-amber-700" />
+          <AlertTriangle className="mt-0.5 size-5 shrink-0 text-(--honey-700)" />
           <div className="min-w-0 space-y-2">
-            <h2 className="text-lg font-bold text-ink">
+            <h2 className="text-h4 text-text">
               {t.institution.softGate.title}
             </h2>
-            <p className="text-sm text-ink-muted">
+            <p className="text-body-sm text-text-secondary">
               {t.institution.softGate.body}
             </p>
             <div className="flex flex-wrap gap-2 pt-1">
@@ -51,7 +51,7 @@ export function SoftGateBanner({
   return (
     <p
       className={[
-        "rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-semibold text-ink",
+        "text-body-sm rounded-2xl border border-warning-border bg-warning-soft px-4 py-3 font-semibold text-text",
         className,
       ].join(" ")}
     >

@@ -1,47 +1,68 @@
 "use client";
 
+import { useId } from "react";
+
 type BarListProps = {
   items: { key: string; label: string; count: number }[];
   empty: string;
   className?: string;
 };
 
-/** Simple horizontal bar chart — no external chart lib. */
+/** SVG bar chart with a text table for the same values. */
 export function BarList({ items, empty, className = "" }: BarListProps) {
+  const titleId = useId();
+
   if (items.length === 0) {
-    return (
-      <p className="rounded-2xl border border-dashed border-border-soft bg-white px-3 py-6 text-center text-sm text-ink-muted">
-        {empty}
-      </p>
-    );
+    return <p className="text-body-sm text-text-secondary">{empty}</p>;
   }
 
   const max = Math.max(...items.map((i) => i.count), 1);
+  const row = 28;
+  const height = items.length * row;
 
   return (
-    <ul className={`space-y-2 ${className}`.trim()}>
-      {items.map((item) => {
-        const pct = Math.max((item.count / max) * 100, item.count > 0 ? 4 : 0);
-        return (
-          <li key={item.key} className="space-y-1">
-            <div className="flex items-baseline justify-between gap-2 text-sm">
-              <span className="min-w-0 truncate font-semibold text-ink">
+    <figure className={className}>
+      <svg
+        role="img"
+        aria-labelledby={titleId}
+        viewBox={`0 0 100 ${height}`}
+        className="h-auto w-full"
+      >
+        <title id={titleId}>
+          {items.map((item) => `${item.label}: ${item.count}`).join(", ")}
+        </title>
+        {items.map((item, index) => {
+          const width = Math.max((item.count / max) * 100, item.count > 0 ? 4 : 0);
+          const fill = ["fill-primary", "fill-secondary", "fill-success", "fill-honey-600", "fill-info"][
+            index % 5
+          ];
+          return (
+            <rect
+              key={item.key}
+              x="0"
+              y={index * row + 6}
+              width={width}
+              height={16}
+              rx="8"
+              className={fill}
+            />
+          );
+        })}
+      </svg>
+      <table className="mt-2 w-full text-sm">
+        <tbody>
+          {items.map((item) => (
+            <tr key={item.key}>
+              <th scope="row" className="py-1 pr-3 text-left font-semibold text-ink">
                 {item.label}
-              </span>
-              <span className="shrink-0 tabular-nums font-bold text-ink-muted">
+              </th>
+              <td className="py-1 text-right font-bold tabular-nums text-ink-muted">
                 {item.count}
-              </span>
-            </div>
-            <div className="h-2 overflow-hidden rounded-full bg-gray-soft">
-              <div
-                className="h-full rounded-full bg-brand-green transition-[width] duration-300"
-                style={{ width: `${pct}%` }}
-                aria-hidden
-              />
-            </div>
-          </li>
-        );
-      })}
-    </ul>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </figure>
   );
 }

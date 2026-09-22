@@ -9,9 +9,9 @@ type IconButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 };
 
 const TONE: Record<NonNullable<IconButtonProps["tone"]>, string> = {
-  default: "text-ink hover:bg-pastel-green/60",
-  muted: "text-ink-muted hover:bg-gray-soft",
-  danger: "text-error hover:bg-red-50",
+  default: "text-text hover:bg-primary-soft",
+  muted: "text-text-muted hover:bg-surface-hover",
+  danger: "text-danger hover:bg-danger-soft",
 };
 
 export function IconButton({
@@ -29,7 +29,7 @@ export function IconButton({
       title={label}
       className={[
         "inline-flex size-11 shrink-0 items-center justify-center rounded-full transition-colors",
-        "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-pink",
+        "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary",
         "disabled:cursor-not-allowed disabled:opacity-50",
         TONE[tone],
         className,

@@ -1,14 +1,5 @@
-export { default as ClickSpark } from "./ClickSpark";
 export { default as AnimatedContent } from "./AnimatedContent";
-export { default as ScrollReveal } from "./ScrollReveal";
-export { default as Magnet } from "./Magnet";
-export { default as TiltedCard } from "./TiltedCard";
 export { default as CurvedLoop } from "./CurvedLoop";
-export { default as DotGrid, updateDotGridVars } from "./DotGrid";
-export { default as Aurora } from "./Aurora";
-export { default as SpotlightCard } from "./SpotlightCard";
-export { default as GlareHover } from "./GlareHover";
-export { default as GradualBlur } from "./GradualBlur";
-export { default as SplitText } from "./SplitText";
-export { default as ScrollFloat } from "./ScrollFloat";
-export { default as ScrollStack, ScrollStackItem } from "./ScrollStack";
+export { AnimatedHeading } from "./AnimatedHeading";
+export { Blob } from "./Blob";
+export { ParticleBurst } from "./ParticleBurst";

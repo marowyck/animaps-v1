@@ -3,10 +3,10 @@
 import { FormEvent } from "react";
 import { Trash2, Users } from "lucide-react";
 import { Button } from "@/components/Button";
-import { Card } from "@/components/Card";
 import { Input } from "@/components/Input";
 import { useToast } from "@/components/Toast";
 import { useT } from "@/i18n";
+import { WorkspaceSection } from "../WorkspaceSection";
 import type {
   InstitutionDepartmentRecord,
   InstitutionTeamRecord,
@@ -41,13 +41,11 @@ export function TeamTeamsCard({
   const { toast } = useToast();
 
   return (
-    <Card className="space-y-3 p-4">
-      <div className="flex items-center gap-2">
-        <Users className="size-4 text-brand-blue" aria-hidden />
-        <h2 className="text-sm font-bold text-ink">
-          {t.institution.team.teamsTitle}
-        </h2>
-      </div>
+    <WorkspaceSection
+      title={t.institution.team.teamsTitle}
+      icon={<Users className="size-5" aria-hidden />}
+      tone="info"
+    >
       {canManage ? (
         <form onSubmit={onAdd} className="space-y-2">
           <Input
@@ -114,6 +112,6 @@ export function TeamTeamsCard({
           ))}
         </ul>
       )}
-    </Card>
+    </WorkspaceSection>
   );
 }

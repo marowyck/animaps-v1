@@ -2,6 +2,9 @@
 
 import type { ReactNode } from "react";
 import { ArrowLeft, X } from "lucide-react";
+import { Blob } from "@/components/bits";
+import { PawDoodle } from "@/components/illustrations/Doodles";
+import { LocaleSwitcher } from "@/components/LocaleSwitcher";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/Button";
 import { IconButton } from "@/components/IconButton";
@@ -42,7 +45,7 @@ export function OnboardingLayout({
   continueDisabled = false,
   continueLoading = false,
   onSkip,
-  showSkip = false,
+  showSkip,
   backHref,
   closeHref = "/",
   footerAlign = "end",
@@ -55,16 +58,26 @@ export function OnboardingLayout({
   const nav = useOnboardingNavigation(step);
   const current = progressCurrent ?? nav.current;
   const total = progressTotal ?? nav.total;
+  const canSkip = showSkip ?? Boolean(nav.definition?.skippable);
+  const skip = onSkip ?? (() => nav.goSkip());
 
   return (
     <div
       className={[
-        "mx-auto flex min-h-dvh w-full flex-col px-4 sm:px-6",
+        "relative mx-auto flex min-h-dvh w-full flex-col overflow-x-clip bg-background px-5 sm:px-8",
         compact ? "max-w-4xl pb-4 pt-3" : "max-w-2xl pb-8 pt-4",
       ].join(" ")}
     >
+      <Blob
+        variant={1}
+        className="absolute -top-16 -right-16 size-48 text-primary/15 sm:size-64"
+      />
+      <Blob
+        variant={2}
+        className="absolute -bottom-20 -left-16 size-56 text-secondary/15"
+      />
       <header
-        className={["flex items-center justify-between gap-2", compact ? "mb-2" : "mb-4"].join(
+        className={["relative z-10 flex items-center justify-between gap-2", compact ? "mb-2" : "mb-4"].join(
           " ",
         )}
       >
@@ -80,7 +93,11 @@ export function OnboardingLayout({
         >
           <ArrowLeft className="size-5" aria-hidden />
         </IconButton>
-        <span className="font-display text-lg tracking-tight text-ink">ANIMAPS</span>
+        <span className="inline-flex items-center gap-2 font-display text-xl tracking-tight text-text">
+          <PawDoodle className="size-5 text-primary" />
+          ANIMAPS
+          <LocaleSwitcher tone="light" variant="menu" />
+        </span>
         <IconButton label={t.onboarding.close} onClick={() => router.push(closeHref)}>
           <X className="size-5" aria-hidden />
         </IconButton>
@@ -92,10 +109,10 @@ export function OnboardingLayout({
         label={t.onboarding.stepOf
           .replace("{current}", String(current))
           .replace("{total}", String(total))}
-        className={compact ? "mb-3" : "mb-6"}
+        className={compact ? "relative z-10 mb-3" : "relative z-10 mb-6"}
       />
 
-      <div key={step} className="flex min-h-0 flex-1 flex-col animate-fade-in-up">
+      <div key={step} className="relative z-10 flex min-h-0 flex-1 flex-col animate-fade-in-up">
         <div className={["space-y-1", compact ? "mb-3" : "mb-6 space-y-2"].join(" ")}>
           <h1
             className={[
@@ -123,7 +140,7 @@ export function OnboardingLayout({
             .filter(Boolean)
             .join(" ")}
         >
-          {showSkip && onSkip ? (
+          {canSkip ? (
             <Button
               variant="ghost"
               size="sm"
@@ -131,7 +148,7 @@ export function OnboardingLayout({
                 "order-2",
                 footerAlign === "center" ? "sm:order-1" : "sm:order-1",
               ].join(" ")}
-              onClick={onSkip}
+              onClick={skip}
             >
               {t.onboarding.skip}
             </Button>

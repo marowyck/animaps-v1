@@ -1,26 +1,26 @@
 import type { Metadata } from "next";
-import { Bagel_Fat_One, Nunito } from "next/font/google";
+import { Baloo_2, Nunito_Sans } from "next/font/google";
 import { SmoothScrollProvider } from "./providers";
 import "./globals.css";
 
-const bagelFatOne = Bagel_Fat_One({
-  weight: "400",
+const baloo = Baloo_2({
+  weight: ["500", "600", "700", "800"],
   subsets: ["latin"],
-  variable: "--font-bagel",
+  variable: "--font-display-face",
   display: "swap",
 });
 
-const nunito = Nunito({
+const nunito = Nunito_Sans({
   weight: ["400", "500", "600", "700", "800"],
   subsets: ["latin"],
-  variable: "--font-nunito",
+  variable: "--font-sans-face",
   display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "ANIMAPS — O match certo pro seu melhor amigo",
+  title: "ANIMAPS — pessoas, animais e lugares",
   description:
-    "Crie sua conta no ANIMAPS, encontre o Match ideal e use o mapa de ocorrências. Adoção responsável com carinho.",
+    "Conecte pessoas, animais e lugares. Adoção, ocorrências, organizações e instituições no mesmo mapa.",
 };
 
 export default function RootLayout({
@@ -31,9 +31,9 @@ export default function RootLayout({
   return (
     <html
       lang="pt-BR"
-      className={`${bagelFatOne.variable} ${nunito.variable} h-full antialiased`}
+      className={`${baloo.variable} ${nunito.variable} h-full antialiased`}
     >
-      <body className="font-sans flex min-h-full flex-col overflow-x-clip bg-gray-soft text-base leading-relaxed text-ink">
+      <body className="font-sans flex min-h-full flex-col overflow-x-clip bg-background text-body text-text">
         <SmoothScrollProvider>{children}</SmoothScrollProvider>
       </body>
     </html>

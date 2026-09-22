@@ -1,7 +1,5 @@
 export { Header } from "./components/Header";
 export { Hero } from "./components/Hero";
-export { ClayFigure } from "./components/ClayFigure";
-export { ClayStage } from "./components/ClayStage";
 export { SolutionSection } from "./components/SolutionSection";
 export { HowItWorks } from "./components/HowItWorks";
 export { AudienceCards } from "./components/AudienceCards";

@@ -82,12 +82,12 @@ export type DashboardConfig = {
 const PERSON_NAV: DashboardNavItem[] = [
   { id: "discover", href: "/discover", icon: Compass },
   { id: "animals", href: "/animals", icon: PawPrint, placeholder: true, permission: "VIEW_ANIMALS" },
-  { id: "matches", href: "/matches", icon: Heart, placeholder: true, permission: "ADOPT" },
+  { id: "matches", href: "/matches", icon: Heart, permission: "ADOPT" },
   { id: "messages", href: "/messages", icon: MessageCircle, placeholder: true, permission: "MESSAGE" },
   { id: "reports", href: "/cases", icon: AlertTriangle, permission: "REPORT" },
-  { id: "favorites", href: "/favorites", icon: Star, placeholder: true },
-  { id: "profile", href: "/profile", icon: User, placeholder: true, permission: "CREATE_PROFILE" },
-  { id: "settings", href: "/settings", icon: Settings, placeholder: true },
+  { id: "favorites", href: "/favorites", icon: Star },
+  { id: "profile", href: "/profile", icon: User, permission: "CREATE_PROFILE" },
+  { id: "settings", href: "/settings", icon: Settings },
 ];
 
 const ONG_NAV: DashboardNavItem[] = [
@@ -117,9 +117,8 @@ const ONG_NAV: DashboardNavItem[] = [
   { id: "messages", href: "/messages", icon: MessageCircle, placeholder: true, permission: "MESSAGE" },
   {
     id: "organization",
-    href: "/organization",
+    href: "/profile",
     icon: Building2,
-    placeholder: true,
     permission: "MANAGE_ORGANIZATION",
   },
 ];
@@ -147,7 +146,6 @@ const CLINIC_NAV: DashboardNavItem[] = [
     id: "profile",
     href: "/profile",
     icon: User,
-    placeholder: true,
     permission: "MANAGE_PROFILE",
   },
 ];
@@ -155,8 +153,8 @@ const CLINIC_NAV: DashboardNavItem[] = [
 const OTHER_NAV: DashboardNavItem[] = [
   { id: "discover", href: "/discover", icon: Compass },
   { id: "messages", href: "/messages", icon: MessageCircle, placeholder: true, permission: "MESSAGE" },
-  { id: "profile", href: "/profile", icon: User, placeholder: true, permission: "CREATE_PROFILE" },
-  { id: "settings", href: "/settings", icon: Settings, placeholder: true },
+  { id: "profile", href: "/profile", icon: User, permission: "CREATE_PROFILE" },
+  { id: "settings", href: "/settings", icon: Settings },
 ];
 
 /** Government workspace — Fase 4 modules live; messages stay placeholder. */

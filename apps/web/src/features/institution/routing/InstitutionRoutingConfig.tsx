@@ -3,14 +3,13 @@
 import { FormEvent, useEffect, useState } from "react";
 import { MapPinned, Trash2 } from "lucide-react";
 import { Button } from "@/components/Button";
-import { Card } from "@/components/Card";
 import { Input } from "@/components/Input";
 import { useToast } from "@/components/Toast";
 import { CASE_TYPE_IDS } from "@/features/cases/types";
 import { hasPermission } from "@/features/permissions";
 import { useOnboarding } from "@/features/onboarding";
 import { useT } from "@/i18n";
-import { SoftGateBanner } from "../SoftGateBanner";
+import { WorkspaceSection } from "../WorkspaceSection";
 import { isInstitutionOperational } from "../metrics";
 import { useRoutingCatalog } from "./useRoutingCatalog";
 import {
@@ -89,23 +88,18 @@ export function InstitutionRoutingConfig() {
 
   return (
     <div className="space-y-4">
-      {!verified ? <SoftGateBanner /> : null}
       {!verified ? (
         <p className="text-sm text-ink-muted">
           {t.institution.routing.readOnlyHint}
         </p>
       ) : null}
 
-      <Card className="space-y-3 p-4">
-        <div className="flex items-center gap-2">
-          <MapPinned className="size-4 text-brand-green" aria-hidden />
-          <h2 className="text-sm font-bold text-ink">
-            {t.institution.routing.jurisdictionsTitle}
-          </h2>
-        </div>
-        <p className="text-xs text-ink-muted">
-          {t.institution.routing.jurisdictionsHint}
-        </p>
+      <WorkspaceSection
+        title={t.institution.routing.jurisdictionsTitle}
+        hint={t.institution.routing.jurisdictionsHint}
+        icon={<MapPinned className="size-5" aria-hidden />}
+        tone="success"
+      >
 
         {canManage ? (
           <form onSubmit={onAddJurisdiction} className="grid gap-2 sm:grid-cols-3">
@@ -178,15 +172,13 @@ export function InstitutionRoutingConfig() {
             ))}
           </ul>
         )}
-      </Card>
+      </WorkspaceSection>
 
-      <Card className="space-y-3 p-4">
-        <h2 className="text-sm font-bold text-ink">
-          {t.institution.routing.capabilitiesTitle}
-        </h2>
-        <p className="text-xs text-ink-muted">
-          {t.institution.routing.capabilitiesHint}
-        </p>
+      <WorkspaceSection
+        title={t.institution.routing.capabilitiesTitle}
+        hint={t.institution.routing.capabilitiesHint}
+        tone="secondary"
+      >
         <ul className="grid gap-2 sm:grid-cols-2">
           {CASE_TYPE_IDS.map((typeId) => {
             const accepted =
@@ -210,12 +202,9 @@ export function InstitutionRoutingConfig() {
             );
           })}
         </ul>
-      </Card>
+      </WorkspaceSection>
 
-      <Card className="space-y-3 p-4">
-        <h2 className="text-sm font-bold text-ink">
-          {t.institution.routing.policyTitle}
-        </h2>
+      <WorkspaceSection title={t.institution.routing.policyTitle} tone="warning">
         <label className="flex items-center gap-2 text-sm">
           <input
             type="checkbox"
@@ -235,7 +224,7 @@ export function InstitutionRoutingConfig() {
         <p className="text-xs text-ink-muted">
           {t.institution.routing.policyHint}
         </p>
-      </Card>
+      </WorkspaceSection>
     </div>
   );
 }

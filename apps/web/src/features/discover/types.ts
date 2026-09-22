@@ -12,6 +12,8 @@ export type DiscoverItem = {
   imageUrl?: string;
   tags?: string[];
   distanceKm?: number;
+  /** Preview catalog: liking this card also creates a match. */
+  reciprocates?: boolean;
 };
 
 export type DiscoverAction =

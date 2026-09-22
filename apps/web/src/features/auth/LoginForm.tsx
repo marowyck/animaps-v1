@@ -23,9 +23,9 @@ export function LoginForm() {
       toast({ message: t.auth.login.soon, tone: "info" });
       return;
     }
-    // Frontend-only: skip real auth and enter email OTP → onboarding path.
+    // Frontend-only: password is not checked. The next screen is a demo code.
     patch({ email: email.trim() });
-    toast({ message: t.auth.login.soon, tone: "info" });
+    toast({ message: t.auth.login.preview, tone: "info" });
     router.push(`/verify-email?email=${encodeURIComponent(email.trim())}`);
   }
 

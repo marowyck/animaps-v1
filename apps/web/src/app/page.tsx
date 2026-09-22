@@ -9,6 +9,7 @@ import {
   Differentials,
   FAQ,
   Footer,
+  WaitlistSection,
 } from "@/features/landing";
 import { CookieBanner } from "@/features/consent";
 import { CurvedLoop } from "@/components/bits";
@@ -35,6 +36,7 @@ export default function HomePage() {
         <AudienceCards />
         <Differentials />
         <FAQ />
+        <WaitlistSection />
 
         <CurvedLoop
           marqueeText={t.marquees.pink}
@@ -43,7 +45,7 @@ export default function HomePage() {
           ribbonFill="var(--pastel-pink)"
           bridgeAbove
           bridgeBelow
-          bridgeBelowFill="#1a1214"
+          bridgeBelowFill="var(--footer)"
           className="bg-pastel-pink"
         />
       </main>

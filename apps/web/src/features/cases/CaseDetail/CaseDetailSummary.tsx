@@ -1,6 +1,5 @@
 "use client";
 
-import { Card } from "@/components/Card";
 import { useT } from "@/i18n";
 import type { CaseRecord } from "../types";
 import { StatusPill } from "./CaseDetailTimeline";
@@ -13,7 +12,7 @@ type CaseDetailSummaryProps = {
 export function CaseDetailSummary({ record, mode }: CaseDetailSummaryProps) {
   const t = useT();
   return (
-    <Card className="space-y-3 p-4">
+    <section className="space-y-3">
       <div className="flex flex-wrap gap-2">
         <StatusPill label={t.cases.detail.citizenStatus}>
           {t.cases.citizenStatus[record.citizenStatus]}
@@ -27,15 +26,15 @@ export function CaseDetailSummary({ record, mode }: CaseDetailSummaryProps) {
           {t.cases.priority[record.priority]}
         </StatusPill>
       </div>
-      <p className="text-sm leading-relaxed text-ink">{record.description}</p>
-      <p className="text-xs font-semibold text-ink-muted">
+      <p className="text-body leading-relaxed text-text">{record.description}</p>
+      <p className="text-body-sm font-semibold text-text-secondary">
         {[record.location.neighborhood, record.location.city, record.location.state]
           .filter(Boolean)
           .join(" · ") || t.cases.detail.noLocation}
         {" · "}
         {t.cases.precision[record.location.precision]}
       </p>
-      <p className="text-xs text-ink-muted">{t.cases.detail.honesty}</p>
-    </Card>
+      <p className="text-caption text-text-muted">{t.cases.detail.honesty}</p>
+    </section>
   );
 }

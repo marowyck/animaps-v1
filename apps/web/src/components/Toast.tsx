@@ -18,6 +18,7 @@ import {
   X,
   type LucideIcon,
 } from "lucide-react";
+import { useT } from "@/i18n";
 
 export type ToastTone = "info" | "success" | "error" | "warning";
 
@@ -47,10 +48,10 @@ const TONE_ICON: Record<ToastTone, LucideIcon> = {
 };
 
 const TONE_ICON_CLASS: Record<ToastTone, string> = {
-  info: "text-brand-pink",
-  success: "text-brand-green",
-  error: "text-red-500",
-  warning: "text-amber-500",
+  info: "text-info",
+  success: "text-success",
+  error: "text-danger",
+  warning: "text-warning",
 };
 
 const ENTER_MS = 280;
@@ -59,13 +60,13 @@ const EXIT_MS = 260;
 function toneClasses(tone: ToastTone): string {
   switch (tone) {
     case "success":
-      return "border-brand-green/40 bg-white text-ink shadow-[0_8px_24px_-8px_rgba(95,175,106,0.45)]";
+      return "border-success/30 bg-surface-elevated text-text shadow-lg";
     case "error":
-      return "border-red-300 bg-white text-ink shadow-[0_8px_24px_-8px_rgba(239,68,68,0.35)]";
+      return "border-danger/30 bg-surface-elevated text-text shadow-lg";
     case "warning":
-      return "border-amber-300 bg-white text-ink shadow-[0_8px_24px_-8px_rgba(245,158,11,0.4)]";
+      return "border-warning/40 bg-surface-elevated text-text shadow-lg";
     default:
-      return "border-brand-pink/35 bg-white text-ink shadow-[0_8px_24px_-8px_rgba(224,122,150,0.45)]";
+      return "border-info/30 bg-surface-elevated text-text shadow-lg";
   }
 }
 
@@ -80,6 +81,7 @@ function ToastCard({
 }) {
   const tone = item.tone ?? "info";
   const Icon = TONE_ICON[tone];
+  const t = useT();
   const [entered, setEntered] = useState(false);
   const exitTimer = useRef<number | null>(null);
 
@@ -122,7 +124,7 @@ function ToastCard({
       <button
         type="button"
         className="inline-flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-full text-ink-muted transition-colors hover:bg-gray-soft hover:text-ink"
-        aria-label="Dismiss"
+        aria-label={t.chrome.dismiss}
         onClick={() => onRequestClose(item.id)}
       >
         <X size={16} strokeWidth={2.25} aria-hidden />

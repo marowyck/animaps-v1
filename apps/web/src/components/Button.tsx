@@ -1,19 +1,19 @@
 "use client";
 
-import {
-  useCallback,
-  useRef,
-  useState,
-  type AnchorHTMLAttributes,
-  type ButtonHTMLAttributes,
-  type MouseEvent,
-  type ReactNode,
-  type RefObject,
+import { Loader2 } from "lucide-react";
+import type {
+  AnchorHTMLAttributes,
+  ButtonHTMLAttributes,
+  ReactNode,
 } from "react";
-import { gsap } from "gsap";
-import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
 
 export type ButtonVariant =
+  | "primary"
+  | "secondary"
+  | "outline"
+  | "ghost"
+  | "danger"
+  | "link"
   | "pink"
   | "orange"
   | "blue"
@@ -21,7 +21,6 @@ export type ButtonVariant =
   | "white"
   | "ink"
   | "soft"
-  | "ghost"
   | "segment"
   | "field";
 
@@ -31,13 +30,13 @@ type SharedProps = {
   children: ReactNode;
   variant?: ButtonVariant;
   size?: ButtonSize;
+  /** Kept for call-site compatibility. Motion is a short press, not a magnetic pull. */
   magnetic?: boolean;
-  /** Active state for `segment` (e.g. locale pills). */
   selected?: boolean;
-  /** Surface behind `segment` pills. */
   tone?: "light" | "dark";
   className?: string;
   disabled?: boolean;
+  loading?: boolean;
 };
 
 type AsButton = SharedProps &
@@ -52,83 +51,68 @@ type AsLink = SharedProps &
 
 export type ButtonProps = AsButton | AsLink;
 
-const FILL = {
-  pink: { base: "bg-brand-pink text-white", fill: "bg-brand-pink-hover", textHover: "" },
-  orange: { base: "bg-brand-pink text-white", fill: "bg-brand-pink-hover", textHover: "" },
-  blue: { base: "bg-brand-blue text-white", fill: "bg-brand-blue-hover", textHover: "" },
-  green: { base: "bg-brand-green text-white", fill: "bg-brand-green-hover", textHover: "" },
-  white: {
-    base: "bg-white border-2 border-brand-green/45 text-ink",
-    fill: "bg-brand-green",
-    textHover: "group-hover:text-white",
-  },
-} as const;
-
 const SIZE: Record<ButtonSize, string> = {
-  md: "min-h-12 min-w-[13.5rem] justify-center px-6 py-3 text-base font-semibold",
-  sm: "min-h-11 justify-center px-4 py-2.5 text-sm font-bold tracking-tight sm:px-5 sm:text-[0.95rem]",
-  xs: "min-h-9 justify-center px-2.5 text-xs font-bold tracking-wide",
+  md: "min-h-12 justify-center px-5 py-3 text-body-sm font-semibold",
+  sm: "min-h-10 justify-center px-4 py-2 text-body-sm font-semibold",
+  xs: "min-h-8 justify-center px-3 text-caption font-semibold",
   icon: "size-11 shrink-0 justify-center p-0",
-  stretch: "w-full justify-between gap-4 px-6 py-5 text-left text-base font-black",
-  field: "w-full justify-between gap-3 rounded-full border-2 px-5 py-3.5 text-left font-bold",
+  stretch: "w-full justify-between gap-4 px-5 py-4 text-left text-body font-semibold",
+  field: "w-full justify-between gap-3 rounded-xl border px-4 py-3 text-left font-semibold",
 };
 
-function isFillVariant(
-  variant: ButtonVariant,
-): variant is keyof typeof FILL {
-  return variant in FILL;
+function resolveVariant(variant: ButtonVariant): ButtonVariant {
+  switch (variant) {
+    case "pink":
+    case "orange":
+      return "primary";
+    case "white":
+      return "outline";
+    case "blue":
+      return "secondary";
+    default:
+      return variant;
+  }
 }
 
 function skinClasses(
   variant: ButtonVariant,
   selected: boolean,
   tone: "light" | "dark",
-): { base: string; fill?: string; textHover?: string; useFill: boolean } {
-  if (isFillVariant(variant)) {
-    const skin = FILL[variant];
-    return { ...skin, useFill: true };
-  }
-
-  switch (variant) {
+): string {
+  switch (resolveVariant(variant)) {
+    case "green":
+      return "bg-success text-surface-elevated shadow-sm hover:brightness-95";
+    case "primary":
+      return "bg-primary text-surface-elevated shadow-sm hover:bg-primary-hover hover:shadow-[var(--shadow-glow-primary)] active:bg-primary-active";
+    case "secondary":
+      return "bg-secondary text-surface-elevated shadow-sm hover:bg-secondary-hover hover:shadow-[var(--shadow-glow-secondary)]";
+    case "outline":
+      return "border border-border bg-surface text-text hover:border-primary/40 hover:bg-primary-soft";
+    case "danger":
+      return "bg-danger text-surface-elevated shadow-sm hover:brightness-95";
+    case "link":
+      return "h-auto min-h-0 bg-transparent px-0 py-0 text-primary underline-offset-4 hover:underline";
     case "ink":
-      return {
-        base: "bg-ink text-white shadow-none hover:scale-105 active:scale-95",
-        useFill: false,
-      };
+      return "bg-text text-surface-elevated hover:opacity-90";
     case "soft":
-      return {
-        base: selected
-          ? "bg-brand-green text-white shadow-none hover:bg-brand-green-hover active:scale-95"
-          : "bg-pastel-green text-brand-green shadow-none hover:scale-105 hover:bg-brand-green hover:text-white active:scale-95",
-        useFill: false,
-      };
+      return selected
+        ? "bg-primary text-surface-elevated"
+        : "bg-primary-soft text-primary hover:bg-primary hover:text-surface-elevated";
     case "ghost":
-      return {
-        base: "bg-transparent text-ink shadow-none",
-        useFill: false,
-      };
+      return "bg-transparent text-text hover:bg-surface-hover";
     case "segment":
       if (tone === "dark") {
-        return {
-          base: selected
-            ? "bg-brand-pink text-white shadow-sm"
-            : "bg-transparent text-white/55 hover:text-white/85",
-          useFill: false,
-        };
+        return selected
+          ? "bg-primary text-surface-elevated shadow-sm"
+          : "bg-transparent text-surface/70 hover:text-surface";
       }
-      return {
-        base: selected
-          ? "bg-brand-pink text-white shadow-sm"
-          : "bg-transparent text-ink-muted hover:bg-white hover:text-ink",
-        useFill: false,
-      };
+      return selected
+        ? "bg-primary text-surface-elevated shadow-sm"
+        : "bg-transparent text-text-secondary hover:bg-surface hover:text-text";
     case "field":
-      return {
-        base: "border-border-soft bg-gray-soft text-ink shadow-none outline-none focus:border-brand-pink focus:bg-white",
-        useFill: false,
-      };
+      return "border-border bg-background text-text shadow-none outline-none focus:border-primary focus:bg-surface";
     default:
-      return { base: "", useFill: false };
+      return "";
   }
 }
 
@@ -137,139 +121,56 @@ export function Button({
   href,
   className = "",
   disabled = false,
-  variant = "pink",
+  loading = false,
+  variant = "primary",
   size = "md",
-  magnetic,
   selected = false,
   tone = "light",
+  magnetic: _magnetic,
   ...rest
 }: ButtonProps) {
-  const ref = useRef<HTMLAnchorElement | HTMLButtonElement>(null);
-  const fillRef = useRef<HTMLSpanElement>(null);
-  const reduced = usePrefersReducedMotion();
-  const [hovered, setHovered] = useState(false);
-
+  void _magnetic;
   const resolvedSize = variant === "field" && size === "md" ? "field" : size;
-  const skin = skinClasses(variant, selected, tone);
-  /** Magnetic pull is optional; fill hover stays on for fill variants. */
-  const magneticOn = magnetic ?? false;
-  const showFill = skin.useFill && resolvedSize === "md";
-
-  const handleMove = useCallback(
-    (e: MouseEvent) => {
-      if (!magneticOn || reduced || disabled) return;
-      const el = ref.current;
-      if (!el) return;
-      const rect = el.getBoundingClientRect();
-      const x = e.clientX - rect.left - rect.width / 2;
-      const y = e.clientY - rect.top - rect.height / 2;
-      el.style.transform = `translate(${x * 0.12}px, ${y * 0.12}px)`;
-    },
-    [magneticOn, reduced, disabled],
-  );
-
-  const handleEnter = useCallback(
-    (e: MouseEvent) => {
-      setHovered(true);
-      if (!showFill || reduced || disabled) return;
-      const fill = fillRef.current;
-      if (!fill) return;
-      const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-      const x = ((e.clientX - rect.left) / rect.width) * 100;
-      const y = ((e.clientY - rect.top) / rect.height) * 100;
-      gsap.set(fill, { clipPath: `circle(0% at ${x}% ${y}%)` });
-      gsap.to(fill, {
-        clipPath: `circle(150% at ${x}% ${y}%)`,
-        duration: 0.45,
-        ease: "power2.out",
-      });
-    },
-    [showFill, reduced, disabled],
-  );
-
-  const handleLeave = useCallback(() => {
-    setHovered(false);
-    const el = ref.current;
-    if (el) el.style.transform = "translate(0, 0)";
-    if (!showFill || reduced) return;
-    const fill = fillRef.current;
-    if (!fill) return;
-    gsap.to(fill, {
-      clipPath: "circle(0% at 50% 50%)",
-      duration: 0.35,
-      ease: "power2.in",
-    });
-  }, [showFill, reduced]);
-
-  const pinkSm =
-    variant === "pink" && resolvedSize === "sm";
-  /** Soft fill hover for compact CTAs — no scale (avoids shadow/radius ghost). */
+  const isDisabled = disabled || loading;
   const base = [
-    "group relative inline-flex cursor-pointer items-center gap-2 overflow-hidden rounded-full transition-[transform,background-color,box-shadow,color,border-color] duration-200 ease-out active:scale-[0.98]",
-    "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-pink",
-    "disabled:cursor-not-allowed disabled:opacity-60 disabled:active:scale-100",
-    showFill ? "shadow-md" : "",
-    pinkSm
-      ? "shadow-[0_6px_16px_-4px_rgba(224,122,150,0.55)] hover:bg-brand-pink-hover hover:shadow-[0_10px_22px_-6px_rgba(224,122,150,0.55)] active:brightness-95"
-      : "",
-    !showFill && skin.useFill && !pinkSm ? "shadow-md" : "",
-    variant === "white"
-      ? "hover:border-brand-green hover:bg-brand-green hover:text-white"
-      : "",
+    "group relative inline-flex cursor-pointer items-center gap-2 rounded-full transition-[background-color,color,border-color,transform,box-shadow] duration-150 ease-out",
+    "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary",
+    "disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100",
+    "active:scale-[0.98]",
     SIZE[resolvedSize],
-    skin.base,
+    skinClasses(variant, selected, tone),
     className,
   ]
     .filter(Boolean)
     .join(" ");
 
   const content = (
-    <>
-      {showFill ? (
-        <span
-          ref={fillRef}
-          aria-hidden
-          className={`pointer-events-none absolute inset-0 z-0 ${skin.fill}`}
-          style={{ clipPath: "circle(0% at 50% 50%)" }}
-        />
-      ) : null}
-      <span
-        className={`relative z-10 inline-flex items-center gap-2 ${
-          resolvedSize === "stretch" || resolvedSize === "field"
-            ? "w-full justify-between"
-            : ""
-        } ${variant === "white" && hovered ? "text-white" : ""} ${skin.textHover ?? ""}`}
-      >
-        {children}
-      </span>
-    </>
+    <span
+      className={[
+        "relative z-10 inline-flex items-center gap-2",
+        resolvedSize === "stretch" || resolvedSize === "field" ? "w-full justify-between" : "",
+      ].join(" ")}
+    >
+      {loading ? <Loader2 className="size-4 animate-spin" aria-hidden /> : null}
+      {children}
+    </span>
   );
 
-  const motionHandlers = {
-    onMouseMove: handleMove,
-    onMouseEnter: handleEnter,
-    onMouseLeave: handleLeave,
-  };
-
   if (href) {
-    const { onClick, ...anchorRest } = rest as Omit<
-      AsLink,
-      keyof SharedProps | "href"
-    >;
+    const { onClick, ...anchorRest } = rest as Omit<AsLink, keyof SharedProps | "href">;
     return (
       <a
-        ref={ref as RefObject<HTMLAnchorElement>}
         href={href}
         className={base}
-        aria-disabled={disabled || undefined}
+        aria-disabled={isDisabled || undefined}
+        aria-busy={loading || undefined}
         onClick={(e) => {
-          if (disabled) {
+          if (isDisabled) {
             e.preventDefault();
             return;
           }
           onClick?.(e);
         }}
-        {...motionHandlers}
         {...anchorRest}
       >
         {content}
@@ -277,20 +178,51 @@ export function Button({
     );
   }
 
-  const { type = "button", ...buttonRest } = rest as Omit<
-    AsButton,
-    keyof SharedProps
-  >;
+  const { type = "button", ...buttonRest } = rest as Omit<AsButton, keyof SharedProps>;
   return (
     <button
-      ref={ref as RefObject<HTMLButtonElement>}
       type={type}
-      disabled={disabled}
+      disabled={isDisabled}
       className={base}
-      {...motionHandlers}
+      aria-busy={loading || undefined}
       {...buttonRest}
     >
       {content}
     </button>
   );
+}
+
+type NamedButtonProps = {
+  children: ReactNode;
+  href?: string;
+  className?: string;
+  disabled?: boolean;
+  loading?: boolean;
+  size?: ButtonSize;
+  type?: "button" | "submit" | "reset";
+  onClick?: () => void;
+};
+
+export function PrimaryButton(props: NamedButtonProps) {
+  return <Button variant="primary" {...props} />;
+}
+
+export function SecondaryButton(props: NamedButtonProps) {
+  return <Button variant="secondary" {...props} />;
+}
+
+export function OutlineButton(props: NamedButtonProps) {
+  return <Button variant="outline" {...props} />;
+}
+
+export function GhostButton(props: NamedButtonProps) {
+  return <Button variant="ghost" {...props} />;
+}
+
+export function DangerButton(props: NamedButtonProps) {
+  return <Button variant="danger" {...props} />;
+}
+
+export function LinkButton(props: NamedButtonProps) {
+  return <Button variant="link" {...props} />;
 }

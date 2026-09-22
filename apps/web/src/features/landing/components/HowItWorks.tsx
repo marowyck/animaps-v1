@@ -10,12 +10,9 @@ import {
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
-import { Button } from "@/components/Button";
 import { AnimatedContent } from "@/components/bits";
 import { useT } from "@/i18n";
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
-import { SectionDivider } from "./SectionDivider";
-import { ClayFigure } from "./ClayFigure";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -86,47 +83,34 @@ export function HowItWorks() {
     { scope: sectionRef, dependencies: [reduced, t.howItWorks.titleBefore] },
   );
 
-  const wiggle = (el: HTMLElement) => {
-    gsap.fromTo(
-      el,
-      { rotate: 0 },
-      {
-        rotate: 8,
-        duration: 0.12,
-        yoyo: true,
-        repeat: 5,
-        ease: "power1.inOut",
-        onComplete: () => gsap.set(el, { rotate: 0 }),
-      },
-    );
-  };
-
   return (
     <section
       id="how-it-works"
       ref={sectionRef}
-      className="relative z-10 flex min-h-[100svh] flex-col justify-center overflow-hidden bg-pastel-green py-20 md:py-24"
+      className="relative z-10 overflow-hidden bg-background px-5 py-24 sm:px-8 md:py-32"
     >
-      <SectionDivider fill="#ffffff" position="top" />
-
-      <div className="relative z-10 mx-auto w-full max-w-5xl px-4 pt-10 md:pt-12">
-        <div className="mb-8 flex flex-col items-center gap-4 md:mb-10 md:flex-row md:items-end md:justify-center md:gap-6">
+      <div className="relative z-10 mx-auto w-full max-w-6xl">
+        <div className="mb-10 flex flex-col items-center gap-4 md:flex-row md:items-end md:justify-center md:gap-6">
           <div className="max-w-2xl text-center md:text-left">
-            <h2 className="font-display mb-2 text-4xl tracking-tight text-ink md:text-5xl">
+            <h2 className="text-h1 text-text">
               {t.howItWorks.titleBefore}{" "}
               <span className="text-brand-pink">{t.howItWorks.titleHighlight}</span>
             </h2>
-            <p className="text-base text-ink-muted md:text-lg">{t.howItWorks.subtitle}</p>
+            <p className="text-body mt-4 text-text-secondary md:text-body-lg">{t.howItWorks.subtitle}</p>
           </div>
-          <ClayFigure
-            name="critter"
-            size={160}
-            className="w-[120px] shrink-0 rotate-[-6deg] md:w-[150px]"
-            sizes="(max-width: 768px) 240px, 300px"
-          />
         </div>
 
         <div className="relative mb-8">
+          <ol className="mb-4 flex items-center justify-center gap-2 md:hidden" aria-hidden>
+            {steps.map((step, index) => (
+              <li key={step.key} className="flex items-center gap-2">
+                <span className="size-2.5 rounded-full bg-primary" />
+                {index < steps.length - 1 ? (
+                  <span className="h-0.5 w-6 bg-primary/40" />
+                ) : null}
+              </li>
+            ))}
+          </ol>
           <svg
             className="pointer-events-none absolute inset-x-8 top-1/2 hidden h-16 -translate-y-1/2 opacity-50 md:block"
             viewBox="0 0 800 80"
@@ -137,7 +121,7 @@ export function HowItWorks() {
             <path
               ref={leashRef}
               d="M20 40 C 140 10, 260 70, 400 40 C 540 10, 660 70, 780 40"
-              stroke="#e07a96"
+              stroke="var(--primary)"
               strokeWidth="3"
               strokeLinecap="round"
             />
@@ -146,9 +130,9 @@ export function HowItWorks() {
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {steps.map((step, idx) => (
               <AnimatedContent key={step.key} delay={idx * 0.08} distance={24}>
-                <article
-                  className={`how-card group relative flex h-full flex-col items-center rounded-[1.75rem] border-2 ${step.border} bg-white p-5 text-center shadow-[0_12px_32px_-10px_rgba(224,122,150,0.3)] transition-transform duration-300 hover:-translate-y-1 hover:rotate-1`}
-                  onClick={(e) => wiggle(e.currentTarget)}
+                <button
+                  type="button"
+                  className={`how-card group relative flex h-full w-full cursor-pointer flex-col items-start rounded-2xl border border-border-subtle ${step.border} bg-surface p-5 text-left transition-colors duration-200 hover:border-primary/30 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary`}
                 >
                   <span
                     className={`absolute -top-2.5 left-4 flex h-8 w-8 items-center justify-center rounded-full font-display text-sm shadow-sm ${step.badge}`}
@@ -156,28 +140,20 @@ export function HowItWorks() {
                     {idx + 1}
                   </span>
                   <div
-                    className={`how-icon-wrap mb-4 flex h-14 w-14 items-center justify-center rounded-full ${step.color} shadow-sm ring-4 ring-white`}
+                    className={`how-icon-wrap mb-4 flex h-11 w-11 items-center justify-center rounded-xl ${step.color}`}
                   >
-                    <step.icon size={26} strokeWidth={2.25} />
+                    <step.icon size={26} strokeWidth={2.25} aria-hidden />
                   </div>
-                  <h3 className="mb-1.5 text-base font-bold tracking-tight text-ink md:text-lg">
-                    {step.title}
-                  </h3>
-                  <p className="text-xs leading-relaxed text-ink-muted md:text-sm">
+                  <span className="text-h4 mb-1.5 text-text">{step.title}</span>
+                  <span className="text-caption text-text-secondary md:text-body-sm">
                     {step.desc}
-                  </p>
-                </article>
+                  </span>
+                </button>
               </AnimatedContent>
             ))}
           </div>
         </div>
 
-        <div className="flex justify-center">
-          <Button href="/register" variant="pink">
-            <UserPlus size={18} />
-            {t.howItWorks.cta}
-          </Button>
-        </div>
       </div>
     </section>
   );

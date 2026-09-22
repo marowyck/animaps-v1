@@ -8,10 +8,12 @@ import {
   useState,
   type KeyboardEvent,
 } from "react";
-import { Check, ChevronDown } from "lucide-react";
+import { ChevronDown } from "lucide-react";
+import { SelectListbox } from "./SelectListbox";
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 import { Button } from "@/components/Button";
+import { useT } from "@/i18n";
 
 export type SelectOption = {
   value: string;
@@ -32,14 +34,6 @@ type SelectProps = {
   compact?: boolean;
 };
 
-const HOVER_COLORS = [
-  { bg: "#FFE4C4", text: "#F89D1C" },
-  { bg: "#D4EEF9", text: "#00A0E3" },
-  { bg: "#D8F0C8", text: "#68BC45" },
-  { bg: "#F0D4EE", text: "#92278F" },
-  { bg: "#FFF4B8", text: "#333333" },
-];
-
 function prefersReducedMotion(): boolean {
   if (typeof window === "undefined") return false;
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -50,7 +44,7 @@ export function Select({
   options,
   value,
   onChange,
-  placeholder = "Selecione…",
+  placeholder,
   name,
   required = false,
   disabled = false,
@@ -58,6 +52,8 @@ export function Select({
   error,
   compact = false,
 }: SelectProps) {
+  const t = useT();
+  const place = placeholder ?? t.chrome.selectPlaceholder;
   const [open, setOpen] = useState(false);
   const [highlight, setHighlight] = useState(-1);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -69,7 +65,7 @@ export function Select({
   const buttonId = `${uid}-button`;
 
   const selected = options.find((o) => o.value === value);
-  const displayLabel = selected?.label ?? placeholder;
+  const displayLabel = selected?.label ?? place;
 
   useGSAP(
     () => {
@@ -253,9 +249,9 @@ export function Select({
         disabled={disabled}
         onClick={() => !disabled && setOpen((v) => !v)}
         onKeyDown={onTriggerKeyDown}
-        className={`${open ? "border-brand-pink bg-white" : ""} ${
-          error ? "border-red-400" : ""
-        } ${selected ? "text-ink" : "text-ink-muted"} ${
+        className={`${open ? "border-primary bg-surface" : ""} ${
+          error ? "border-error" : ""
+        } ${selected ? "text-text" : "text-text-secondary"} ${
           compact ? "!px-5 !py-3 !text-[0.95rem]" : ""
         }`}
       >
@@ -270,56 +266,21 @@ export function Select({
         />
       </Button>
 
-      <ul
+      <SelectListbox
         id={listboxId}
-        ref={listRef}
-        role="listbox"
-        aria-labelledby={labelId}
-        tabIndex={-1}
-        className="absolute left-0 right-0 z-50 mt-2 origin-top scale-90 rounded-[1.75rem] border-2 border-border-soft bg-white/95 p-2 opacity-0 shadow-xl backdrop-blur-xl"
-        style={{ pointerEvents: "none" }}
-      >
-        {options.map((opt, index) => {
-          const isSelected = opt.value === value;
-          const isHighlighted = index === highlight;
-          const colors = HOVER_COLORS[index % HOVER_COLORS.length];
-
-          return (
-            <li
-              key={opt.value}
-              ref={(el) => {
-                optionRefs.current[index] = el;
-              }}
-              role="option"
-              aria-selected={isSelected}
-              id={`${uid}-option-${index}`}
-              onClick={() => selectOption(opt.value)}
-              onMouseEnter={() => setHighlight(index)}
-              className="flex cursor-pointer items-center justify-between gap-3 rounded-full px-4 py-3 text-sm font-bold transition-colors"
-              style={{
-                backgroundColor: isHighlighted
-                  ? colors.bg
-                  : isSelected
-                    ? "var(--pastel-pink)"
-                    : "transparent",
-                color: isHighlighted
-                  ? colors.text
-                  : isSelected
-                    ? "var(--brand-pink)"
-                    : "var(--ink)",
-              }}
-            >
-              <span>{opt.label}</span>
-              {isSelected ? (
-                <Check size={18} strokeWidth={2.5} aria-hidden />
-              ) : null}
-            </li>
-          );
-        })}
-      </ul>
+        labelId={labelId}
+        listRef={listRef}
+        optionRefs={optionRefs}
+        options={options}
+        value={value}
+        highlight={highlight}
+        uid={uid}
+        onSelect={selectOption}
+        onHighlight={setHighlight}
+      />
 
       {error ? (
-        <span className="mt-1.5 block text-sm font-bold text-red-500" role="alert">
+        <span className="text-body-sm mt-1.5 block font-bold text-error" role="alert">
           {error}
         </span>
       ) : null}

@@ -12,6 +12,7 @@ import {
   type AnalyticsPeriod,
 } from "../analytics";
 import { SoftGateBanner } from "../SoftGateBanner";
+import { WorkspaceHeader } from "../WorkspaceHeader";
 import { isInstitutionOperational } from "../metrics";
 import { ConnectionsCard } from "./ConnectionsCard";
 import { ExportAggregatesCard } from "./ExportAggregatesCard";
@@ -108,17 +109,11 @@ export function InstitutionIntegrationsShell() {
 
   return (
     <div className="space-y-5">
-      <header>
-        <h1 className="font-display text-3xl text-ink">
-          {t.institution.integrations.title}
-        </h1>
-        <p className="mt-1 text-sm text-ink-muted">
-          {t.institution.integrations.subtitle}
-        </p>
-        <p className="mt-2 text-xs font-semibold text-ink-muted">
-          {t.institution.integrations.honesty}
-        </p>
-      </header>
+      <WorkspaceHeader
+        title={t.institution.integrations.title}
+        subtitle={t.institution.integrations.subtitle}
+        note={t.institution.integrations.honesty}
+      />
 
       {!verified ? <SoftGateBanner /> : null}
       {!verified ? (

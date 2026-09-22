@@ -1,7 +1,7 @@
 "use client";
 
 import { Check } from "lucide-react";
-import { Card } from "@/components/Card";
+import { PawDoodle } from "@/components/illustrations/Doodles";
 import { useT } from "@/i18n";
 import { OnboardingLayout } from "./OnboardingLayout";
 import { useOnboarding } from "./OnboardingProvider";
@@ -37,11 +37,11 @@ export function GuidelinesStep() {
       continueLabel={t.onboarding.guidelines.accept}
       footerAlign="center"
     >
-      <Card className="mx-auto w-full max-w-xl space-y-3">
+      <div className="mx-auto w-full max-w-xl">
         <ul className="space-y-3">
           {RULE_KEYS.map((key) => (
-            <li key={key} className="flex items-start gap-3 text-sm text-ink">
-              <span className="mt-0.5 inline-flex size-6 shrink-0 items-center justify-center rounded-full bg-pastel-green text-brand-green">
+            <li key={key} className="flex items-start gap-3 text-body-sm text-text">
+              <span className="mt-0.5 inline-flex size-7 shrink-0 items-center justify-center rounded-full bg-success-soft text-(--mint-700)">
                 <Check className="size-3.5" aria-hidden />
               </span>
               <span className="font-semibold leading-snug">
@@ -50,22 +50,25 @@ export function GuidelinesStep() {
             </li>
           ))}
         </ul>
-        <p className="pt-2 text-xs leading-relaxed text-ink-muted">
-          {t.onboarding.guidelines.legalBefore}{" "}
-          <a href="#" className="font-bold text-brand-pink underline-offset-2 hover:underline">
-            {t.onboarding.guidelines.terms}
-          </a>
-          ,{" "}
-          <a href="#" className="font-bold text-brand-pink underline-offset-2 hover:underline">
-            {t.onboarding.guidelines.privacy}
-          </a>{" "}
-          {t.onboarding.guidelines.legalAnd}{" "}
-          <a href="#" className="font-bold text-brand-pink underline-offset-2 hover:underline">
-            {t.onboarding.guidelines.community}
-          </a>
-          .
+        <p className="mt-5 flex items-start gap-3 text-body-sm leading-relaxed text-text-secondary">
+          <PawDoodle className="mt-0.5 size-6 shrink-0 text-primary" />
+          <span>
+            {t.onboarding.guidelines.legalBefore}{" "}
+            <a href="#" className="font-semibold text-(--pink-700) underline-offset-2 hover:underline">
+              {t.onboarding.guidelines.terms}
+            </a>
+            ,{" "}
+            <a href="#" className="font-semibold text-(--pink-700) underline-offset-2 hover:underline">
+              {t.onboarding.guidelines.privacy}
+            </a>{" "}
+            {t.onboarding.guidelines.legalAnd}{" "}
+            <a href="#" className="font-semibold text-(--pink-700) underline-offset-2 hover:underline">
+              {t.onboarding.guidelines.community}
+            </a>
+            .
+          </span>
         </p>
-      </Card>
+      </div>
     </OnboardingLayout>
   );
 }

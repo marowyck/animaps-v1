@@ -5,6 +5,7 @@ import { CaseList } from "@/features/cases";
 import type { CasePriority, CaseRecord, CaseStatus } from "@/features/cases";
 import { useT } from "@/i18n";
 import { SoftGateBanner } from "./SoftGateBanner";
+import { WorkspaceHeader } from "./WorkspaceHeader";
 
 type InstitutionCasesInboxProps = {
   cases: CaseRecord[];
@@ -38,34 +39,36 @@ export function InstitutionCasesInbox({
     });
   }, [cases, query, priority, status]);
 
+  const fieldClass =
+    "w-full rounded-full border border-border bg-background px-4 py-2.5 text-body-sm text-text outline-none focus-visible:border-primary focus-visible:bg-surface";
+
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
+      <WorkspaceHeader
+        title={t.dashboard.nav.cases ?? t.institution.overview.openInbox}
+        subtitle={verified ? undefined : t.institution.inbox.readOnlyHint}
+      />
+
       {!verified ? <SoftGateBanner /> : null}
 
-      {!verified ? (
-        <p className="text-sm text-ink-muted">
-          {t.institution.inbox.readOnlyHint}
-        </p>
-      ) : null}
-
-      <div className="grid gap-2 sm:grid-cols-3">
-        <label className="block space-y-1">
-          <span className="text-xs font-bold text-ink">
+      <div className="grid gap-3 sm:grid-cols-3">
+        <label className="block space-y-1.5">
+          <span className="text-caption font-semibold text-text-secondary">
             {t.institution.inbox.search}
           </span>
           <input
-            className="w-full rounded-2xl border-2 border-border-soft bg-white px-3 py-2 text-sm outline-none focus-visible:border-brand-green"
+            className={fieldClass}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder={t.institution.inbox.searchPlaceholder}
           />
         </label>
-        <label className="block space-y-1">
-          <span className="text-xs font-bold text-ink">
+        <label className="block space-y-1.5">
+          <span className="text-caption font-semibold text-text-secondary">
             {t.institution.inbox.priority}
           </span>
           <select
-            className="w-full rounded-2xl border-2 border-border-soft bg-white px-3 py-2 text-sm outline-none focus-visible:border-brand-green"
+            className={fieldClass}
             value={priority}
             onChange={(e) => setPriority(e.target.value as PriorityFilter)}
           >
@@ -76,12 +79,12 @@ export function InstitutionCasesInbox({
             <option value="low">{t.cases.priority.low}</option>
           </select>
         </label>
-        <label className="block space-y-1">
-          <span className="text-xs font-bold text-ink">
+        <label className="block space-y-1.5">
+          <span className="text-caption font-semibold text-text-secondary">
             {t.institution.inbox.status}
           </span>
           <select
-            className="w-full rounded-2xl border-2 border-border-soft bg-white px-3 py-2 text-sm outline-none focus-visible:border-brand-green"
+            className={fieldClass}
             value={status}
             onChange={(e) => setStatus(e.target.value as StatusFilter)}
           >
@@ -98,10 +101,25 @@ export function InstitutionCasesInbox({
         </label>
       </div>
 
+      <p className="text-caption text-text-muted" aria-live="polite">
+        {t.institution.inbox.resultCount.replace("{count}", String(filtered.length))}
+      </p>
+
       <CaseList
         cases={filtered}
         mode="institution"
-        canCreate={verified}
+        showHeading={false}
+        canCreate={verified && cases.length === 0}
+        emptyTitle={
+          cases.length > 0 && filtered.length === 0
+            ? t.institution.inbox.filterEmpty
+            : undefined
+        }
+        emptyDescription={
+          cases.length > 0 && filtered.length === 0
+            ? t.institution.inbox.searchPlaceholder
+            : undefined
+        }
       />
     </div>
   );

@@ -1,13 +1,15 @@
 "use client";
 
 import { useRef } from "react";
+import Image from "next/image";
 import { Heart, Building2, Stethoscope, Landmark } from "lucide-react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import { useT } from "@/i18n";
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
-import { ClayFigure } from "./ClayFigure";
+import { Blob } from "@/components/bits";
+import { SectionDivider } from "./SectionDivider";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -42,6 +44,9 @@ const AUDIENCE_META = [
   },
 ];
 
+const PHOTO_MASK =
+  "polygon(58% 2%, 74% 0%, 88% 7%, 98% 20%, 100% 40%, 97% 58%, 92% 76%, 80% 92%, 62% 99%, 44% 100%, 26% 94%, 12% 82%, 2% 64%, 0% 44%, 4% 26%, 16% 12%, 34% 4%)";
+
 export function AudienceCards() {
   const t = useT();
   const wrapRef = useRef<HTMLElement>(null);
@@ -56,6 +61,16 @@ export function AudienceCards() {
   useGSAP(
     () => {
       if (reduced || !wrapRef.current) return;
+      const photo = wrapRef.current.querySelector<HTMLElement>("[data-float]");
+      if (photo) {
+        gsap.to(photo, {
+          y: -10,
+          duration: 3.4,
+          ease: "sine.inOut",
+          yoyo: true,
+          repeat: -1,
+        });
+      }
       const cards = wrapRef.current.querySelectorAll<HTMLElement>(".polaroid-card");
 
       gsap.fromTo(
@@ -81,6 +96,7 @@ export function AudienceCards() {
   );
 
   const flipCaption = (el: HTMLElement) => {
+    if (reduced) return;
     const cap = el.querySelector(".polaroid-cap");
     if (!cap) return;
     gsap.fromTo(
@@ -88,7 +104,9 @@ export function AudienceCards() {
       { scale: 1 },
       {
         scale: 1.15,
-        color: "#e07a96",
+        color: getComputedStyle(document.documentElement)
+          .getPropertyValue("--primary")
+          .trim(),
         duration: 0.25,
         yoyo: true,
         repeat: 1,
@@ -101,59 +119,75 @@ export function AudienceCards() {
     <section
       id="audience"
       ref={wrapRef}
-      className="relative z-10 flex min-h-[100svh] flex-col justify-center overflow-hidden bg-gray-soft px-4 py-16 md:py-20"
+      className="relative z-10 flex min-h-[100svh] flex-col justify-center overflow-hidden bg-gray-soft px-5 py-24 sm:px-8 md:py-32"
     >
-      <div className="relative z-10 mx-auto grid w-full max-w-7xl items-center gap-6 lg:grid-cols-12 lg:gap-6 xl:max-w-[90rem] xl:gap-8">
+      <div className="relative z-10 mx-auto grid w-full max-w-6xl items-center gap-10 lg:grid-cols-12 lg:gap-12">
         <div className="min-w-0 lg:col-span-5">
           <p className="mb-2 text-xs font-bold uppercase tracking-wider text-brand-green">
             {t.audience.eyebrow}
           </p>
-          <h2 className="font-display mb-3 text-4xl leading-tight tracking-tight text-ink md:text-5xl">
+          <h2 className="text-h1 text-text">
             {t.audience.titleBefore}{" "}
-            <span className="text-brand-green">{t.audience.titleHighlight}</span>
+            <span className="text-(--mint-700)">{t.audience.titleHighlight}</span>
           </h2>
-          <p className="mb-8 max-w-lg text-sm text-ink-muted md:text-base">
+          <p className="text-body mt-4 mb-10 max-w-lg text-text-secondary">
             {t.audience.body}
           </p>
 
           <div className="grid gap-4 sm:grid-cols-2">
             {audiences.map((a) => (
-              <article
+              <button
                 key={a.key}
-                className={`polaroid-card group cursor-pointer rounded-[1.5rem] p-3 shadow-[0_14px_32px_-12px_rgba(224,122,150,0.3)] transition-transform duration-300 hover:z-10 hover:!rotate-0 hover:scale-105 ${a.tone} ${a.rotateClass}`}
+                id={`audience-${a.key}`}
+                type="button"
+                className={`polaroid-card group cursor-pointer rounded-2xl border border-border-subtle p-3 text-left transition-colors duration-200 hover:border-primary/30 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${a.tone}`}
                 onClick={(e) => flipCaption(e.currentTarget)}
               >
                 <div className="rounded-[1.1rem] bg-white/85 px-5 py-4">
                   <div
                     className={`mb-2.5 flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-sm ${a.iconColor}`}
                   >
-                    <a.icon size={18} strokeWidth={2.25} />
+                    <a.icon size={18} strokeWidth={2.25} aria-hidden />
                   </div>
-                  <h3 className="text-sm font-bold tracking-tight text-ink md:text-base">
-                    {a.title}
-                  </h3>
-                  <p className="mt-1 text-xs leading-relaxed text-ink-muted md:text-sm">
+                  <span className="text-h4 block text-text">{a.title}</span>
+                  <span className="text-caption mt-1 block text-text-secondary md:text-body-sm">
                     {a.body}
-                  </p>
+                  </span>
                 </div>
-                <p className="polaroid-cap mt-1.5 px-2 pb-0.5 text-center font-display text-xs text-ink/45">
-                  ANIMAPS
-                </p>
-              </article>
+                <span className="polaroid-cap text-caption mt-1.5 block px-2 pb-0.5 text-center font-display text-text/45">
+                  {t.brand}
+                </span>
+              </button>
             ))}
           </div>
         </div>
 
         <div className="relative flex w-full items-center justify-center lg:col-span-7 lg:justify-end">
-          <ClayFigure
-            name="family"
-            size={720}
-            priority
-            className="relative z-10 w-[min(100%,560px)] sm:w-[min(100%,640px)] lg:w-[min(100%,720px)]"
-            sizes="(max-width: 640px) 90vw, (max-width: 1024px) 640px, 720px"
-          />
+          <div data-float className="relative w-full max-w-xl">
+            <Blob
+              variant={0}
+              className="absolute -top-8 -left-8 size-28 text-primary/25 sm:size-36"
+            />
+            <Blob
+              variant={2}
+              className="absolute -right-6 -bottom-8 size-36 text-secondary/30"
+            />
+            <div
+              className="relative aspect-[5/4] w-full bg-surface-accent shadow-lg"
+              style={{ clipPath: PHOTO_MASK }}
+            >
+              <Image
+                src="/images/hero-pet.jpg"
+                alt={t.hero.imageAlt}
+                fill
+                sizes="(max-width: 1024px) 90vw, 36rem"
+                className="object-cover"
+              />
+            </div>
+          </div>
         </div>
       </div>
+      <SectionDivider fill="var(--pastel-yellow)" />
     </section>
   );
 }

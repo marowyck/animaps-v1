@@ -4,7 +4,7 @@ import { DashboardShell } from "@/features/dashboard";
 import { InstitutionProfile } from "@/features/institution";
 import { useOnboarding } from "@/features/onboarding";
 import { useT } from "@/i18n";
-import { LoadingState, EmptyState } from "@/components/StateBlocks";
+import { LoadingState } from "@/components/StateBlocks";
 import { Button } from "@/components/Button";
 
 export default function SettingsPage() {
@@ -24,15 +24,22 @@ export default function SettingsPage() {
       {userType === "INSTITUTION" ? (
         <InstitutionProfile mode="settings" />
       ) : (
-        <EmptyState
-          title={t.institution.settings.genericTitle}
-          description={t.institution.settings.genericBody}
-          action={
-            <Button href="/dashboard" variant="pink" size="sm">
-              {t.cases.detail.back}
-            </Button>
-          }
-        />
+        <div className="mx-auto flex max-w-2xl flex-col gap-5">
+          <header>
+            <h1 className="text-h1 text-text">
+              {t.institution.settings.genericTitle}
+            </h1>
+            <p className="mt-2 max-w-md text-body-sm text-text-secondary">
+              {t.institution.settings.genericBody}
+            </p>
+          </header>
+          <p className="text-body text-text">
+            {draft.email ?? t.profilePage.emptyIntentions}
+          </p>
+          <Button href="/profile" variant="primary" size="sm">
+            {t.dashboard.nav.profile}
+          </Button>
+        </div>
       )}
     </DashboardShell>
   );

@@ -1,6 +1,5 @@
 "use client";
 
-import { Card } from "@/components/Card";
 import { useT } from "@/i18n";
 
 type CaseDetailClaimBannerProps = {
@@ -16,9 +15,9 @@ export function CaseDetailClaimBanner({
 }: CaseDetailClaimBannerProps) {
   const t = useT();
   return (
-    <Card className="border-brand-pink/40 bg-pastel-pink/30 p-4">
-      <p className="text-sm font-bold text-ink">{t.cases.claim.saveToken}</p>
-      <p className="mt-1 font-mono text-lg font-bold tracking-wide text-ink">
+    <div className="rounded-[1.6rem] bg-primary-soft px-5 py-4">
+      <p className="text-body-sm font-semibold text-(--pink-700)">{t.cases.claim.saveToken}</p>
+      <p className="mt-1 font-display text-2xl tracking-wide text-text">
         {token}
       </p>
       <button
@@ -35,6 +34,6 @@ export function CaseDetailClaimBanner({
       >
         {t.cases.claim.dismissToken}
       </button>
-    </Card>
+    </div>
   );
 }

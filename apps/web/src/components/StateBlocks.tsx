@@ -1,7 +1,8 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { AlertCircle, CheckCircle2, Inbox, Loader2 } from "lucide-react";
+import { AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
+import { PawDoodle } from "./illustrations/Doodles";
 
 type StateBlockProps = {
   title: string;
@@ -20,18 +21,18 @@ function StateShell({
   return (
     <div
       className={[
-        "flex flex-col items-center gap-3 rounded-3xl border-2 border-dashed border-border-soft bg-white px-6 py-12 text-center animate-fade-in-up",
+        "flex flex-col items-center gap-3 rounded-3xl border border-dashed border-border bg-surface px-6 py-12 text-center animate-fade-in-up",
         className,
       ]
         .filter(Boolean)
         .join(" ")}
     >
-      <span className="text-brand-pink" aria-hidden>
+      <span className="flex size-12 items-center justify-center rounded-2xl bg-primary-soft text-primary" aria-hidden>
         {icon}
       </span>
-      <h3 className="text-lg font-bold text-ink">{title}</h3>
+      <h3 className="text-h4 text-text">{title}</h3>
       {description ? (
-        <p className="max-w-sm text-sm text-ink-muted">{description}</p>
+        <p className="max-w-sm text-body-sm text-text-secondary">{description}</p>
       ) : null}
       {action}
     </div>
@@ -39,7 +40,7 @@ function StateShell({
 }
 
 export function EmptyState(props: StateBlockProps) {
-  return <StateShell icon={<Inbox className="size-8" />} {...props} />;
+  return <StateShell icon={<PawDoodle className="size-8" />} {...props} />;
 }
 
 export function LoadingState({

@@ -34,7 +34,7 @@ export function ProfileAvatar({
         src={src}
         alt={label}
         className={[
-          "rounded-full object-cover ring-2 ring-border-soft",
+          "rounded-full object-cover ring-2 ring-surface",
           SIZE[size],
           className,
         ]
@@ -49,7 +49,7 @@ export function ProfileAvatar({
       role="img"
       aria-label={label}
       className={[
-        "inline-flex items-center justify-center rounded-full bg-pastel-green font-bold text-brand-green ring-2 ring-border-soft",
+        "inline-flex items-center justify-center rounded-full bg-primary-soft font-semibold text-primary ring-2 ring-surface",
         SIZE[size],
         className,
       ]

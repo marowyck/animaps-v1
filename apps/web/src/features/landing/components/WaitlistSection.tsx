@@ -9,14 +9,14 @@ export function WaitlistSection() {
   return (
     <section
       id="register"
-      className="relative z-10 overflow-visible bg-gray-soft px-4 py-20 md:py-24"
+      className="relative z-10 overflow-visible bg-gray-soft px-5 py-24 sm:px-8 md:py-32"
     >
-      <div className="relative z-10 mx-auto grid max-w-6xl gap-10 overflow-visible pt-4 md:grid-cols-12 md:pt-6">
+      <div className="relative z-10 mx-auto grid max-w-6xl gap-10 overflow-visible md:grid-cols-12">
         <div className="md:col-span-5">
           <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-brand-pink">
             {t.waitlist.eyebrow}
           </p>
-          <h2 className="font-display text-3xl leading-tight tracking-tight text-ink md:text-4xl">
+          <h2 className="text-h1 text-text">
             {t.waitlist.titleBefore}{" "}
             <span className="text-brand-pink">{t.waitlist.titleHighlight}</span>
           </h2>

@@ -13,11 +13,11 @@ type VerificationStatusBadgeProps = {
 };
 
 const STYLES: Record<VerificationStatus, string> = {
-  pending: "bg-gray-soft text-ink-muted border-border-soft",
-  processing: "bg-pastel-blue text-brand-blue border-brand-blue/30 animate-pulse",
-  approved: "bg-pastel-green text-brand-green border-brand-green/40",
-  rejected: "bg-red-50 text-error border-error/30",
-  retry_required: "bg-amber-50 text-warning border-warning/30",
+  pending: "bg-background-secondary text-text-secondary border-border-subtle",
+  processing: "bg-info-soft text-info border-info/30",
+  approved: "bg-success-soft text-success border-success/30",
+  rejected: "bg-danger-soft text-danger border-danger/30",
+  retry_required: "bg-warning-soft text-warning border-warning/40",
 };
 
 export function VerificationStatusBadge({
@@ -27,7 +27,7 @@ export function VerificationStatusBadge({
   return (
     <span
       className={[
-        "inline-flex items-center rounded-full border-2 px-3 py-1 text-xs font-bold uppercase tracking-wide",
+        "inline-flex items-center rounded-full border px-3 py-1 text-caption font-semibold",
         STYLES[status],
       ].join(" ")}
     >

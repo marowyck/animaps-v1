@@ -2,7 +2,6 @@
 
 import { FormEvent, useMemo, useState } from "react";
 import { Button } from "@/components/Button";
-import { Card } from "@/components/Card";
 import { useToast } from "@/components/Toast";
 import { useRoutingCatalog } from "@/features/institution/routing/useRoutingCatalog";
 import { matchInstitutions } from "@/features/institution/routing/matcher";
@@ -96,35 +95,38 @@ export function CaseRoutingPanel({ record, verified }: CaseRoutingPanelProps) {
   }
 
   return (
-    <Card className="space-y-3 p-4">
-      <h2 className="text-sm font-bold text-ink">{t.cases.routing.title}</h2>
-      <p className="text-xs text-ink-muted">{t.cases.routing.hint}</p>
+    <section className="space-y-3">
+      <h2 className="text-h4 text-text">{t.cases.routing.title}</h2>
+      <p className="text-body-sm text-text-secondary">{t.cases.routing.hint}</p>
 
       {record.routings.length === 0 ? (
-        <p className="text-xs font-semibold text-ink-muted">
+        <p className="text-body-sm text-text-secondary">
           {t.cases.routing.empty}
         </p>
       ) : (
-        <ul className="divide-y divide-border-soft text-sm">
+        <ul className="space-y-2">
           {record.routings.map((r) => (
-            <li key={r.id} className="py-2">
-              <p className="font-semibold text-ink">
+            <li key={r.id} className="flex gap-3">
+              <span className="mt-1 h-auto w-1.5 shrink-0 self-stretch rounded-full bg-info" aria-hidden />
+              <div>
+              <p className="text-body-sm font-semibold text-text">
                 {r.toInstitutionLabel ?? "—"}
               </p>
-              <p className="text-xs text-ink-muted">
+              <p className="text-caption text-text-muted">
                 {t.cases.routing.reasons[r.reason]}
                 {r.fromInstitutionLabel
                   ? ` · ${t.cases.routing.from} ${r.fromInstitutionLabel}`
                   : ""}
                 {r.note ? ` · ${translateSystemText(r.note, t)}` : ""}
               </p>
+              </div>
             </li>
           ))}
         </ul>
       )}
 
-      <div className="rounded-2xl border border-border-soft bg-white/80 px-3 py-2 text-xs text-ink-muted">
-        <p className="font-bold text-ink">{t.cases.routing.preview}</p>
+      <div className="rounded-[1.4rem] bg-info-soft px-4 py-3 text-body-sm text-text-secondary">
+        <p className="font-semibold text-(--sky-700)">{t.cases.routing.preview}</p>
         <p className="mt-1">
           {preview.status === "matched"
             ? t.cases.routing.previewMatch.replace(
@@ -138,7 +140,7 @@ export function CaseRoutingPanel({ record, verified }: CaseRoutingPanelProps) {
       </div>
 
       {canRoute ? (
-        <Button type="button" size="sm" variant="pink" onClick={onRunMatcher}>
+        <Button type="button" size="sm" variant="primary" onClick={onRunMatcher}>
           {t.cases.routing.runMatcher}
         </Button>
       ) : !verified ? (
@@ -150,17 +152,17 @@ export function CaseRoutingPanel({ record, verified }: CaseRoutingPanelProps) {
       {canForward && otherInstitutions.length > 0 ? (
         <form
           onSubmit={onForward}
-          className="space-y-2 border-t border-border-soft pt-3"
+          className="space-y-2 pt-1"
         >
-          <p className="text-xs font-bold text-ink">
+          <p className="text-label text-text">
             {t.cases.routing.forwardTitle}
           </p>
           <label className="block space-y-1">
-            <span className="text-xs font-bold text-ink">
+            <span className="text-label text-text">
               {t.cases.routing.forwardTo}
             </span>
             <select
-              className="w-full rounded-2xl border-2 border-border-soft bg-white px-3 py-2 text-sm outline-none focus-visible:border-brand-green"
+              className="w-full rounded-[1.25rem] border border-border bg-background px-4 py-2.5 text-body-sm text-text outline-none focus-visible:border-primary"
               value={forwardToId}
               onChange={(e) => setForwardToId(e.target.value)}
             >
@@ -173,11 +175,11 @@ export function CaseRoutingPanel({ record, verified }: CaseRoutingPanelProps) {
             </select>
           </label>
           <label className="block space-y-1">
-            <span className="text-xs font-bold text-ink">
+            <span className="text-label text-text">
               {t.cases.routing.forwardReason}
             </span>
             <select
-              className="w-full rounded-2xl border-2 border-border-soft bg-white px-3 py-2 text-sm outline-none focus-visible:border-brand-green"
+              className="w-full rounded-[1.25rem] border border-border bg-background px-4 py-2.5 text-body-sm text-text outline-none focus-visible:border-primary"
               value={forwardReason}
               onChange={(e) =>
                 setForwardReason(e.target.value as CaseRoutingReason)
@@ -191,11 +193,11 @@ export function CaseRoutingPanel({ record, verified }: CaseRoutingPanelProps) {
             </select>
           </label>
           <label className="block space-y-1">
-            <span className="text-xs font-bold text-ink">
+            <span className="text-label text-text">
               {t.cases.routing.forwardNote}
             </span>
             <input
-              className="w-full rounded-2xl border-2 border-border-soft bg-white px-3 py-2 text-sm outline-none focus-visible:border-brand-green"
+              className="w-full rounded-[1.25rem] border border-border bg-background px-4 py-2.5 text-body-sm text-text outline-none focus-visible:border-primary"
               value={forwardNote}
               onChange={(e) => setForwardNote(e.target.value)}
             />
@@ -205,6 +207,6 @@ export function CaseRoutingPanel({ record, verified }: CaseRoutingPanelProps) {
           </Button>
         </form>
       ) : null}
-    </Card>
+    </section>
   );
 }

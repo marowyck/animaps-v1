@@ -9,6 +9,7 @@ const MOCK_DISCOVER_BASE: DiscoverItem[] = [
     subtitle: "",
     tags: [],
     distanceKm: 3.2,
+    reciprocates: true,
   },
   {
     id: "p1",
@@ -33,6 +34,7 @@ const MOCK_DISCOVER_BASE: DiscoverItem[] = [
     subtitle: "",
     tags: [],
     distanceKm: 2.0,
+    reciprocates: true,
   },
   {
     id: "a2",

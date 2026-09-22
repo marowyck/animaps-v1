@@ -1,255 +1,171 @@
 "use client";
 
 import { useRef } from "react";
+import Image from "next/image";
+import { ArrowDown, MapPin, PawPrint } from "lucide-react";
 import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { SplitText as GSAPSplitText } from "gsap/SplitText";
 import { useGSAP } from "@gsap/react";
-import { UserPlus, ArrowDown } from "lucide-react";
 import { Button } from "@/components/Button";
-import { useT } from "@/i18n";
+import { AnimatedHeading, Blob } from "@/components/bits";
+import { BoneDoodle, HeartDoodle, PawDoodle } from "@/components/illustrations/Doodles";
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
-import { ClayFigure } from "./ClayFigure";
+import { useT } from "@/i18n";
+import { SectionDivider } from "./SectionDivider";
 
-gsap.registerPlugin(ScrollTrigger, GSAPSplitText);
+/** Percentage polygon so the mask survives CSS transforms (url(#clip) often doesn't). */
+const HERO_MASK =
+  "polygon(58% 2%, 74% 0%, 88% 7%, 98% 20%, 100% 40%, 97% 58%, 92% 76%, 80% 92%, 62% 99%, 44% 100%, 26% 94%, 12% 82%, 2% 64%, 0% 44%, 4% 26%, 16% 12%, 34% 4%)";
 
-/**
- * White Hero with soft brand atmosphere — pets frame the copy as one composition.
- */
 export function Hero() {
   const t = useT();
-  const containerRef = useRef<HTMLElement>(null);
-  const sceneRef = useRef<HTMLDivElement>(null);
-  const uiRef = useRef<HTMLDivElement>(null);
-  const titleRef = useRef<HTMLHeadingElement>(null);
+  const sectionRef = useRef<HTMLElement>(null);
   const reduced = usePrefersReducedMotion();
 
   useGSAP(
     () => {
-      const container = containerRef.current;
-      const scene = sceneRef.current;
-      const ui = uiRef.current;
-      if (!container || !scene || !ui) return;
+      const section = sectionRef.current;
+      if (!section || reduced) return;
 
-      let split: GSAPSplitText | undefined;
-      const layers = {
-        wash: scene.querySelector<HTMLElement>(".layer-wash"),
-        clayLeft: scene.querySelector<HTMLElement>(".clay-left"),
-        clayRight: scene.querySelector<HTMLElement>(".clay-right"),
-        ui,
-      };
-
-      const mouse = { x: 0, y: 0 };
-      const target = { x: 0, y: 0 };
-      let raf = 0;
-
-      const applyLayerTransforms = () => {
-        if (layers.wash) {
-          gsap.set(layers.wash, { x: mouse.x * -8, y: mouse.y * -5 });
-        }
-        if (layers.clayLeft) {
-          gsap.set(layers.clayLeft, { x: mouse.x * 16, y: mouse.y * 9 });
-        }
-        if (layers.clayRight) {
-          gsap.set(layers.clayRight, { x: mouse.x * -16, y: mouse.y * 9 });
-        }
-        gsap.set(layers.ui, { x: mouse.x * 5, y: mouse.y * 4 });
-      };
-
-      const runIntro = () => {
-        const tl = gsap.timeline({ defaults: { ease: "back.out(1.6)" } });
-
-        if (titleRef.current) {
-          split = new GSAPSplitText(titleRef.current, {
-            type: "words",
-            wordsClass: "hero-word inline-block",
-          });
-          tl.from(split.words, {
-            y: 40,
-            scale: 0.9,
-            opacity: 0,
-            duration: 0.6,
-            stagger: 0.04,
-          });
-        }
-
-        tl.from(
-          ".hero-body",
-          { y: 16, opacity: 0, duration: 0.4, ease: "power2.out" },
-          "-=0.28",
-        )
-          .from(
-            ".hero-cta > *",
-            {
-              y: 12,
-              scale: 0.94,
-              opacity: 0,
-              duration: 0.35,
-              stagger: 0.06,
-              ease: "back.out(1.7)",
-            },
-            "-=0.18",
-          )
-          .from(
-            ".clay-companion",
-            {
-              y: 40,
-              opacity: 0,
-              scale: 0.9,
-              duration: 0.6,
-              stagger: 0.12,
-              ease: "power2.out",
-            },
-            "-=0.4",
-          );
-      };
-
-      if (document.fonts?.status === "loaded") runIntro();
-      else document.fonts?.ready.then(runIntro);
-
-      const onMove = (e: MouseEvent) => {
-        if (reduced) return;
-        const rect = container.getBoundingClientRect();
-        if (rect.bottom < 0 || rect.top > window.innerHeight) return;
-        target.x = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
-        target.y = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
-      };
-
-      const tick = () => {
-        mouse.x += (target.x - mouse.x) * 0.08;
-        mouse.y += (target.y - mouse.y) * 0.08;
-        if (!reduced) applyLayerTransforms();
-        raf = requestAnimationFrame(tick);
-      };
-
-      if (!reduced) {
-        window.addEventListener("mousemove", onMove, { passive: true });
-        raf = requestAnimationFrame(tick);
-      }
-
-      let fadeTween: gsap.core.Tween | undefined;
-      if (!reduced) {
-        fadeTween = gsap.to(container, {
-          opacity: 0,
-          ease: "none",
-          scrollTrigger: {
-            trigger: container,
-            start: "top top",
-            end: "bottom top",
-            scrub: 0.4,
-          },
+      const floats = section.querySelectorAll<HTMLElement>("[data-float]");
+      floats.forEach((el, index) => {
+        gsap.to(el, {
+          y: index % 2 === 0 ? -10 : 8,
+          rotation: index % 2 === 0 ? 6 : -5,
+          duration: 3.2 + index * 0.35,
+          ease: "sine.inOut",
+          yoyo: true,
+          repeat: -1,
         });
-      }
+      });
 
-      return () => {
-        cancelAnimationFrame(raf);
-        window.removeEventListener("mousemove", onMove);
-        fadeTween?.scrollTrigger?.kill();
-        fadeTween?.kill();
-        try {
-          split?.revert();
-        } catch {
-          /* ignore */
-        }
+      const layers = [...section.querySelectorAll<HTMLElement>("[data-depth]")].map(
+        (el) => ({
+          depth: Number(el.dataset.depth ?? 1),
+          x: gsap.quickTo(el, "x", { duration: 0.7, ease: "power3.out" }),
+          y: gsap.quickTo(el, "y", { duration: 0.7, ease: "power3.out" }),
+        }),
+      );
+
+      const onMove = (event: MouseEvent) => {
+        const rect = section.getBoundingClientRect();
+        const cx = (event.clientX - rect.left) / rect.width - 0.5;
+        const cy = (event.clientY - rect.top) / rect.height - 0.5;
+        layers.forEach((layer) => {
+          layer.x(cx * 18 * layer.depth);
+          layer.y(cy * 12 * layer.depth);
+        });
       };
+
+      section.addEventListener("mousemove", onMove);
+      return () => section.removeEventListener("mousemove", onMove);
     },
-    { scope: containerRef, dependencies: [reduced, t.hero.titleLine1] },
+    { scope: sectionRef, dependencies: [reduced] },
   );
 
   return (
     <section
       id="top"
-      ref={containerRef}
-      className="relative flex min-h-[100svh] w-full flex-col items-center justify-center overflow-hidden bg-white"
+      ref={sectionRef}
+      className="relative flex min-h-svh items-center overflow-hidden px-5 pt-24 pb-20 sm:px-8 sm:pt-28"
     >
-      <div ref={sceneRef} className="absolute inset-0 z-0">
-        {/* Soft brand atmosphere on white */}
-        <div className="layer-wash pointer-events-none absolute inset-0 will-change-transform">
-          <div
-            className="absolute -left-24 top-[-10%] h-[55vmax] w-[55vmax] rounded-full bg-pastel-pink/70 blur-3xl"
-            aria-hidden
-          />
-          <div
-            className="absolute -right-20 bottom-[-5%] h-[50vmax] w-[50vmax] rounded-full bg-pastel-green/55 blur-3xl"
-            aria-hidden
-          />
-          <div
-            className="absolute left-1/2 top-[42%] h-[min(55vw,420px)] w-[min(55vw,420px)] -translate-x-1/2 -translate-y-1/2 rounded-full bg-pastel-pink/40 blur-3xl"
-            aria-hidden
-          />
-        </div>
-
-        {/* Pets as large companions framing the brand */}
-        <div className="pointer-events-none absolute inset-0 z-[2]">
-          <div className="clay-companion clay-left absolute bottom-[8%] left-0 flex flex-col items-center sm:left-[2%] md:bottom-[10%] md:left-[4%] lg:left-[7%]">
-            <div
-              className="absolute bottom-6 left-1/2 h-44 w-44 -translate-x-1/2 rounded-full bg-pastel-pink/80 blur-2xl sm:h-56 sm:w-56 md:h-64 md:w-64"
-              aria-hidden
-            />
-            <ClayFigure
-              name="puppy"
-              size={300}
-              sizes="(max-width: 768px) 200px, (max-width: 1024px) 260px, 320px"
-              priority
-              className="relative z-[1] !w-[160px] sm:!w-[210px] md:!w-[260px] lg:!w-[300px]"
-            />
-            <div
-              className="relative z-[1] mt-[-12px] h-6 w-[75%] rounded-[100%] bg-brand-pink/20 blur-[8px]"
-              aria-hidden
-            />
-          </div>
-
-          <div className="clay-companion clay-right absolute bottom-[7%] right-0 flex flex-col items-center sm:right-[2%] md:bottom-[9%] md:right-[4%] lg:right-[7%]">
-            <div
-              className="absolute bottom-6 left-1/2 h-40 w-40 -translate-x-1/2 rounded-full bg-pastel-green/70 blur-2xl sm:h-52 sm:w-52 md:h-60 md:w-60"
-              aria-hidden
-            />
-            <ClayFigure
-              name="cat"
-              size={280}
-              sizes="(max-width: 768px) 180px, (max-width: 1024px) 240px, 300px"
-              priority
-              className="relative z-[1] !w-[150px] sm:!w-[190px] md:!w-[240px] lg:!w-[280px]"
-            />
-            <div
-              className="relative z-[1] mt-[-10px] h-6 w-[70%] rounded-[100%] bg-brand-green/20 blur-[8px]"
-              aria-hidden
-            />
-          </div>
-        </div>
-      </div>
+      <div className="pointer-events-none absolute inset-0 map-grid opacity-30" aria-hidden />
+      <Blob
+        variant={1}
+        className="absolute -top-16 -left-16 size-72 text-primary/20 sm:size-96"
+      />
+      <Blob
+        variant={2}
+        className="absolute top-24 -right-20 size-80 text-secondary/20 sm:size-[28rem]"
+      />
 
       <div
-        ref={uiRef}
-        className="relative z-10 mx-auto flex w-full max-w-3xl flex-col items-center px-4 text-center will-change-transform md:max-w-4xl"
+        data-depth="1.4"
+        className="pointer-events-none absolute top-32 left-[5%] hidden lg:block"
       >
-        <p className="hero-eyebrow mb-4 inline-flex items-center rounded-full border border-brand-pink/25 bg-pastel-pink/80 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-brand-pink shadow-[0_8px_24px_-8px_rgba(224,122,150,0.45)]">
-          ANIMAPS
-        </p>
-
-        <h1
-          ref={titleRef}
-          className="font-display mb-4 max-w-3xl text-5xl leading-[1.05] tracking-tight text-ink sm:text-6xl md:mb-5 md:text-7xl lg:text-[5.75rem]"
-        >
-          {t.hero.titleLine1}{" "}
-          <span className="text-brand-pink">{t.hero.titleHighlight}</span>
-        </h1>
-
-        <p className="hero-body mb-8 max-w-lg text-base leading-relaxed text-ink-muted md:text-lg">
-          {t.hero.body}
-        </p>
-
-        <div className="hero-cta flex flex-wrap items-center justify-center gap-3">
-          <Button href="/register" variant="pink" magnetic={false}>
-            <UserPlus size={18} />
-            {t.hero.ctaAccount}
-          </Button>
-          <Button href="/#how-it-works" variant="white" magnetic={false}>
-            <ArrowDown size={18} />
-            {t.hero.ctaHow}
-          </Button>
+        <div data-float>
+          <PawDoodle className="size-14 rotate-12 text-primary/35" />
         </div>
       </div>
+      <div
+        data-depth="1"
+        className="pointer-events-none absolute top-36 right-[6%] hidden lg:block"
+      >
+        <div data-float>
+          <HeartDoodle className="size-10 -rotate-12 text-secondary/45" />
+        </div>
+      </div>
+      <div
+        data-depth="0.6"
+        className="pointer-events-none absolute bottom-24 left-[16%] hidden lg:block"
+      >
+        <div data-float>
+          <BoneDoodle className="size-12 rotate-6 text-honey-600/70" />
+        </div>
+      </div>
+
+      <div className="relative z-10 mx-auto grid w-full max-w-6xl items-center gap-10 lg:grid-cols-2 lg:gap-12">
+        <div className="max-w-xl">
+          <p className="text-label mb-5 inline-flex items-center gap-2 rounded-full bg-primary-soft px-3 py-1 text-(--pink-700)">
+            <PawPrint size={14} aria-hidden />
+            {t.brand}
+          </p>
+          <AnimatedHeading
+            as="h1"
+            className="text-display text-text"
+            parts={[
+              { text: t.hero.titleLine1 },
+              { text: t.hero.titleHighlight, className: "text-primary" },
+            ]}
+          />
+          <p className="text-body-lg mt-4 max-w-md text-text-secondary">{t.hero.body}</p>
+          <div className="mt-8 flex flex-wrap items-center gap-3">
+            <Button href="/register" variant="primary">
+              <PawPrint size={18} aria-hidden />
+              {t.hero.ctaAccount}
+            </Button>
+            <Button href="/#how-it-works" variant="ghost" size="sm">
+              <ArrowDown size={16} aria-hidden />
+              {t.hero.ctaHow}
+            </Button>
+          </div>
+        </div>
+
+        <div className="relative mx-auto w-full max-w-lg lg:max-w-none">
+          <div data-depth="0.45" data-float className="relative">
+            <Blob
+              className="absolute -top-10 -left-8 size-44 text-warning/45 sm:size-56"
+              variant={0}
+            />
+            <div className="relative w-full rotate-[-2.5deg]">
+              <div
+                className="relative aspect-[4/5] w-full bg-surface-accent shadow-lg lg:aspect-[5/6] lg:min-h-[32rem]"
+                style={{ clipPath: HERO_MASK }}
+              >
+                <Image
+                  src="/images/auth/adoption.png"
+                  alt={t.hero.imageAlt}
+                  fill
+                  priority
+                  sizes="(max-width: 1024px) 90vw, 40rem"
+                  className="object-cover"
+                />
+              </div>
+
+              <span className="text-caption absolute top-3 right-3 z-10 inline-flex rotate-6 items-center gap-1 rounded-full bg-surface px-2.5 py-1 font-display text-text shadow-md">
+                <MapPin size={12} className="text-primary" aria-hidden />
+                2.4 km
+              </span>
+
+              <span className="text-caption absolute bottom-4 left-3 z-10 inline-flex -rotate-6 items-center gap-1.5 rounded-full bg-honey-600 px-2.5 py-1 font-display text-text shadow-md">
+                <HeartDoodle className="size-4 text-(--pink-700)" />
+                {t.solution.pillars.match.title}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <SectionDivider fill="var(--surface)" />
     </section>
   );
 }

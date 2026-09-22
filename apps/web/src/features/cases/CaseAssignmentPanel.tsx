@@ -2,7 +2,6 @@
 
 import { FormEvent, useMemo, useState } from "react";
 import { Button } from "@/components/Button";
-import { Card } from "@/components/Card";
 import { useToast } from "@/components/Toast";
 import { useInstitutionOrg } from "@/features/institution/team/useInstitutionOrg";
 import { hasPermission } from "@/features/permissions";
@@ -75,12 +74,12 @@ export function CaseAssignmentPanel({
   }
 
   return (
-    <Card className="space-y-3 p-4">
-      <h2 className="text-sm font-bold text-ink">{t.cases.assignment.title}</h2>
-      <p className="text-xs text-ink-muted">{t.cases.assignment.hint}</p>
+    <section className="space-y-3">
+      <h2 className="text-h4 text-text">{t.cases.assignment.title}</h2>
+      <p className="text-body-sm text-text-secondary">{t.cases.assignment.hint}</p>
 
       {record.assignedMemberLabel || record.assignedTeamLabel ? (
-        <p className="rounded-2xl border border-border-soft bg-pastel-green/30 px-3 py-2 text-sm font-semibold text-ink">
+        <p className="rounded-full bg-success-soft px-4 py-2 text-body-sm font-semibold text-(--mint-700)">
           {[record.assignedMemberLabel, record.assignedTeamLabel]
             .filter(Boolean)
             .join(" · ")}
@@ -92,11 +91,11 @@ export function CaseAssignmentPanel({
       {canAssign ? (
         <form onSubmit={onAssign} className="space-y-2">
           <label className="block space-y-1">
-            <span className="text-xs font-bold text-ink">
+            <span className="text-label text-text">
               {t.cases.assignment.member}
             </span>
             <select
-              className="w-full rounded-2xl border-2 border-border-soft bg-white px-3 py-2 text-sm outline-none focus-visible:border-brand-green"
+              className="w-full rounded-[1.25rem] border border-border bg-background px-4 py-2.5 text-body-sm text-text outline-none focus-visible:border-primary"
               value={memberId}
               onChange={(e) => setMemberId(e.target.value)}
             >
@@ -109,11 +108,11 @@ export function CaseAssignmentPanel({
             </select>
           </label>
           <label className="block space-y-1">
-            <span className="text-xs font-bold text-ink">
+            <span className="text-label text-text">
               {t.cases.assignment.team}
             </span>
             <select
-              className="w-full rounded-2xl border-2 border-border-soft bg-white px-3 py-2 text-sm outline-none focus-visible:border-brand-green"
+              className="w-full rounded-[1.25rem] border border-border bg-background px-4 py-2.5 text-body-sm text-text outline-none focus-visible:border-primary"
               value={teamId}
               onChange={(e) => setTeamId(e.target.value)}
             >
@@ -126,7 +125,7 @@ export function CaseAssignmentPanel({
             </select>
           </label>
           <div className="flex flex-wrap gap-2">
-            <Button type="submit" size="sm" variant="pink">
+            <Button type="submit" size="sm" variant="primary">
               {t.cases.assignment.assign}
             </Button>
             {record.assignedMemberId || record.assignedTeamId ? (
@@ -146,6 +145,6 @@ export function CaseAssignmentPanel({
       ) : (
         <p className="text-xs text-ink-muted">{t.cases.assignment.noPermission}</p>
       )}
-    </Card>
+    </section>
   );
 }

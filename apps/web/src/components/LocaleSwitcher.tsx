@@ -66,7 +66,7 @@ export function LocaleSwitcher({
 
     const panel =
       tone === "dark"
-        ? "absolute right-0 z-50 mt-2 min-w-44 overflow-hidden rounded-2xl border border-white/15 bg-[#1a1214] p-1.5 shadow-xl"
+        ? "absolute right-0 z-50 mt-2 min-w-44 overflow-hidden rounded-2xl border border-white/15 bg-footer p-1.5 shadow-xl"
         : "absolute right-0 z-50 mt-2 min-w-44 overflow-hidden rounded-2xl border border-border-soft bg-white p-1.5 shadow-xl";
 
     return (

@@ -1,8 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import { useRef } from "react";
 import { PawPrint } from "lucide-react";
+import { gsap } from "gsap";
+import { useGSAP } from "@gsap/react";
 import { LocaleSwitcher } from "@/components/LocaleSwitcher";
+import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
 import { useT } from "@/i18n";
 import { SectionDivider } from "./SectionDivider";
 
@@ -87,6 +91,18 @@ export function Footer({
 }: FooterProps) {
   const t = useT();
   const year = new Date().getFullYear();
+  const wordRef = useRef<HTMLParagraphElement>(null);
+  const reduced = usePrefersReducedMotion();
+
+  useGSAP(() => {
+    if (reduced || !wordRef.current) return;
+    gsap.from(wordRef.current, {
+      y: 28,
+      opacity: 0,
+      duration: 0.8,
+      ease: "power3.out",
+    });
+  }, { dependencies: [reduced] });
 
   const columns = [
     {
@@ -116,7 +132,7 @@ export function Footer({
 
   return (
     <footer
-      className={`relative z-10 overflow-hidden bg-[#1a1214] text-white ${
+      className={`relative z-10 overflow-hidden bg-footer text-white ${
         showDivider ? "pt-24" : "pt-6 md:pt-8"
       }`}
     >
@@ -124,7 +140,7 @@ export function Footer({
         <SectionDivider fill={dividerFill} position="top" />
       ) : null}
 
-      <div className="relative z-10 mx-auto max-w-6xl px-4 pt-10 pb-8 md:px-6 md:pt-14 md:pb-12">
+      <div className="relative z-10 mx-auto max-w-6xl px-5 pt-12 pb-8 sm:px-8 md:pt-16 md:pb-10">
         <div className="grid grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-3 lg:grid-cols-5">
           <div className="col-span-2 sm:col-span-3 lg:col-span-1">
             <Link
@@ -132,10 +148,10 @@ export function Footer({
               className="inline-flex items-center gap-2 text-white/90 transition-colors hover:text-white"
             >
               <PawPrint size={18} aria-hidden />
-              <span className="text-sm font-semibold tracking-wide">ANIMAPS</span>
+              <span className="text-sm font-semibold tracking-wide">{t.brand}</span>
             </Link>
             <p className="mt-4 text-xs leading-relaxed text-white/45">
-              © {year} Animaps
+              © {year} {t.brand}
             </p>
             <p className="mt-3 max-w-[16rem] text-xs leading-relaxed text-white/40">
               {t.footer.blurb}
@@ -189,11 +205,14 @@ export function Footer({
       </div>
 
       <div
-        className="pointer-events-none relative select-none overflow-hidden leading-none"
+        className="pointer-events-none relative h-[13vw] select-none overflow-hidden"
         aria-hidden
       >
-        <p className="font-display translate-y-[18%] whitespace-nowrap text-center text-[22vw] font-normal tracking-tight text-brand-pink/55 md:text-[18vw] lg:text-[15rem]">
-          ANIMAPS
+        <p
+          ref={wordRef}
+          className="font-display absolute inset-x-0 top-0 text-center text-[42vw] leading-none tracking-tight text-white/30"
+        >
+          {t.brand}
         </p>
       </div>
     </footer>

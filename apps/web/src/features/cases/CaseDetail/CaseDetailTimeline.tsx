@@ -10,11 +10,11 @@ export function StatusPill({
   children: string;
 }) {
   return (
-    <span className="inline-flex flex-col rounded-2xl border border-border-soft bg-gray-soft px-3 py-1.5">
-      <span className="text-[0.65rem] font-bold uppercase tracking-wide text-ink-muted">
+    <span className="inline-flex flex-col rounded-full bg-secondary-soft px-3 py-1.5">
+      <span className="text-caption font-semibold text-(--lilac-700)">
         {label}
       </span>
-      <span className="text-sm font-bold text-ink">{children}</span>
+      <span className="text-body-sm font-semibold text-text">{children}</span>
     </span>
   );
 }
@@ -35,28 +35,27 @@ export function CaseDetailTimeline({
 }) {
   const { locale } = useLocale();
   if (items.length === 0) {
-    return (
-      <p className="rounded-2xl border border-dashed border-border-soft bg-white px-3 py-4 text-sm text-ink-muted">
-        {empty}
-      </p>
-    );
+    return <p className="text-body-sm text-text-secondary">{empty}</p>;
   }
   return (
-    <ol className="space-y-2 rounded-2xl border border-border-soft bg-white p-3">
+    <ol className="space-y-3">
       {items.map((item) => (
-        <li
-          key={item.id}
-          className="border-b border-border-soft/60 pb-2 last:border-0 last:pb-0"
-        >
-          <div className="flex justify-between gap-2">
-            <span className="text-sm font-bold text-ink">{item.title}</span>
-            <time className="text-[0.65rem] tabular-nums text-ink-muted">
-              {formatDateTime(item.at, locale)}
-            </time>
+        <li key={item.id} className="flex gap-3">
+          <span className="mt-1 h-auto w-1.5 shrink-0 self-stretch rounded-full bg-primary" aria-hidden />
+          <div className="min-w-0 flex-1 pb-1">
+            <div className="flex justify-between gap-2">
+              <span className="text-body-sm font-semibold text-text">{item.title}</span>
+              <time
+                dateTime={item.at}
+                className="text-caption tabular-nums text-text-muted"
+              >
+                {formatDateTime(item.at, locale)}
+              </time>
+            </div>
+            {item.body ? (
+              <p className="mt-0.5 text-body-sm text-text-secondary">{item.body}</p>
+            ) : null}
           </div>
-          {item.body ? (
-            <p className="mt-0.5 text-sm text-ink-muted">{item.body}</p>
-          ) : null}
         </li>
       ))}
     </ol>

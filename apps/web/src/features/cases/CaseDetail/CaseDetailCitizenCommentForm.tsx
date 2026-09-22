@@ -40,7 +40,7 @@ export function CaseDetailCitizenCommentForm({
         value={body}
         onChange={(e) => onBodyChange(e.target.value)}
       />
-      <Button type="submit" size="sm" variant="pink">
+      <Button type="submit" size="sm" variant="primary">
         {t.cases.detail.postComment}
       </Button>
     </form>

@@ -19,12 +19,12 @@ export function ProgressIndicator({
 
   return (
     <div className={["w-full", className].filter(Boolean).join(" ")}>
-      <div className="mb-2 flex items-center justify-between gap-3 text-xs font-semibold text-ink-muted">
+      <div className="mb-2 flex items-center justify-between gap-3 text-caption font-semibold text-text-secondary">
         <span>{label ?? `Step ${clamped} of ${safeTotal}`}</span>
         <span aria-hidden>{pct}%</span>
       </div>
       <div
-        className="h-2 w-full rounded-full bg-border-soft"
+        className="h-3 w-full rounded-full bg-primary-soft"
         role="progressbar"
         aria-valuenow={clamped}
         aria-valuemin={0}
@@ -32,7 +32,7 @@ export function ProgressIndicator({
         aria-label={label ?? `Step ${clamped} of ${safeTotal}`}
       >
         <div
-          className="h-full rounded-full bg-brand-pink transition-[width] duration-500 ease-out shadow-[0_0_8px_rgba(224,122,150,0.6)]"
+          className="h-full rounded-full bg-primary transition-[width] duration-500 ease-out"
           style={{ width: `${pct}%` }}
         />
       </div>

@@ -14,14 +14,13 @@ export function CaseDetailAttachments({
   if (attachments.length === 0) return null;
   return (
     <section>
-      <h2 className="mb-2 text-sm font-bold text-ink">
-        {t.cases.detail.attachments}
-      </h2>
-      <ul className="space-y-1 rounded-2xl border border-border-soft bg-white p-3 text-sm">
+      <h2 className="text-h4 mb-3 text-text">{t.cases.detail.attachments}</h2>
+      <ul className="space-y-2">
         {attachments.map((a) => (
-          <li key={a.id} className="flex justify-between gap-2">
-            <span className="font-semibold text-ink">{a.name}</span>
-            <span className="text-xs text-ink-muted">
+          <li key={a.id} className="flex items-center justify-between gap-3">
+            <span className="h-8 w-1.5 shrink-0 rounded-full bg-honey-600" aria-hidden />
+            <span className="min-w-0 flex-1 text-body-sm font-semibold text-text">{a.name}</span>
+            <span className="text-caption text-text-muted">
               {t.cases.attachmentKinds[a.kind]}
             </span>
           </li>

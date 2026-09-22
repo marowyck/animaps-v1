@@ -19,7 +19,7 @@ type CurvedLoopProps = {
   bridgeAbove?: boolean;
   bridgeAboveFill?: string;
   /**
-   * Fill from the ribbon’s lower sine edge downward (e.g. footer `#1a1214`)
+   * Fill from the ribbon’s lower sine edge downward (footer token).
    * so the marquee text rides the same wave as the dark section below.
    */
   bridgeBelow?: boolean;
@@ -130,7 +130,7 @@ export default function CurvedLoop({
   bridgeAbove = false,
   bridgeAboveFill,
   bridgeBelow = false,
-  bridgeBelowFill = "#1a1214",
+  bridgeBelowFill = "var(--footer)",
   bridgeBelowExtend = 96,
 }: CurvedLoopProps) {
   const reduced = usePrefersReducedMotion();

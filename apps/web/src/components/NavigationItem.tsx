@@ -9,6 +9,7 @@ type NavigationItemProps = {
   icon: ReactNode;
   active?: boolean;
   disabled?: boolean;
+  tone?: "default" | "exit";
   onClick?: () => void;
 };
 
@@ -18,15 +19,18 @@ export function NavigationItem({
   icon,
   active = false,
   disabled = false,
+  tone = "default",
   onClick,
 }: NavigationItemProps) {
   const className = [
-    "flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-bold transition-all duration-200 active:scale-[0.97]",
-    "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-pink",
-    active
-      ? "bg-pastel-pink text-brand-pink shadow-sm"
-      : "text-ink-muted hover:bg-pastel-pink/30 hover:text-ink",
-    disabled ? "pointer-events-none opacity-45 active:scale-100" : "",
+    "flex items-center gap-3 rounded-full px-3 py-2.5 text-body-sm font-semibold transition-colors duration-200",
+    "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary",
+    tone === "exit"
+      ? "bg-danger-soft text-(--coral-700) hover:bg-danger/20"
+      : active
+        ? "bg-primary-soft text-(--pink-700)"
+        : "text-text-secondary hover:bg-primary-soft/60 hover:text-text",
+    disabled ? "pointer-events-none opacity-45" : "",
   ]
     .filter(Boolean)
     .join(" ");

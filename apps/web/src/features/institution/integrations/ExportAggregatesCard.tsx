@@ -2,9 +2,9 @@
 
 import { Download } from "lucide-react";
 import { Button } from "@/components/Button";
-import { Card } from "@/components/Card";
 import { Input } from "@/components/Input";
 import { formatDateTime, useLocale, useT } from "@/i18n";
+import { WorkspaceSection } from "../WorkspaceSection";
 import type { AnalyticsPeriod } from "../analytics";
 import type { DataExportRecord } from "./types";
 
@@ -31,16 +31,12 @@ export function ExportAggregatesCard({
   const { locale } = useLocale();
 
   return (
-    <Card className="space-y-3 p-4">
-      <div className="flex items-center gap-2">
-        <Download className="size-4 text-brand-green" aria-hidden />
-        <h2 className="text-sm font-bold text-ink">
-          {t.institution.integrations.exportTitle}
-        </h2>
-      </div>
-      <p className="text-xs text-ink-muted">
-        {t.institution.integrations.exportHint}
-      </p>
+    <WorkspaceSection
+      title={t.institution.integrations.exportTitle}
+      hint={t.institution.integrations.exportHint}
+      icon={<Download className="size-5" aria-hidden />}
+      tone="success"
+    >
 
       {canExport ? (
         <div className="grid gap-2 sm:grid-cols-3">
@@ -103,6 +99,6 @@ export function ExportAggregatesCard({
           ))}
         </ul>
       )}
-    </Card>
+    </WorkspaceSection>
   );
 }

@@ -59,7 +59,7 @@ export function CaseDetail({
       <CaseDetailAttachments attachments={record.attachments} />
 
       <section>
-        <h2 className="mb-2 text-sm font-bold text-ink">
+        <h2 className="text-h4 mb-3 text-text">
           {t.cases.detail.publicUpdates}
         </h2>
         <CaseDetailTimeline
@@ -74,7 +74,7 @@ export function CaseDetail({
       </section>
 
       <section>
-        <h2 className="mb-2 text-sm font-bold text-ink">
+        <h2 className="text-h4 mb-3 text-text">
           {t.cases.detail.timeline}
         </h2>
         <CaseDetailTimeline
@@ -117,7 +117,7 @@ export function CaseDetail({
         />
       )}
 
-      <p className="text-center text-xs text-ink-muted">
+      <p className="text-center text-body-sm text-text-secondary">
         <Link href="/cases/claim" className="underline underline-offset-2">
           {t.cases.claim.link}
         </Link>

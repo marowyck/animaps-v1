@@ -12,9 +12,13 @@ export {
   type CityAggregate,
 } from "./analytics";
 export { SoftGateBanner } from "./SoftGateBanner";
+export {
+  InstitutionGatedPage,
+  useInstitutionGuard,
+} from "./useInstitutionGuard";
 export { InstitutionDashboard } from "./InstitutionDashboard";
 export { InstitutionProfile } from "./InstitutionProfile";
-export { InstitutionMapShell } from "./InstitutionMapShell";
+export { InstitutionMapShell } from "./map/InstitutionMapShell";
 export { InstitutionAnalyticsShell } from "./InstitutionAnalyticsShell";
 export { InstitutionTeamShell } from "./InstitutionTeamShell";
 export { InstitutionCasesInbox } from "./InstitutionCasesInbox";

@@ -32,12 +32,12 @@ export function Checkbox({
         />
         <span
           aria-hidden
-          className="flex h-6 w-6 items-center justify-center rounded-lg border-2 border-border-soft bg-white transition-all duration-200 peer-checked:border-brand-pink peer-checked:bg-brand-pink peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-brand-pink group-hover:border-brand-pink/60"
+          className="flex h-6 w-6 items-center justify-center rounded-md border border-border bg-surface transition-colors duration-150 peer-checked:border-primary peer-checked:bg-primary peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-primary group-hover:border-primary/50"
         >
           <Check
             size={16}
             strokeWidth={3}
-            className={`text-white transition-all duration-200 ${
+            className={`text-surface-elevated transition-all duration-200 ${
               checked ? "scale-100 opacity-100" : "scale-50 opacity-0"
             }`}
           />

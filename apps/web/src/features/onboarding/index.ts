@@ -72,6 +72,7 @@ export { LocationStep } from "./LocationStep";
 export { ServicesStep } from "./ServicesStep";
 export { InstitutionTypeStep } from "./InstitutionTypeStep";
 export { InstitutionInfoStep } from "./InstitutionInfoStep";
+export { TypeSelector, type TypeOption } from "./components/TypeSelector";
 export { UserTypeSelector } from "./components/UserTypeSelector";
 export {
   AccountTypeSelector,

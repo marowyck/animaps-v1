@@ -4,10 +4,42 @@ export type Messages = {
     title: string;
     description: string;
   };
+  brand: string;
+  userTypes: {
+    PERSON: string;
+    ONG: string;
+    VETERINARY_CLINIC: string;
+    OTHER: string;
+    INSTITUTION: string;
+    unknown: string;
+  };
+  chrome: {
+    close: string;
+    dismiss: string;
+    showPassword: string;
+    hidePassword: string;
+    selectPlaceholder: string;
+    loading: string;
+    search: string;
+    clearSearch: string;
+    dashboardNav: string;
+    mobileNav: string;
+    slides: string;
+  };
+  clay: {
+    puppy: string;
+    cat: string;
+    family: string;
+    critter: string;
+    monkey: string;
+  };
   nav: {
     home: string;
     benefits: string;
     howToStart: string;
+    forPeople: string;
+    forOrganizations: string;
+    forInstitutions: string;
     faq: string;
     createAccount: string;
     login: string;
@@ -122,6 +154,7 @@ export type Messages = {
     brandHomeAria: string;
     showPassword: string;
     hidePassword: string;
+    mobileStory: string;
     slides: {
       rescue: { title: string; body: string; imageAlt: string };
       adoption: { title: string; body: string; imageAlt: string };
@@ -160,11 +193,14 @@ export type Messages = {
       noAccount: string;
       registerLink: string;
       soon: string;
+      preview: string;
     };
     verifyEmail: {
       title: string;
       subtitle: string;
       expires: string;
+      missingEmail: string;
+      missingCta: string;
       continue: string;
       resend: string;
       resendIn: string;
@@ -494,6 +530,13 @@ export type Messages = {
     comingSoon: string;
     openMenu: string;
     exit: string;
+    actionTitle: string;
+    actionBody: string;
+    actionDiscover: string;
+    actionCases: string;
+    actionProfile: string;
+    activityTitle: string;
+    activityEmpty: string;
   };
   discover: {
     title: string;
@@ -509,6 +552,10 @@ export type Messages = {
     };
     liked: string;
     favorited: string;
+    matched: string;
+    matchTitle: string;
+    peek: string;
+    keyboardHint: string;
     skipped: string;
     reported: string;
     shared: string;
@@ -522,6 +569,28 @@ export type Messages = {
       "a1" | "p1" | "o1" | "pr1" | "a2",
       { subtitle: string; tags: string[] }
     >;
+  };
+  profilePage: {
+    title: string;
+    subtitle: string;
+    name: string;
+    email: string;
+    type: string;
+    save: string;
+    saved: string;
+    intentions: string;
+    emptyIntentions: string;
+    orgSection: string;
+    clinicSection: string;
+  };
+  saved: {
+    matchesTitle: string;
+    matchesSubtitle: string;
+    matchesEmpty: string;
+    favoritesTitle: string;
+    favoritesSubtitle: string;
+    favoritesEmpty: string;
+    openDiscover: string;
   };
   cases: {
     types: Record<
@@ -719,6 +788,7 @@ export type Messages = {
     };
   };
   institution: {
+    workspaceEyebrow: string;
     softGate: {
       title: string;
       body: string;
@@ -789,6 +859,7 @@ export type Messages = {
       emptyTitle: string;
       emptyBody: string;
       heatmapTitle: string;
+      unplaced: string;
       legendLow: string;
       legendHigh: string;
       caseCount: string;
@@ -879,6 +950,8 @@ export type Messages = {
       status: string;
       all: string;
       readOnlyHint: string;
+      filterEmpty: string;
+      resultCount: string;
     };
     routing: {
       title: string;
