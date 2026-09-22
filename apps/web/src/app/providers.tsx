@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, type ReactNode } from "react";
+import { usePathname } from "next/navigation";
 import { ReactLenis, useLenis } from "lenis/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -76,8 +77,10 @@ function NativeAnchorScroll() {
 }
 
 function SmoothScrollInner({ children }: { children: ReactNode }) {
+  const pathname = usePathname();
   const [reduced, setReduced] = useState(false);
   const [ready, setReady] = useState(false);
+  const onMarketing = pathname === "/";
 
   useEffect(() => {
     /* eslint-disable react-hooks/set-state-in-effect -- hydrate motion preference after mount */
@@ -90,10 +93,10 @@ function SmoothScrollInner({ children }: { children: ReactNode }) {
     return <>{children}</>;
   }
 
-  if (reduced) {
+  if (reduced || !onMarketing) {
     return (
       <>
-        <NativeAnchorScroll />
+        {onMarketing ? <NativeAnchorScroll /> : null}
         {children}
       </>
     );

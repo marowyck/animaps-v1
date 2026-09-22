@@ -41,7 +41,7 @@ export function RoleBasedNavigation({
   }
 
   return (
-    <aside className="hidden h-dvh w-64 shrink-0 flex-col border-r-2 border-border-soft bg-white px-4 py-6 lg:flex">
+    <aside className="hidden h-full min-h-0 w-64 shrink-0 flex-col overflow-y-auto border-r-2 border-border-soft bg-white px-4 py-6 lg:flex">
       <div className="mb-8 px-2">
         <p className="font-display text-2xl text-ink">ANIMAPS</p>
       </div>
