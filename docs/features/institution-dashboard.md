@@ -20,11 +20,11 @@ DashboardShell
 
 | Reuse | Do not |
 |---|---|
-| `DashboardShell`, `RoleBasedNavigation`, `MobileNav`, `SummaryCard` | A second app or layout system |
+| `DashboardShell`, `RoleBasedNavigation`, `MobileNav` | A second app or layout system |
 | Case mock from Fase 3 | Match / Discover card stack |
 | Soft-gate on `institutionalVerificationStatus` | Fake “sent to city hall” KPIs while pending |
 
-When `userType === INSTITUTION`, `/dashboard` renders **InstitutionDashboard** (not `DynamicDashboard` ONG tiles).
+When `userType === INSTITUTION`, `/dashboard` renders **InstitutionDashboard** (not `DynamicDashboard`). Overview metrics use `MetricTile` (neutral surface, tabular numbers). Team, routing, integrations, and analytics share `WorkspaceHeader`. Analytics charts are SVG bars in `BarList` plus a data table. One `SoftGateBanner` per screen.
 
 ---
 
@@ -77,7 +77,7 @@ Nav gates: `VIEW_INCOMING_REPORTS`, `ASSIGN_REPORT`, `ROUTE_CASE`, `FORWARD_CASE
 | Current | Future |
 |---|---|
 | Institution workspace mock in web | Nest institutions + RBAC memberships |
-| City intensity grid + aggregate CSV | Server-side privacy-aware heatmap / PostGIS |
+| Leaflet + OpenStreetMap city centroids + aggregate CSV (no reporter pins) | Server-side privacy-aware heatmap / PostGIS |
 | Team mock (depts / teams / invites / assignment) | Nest membership + invite emails |
 | Routing mock (jurisdictions / capabilities / matcher) | Nest Case routing engine + IBGE/geometry |
 | Integrations mock (generic connections / logs / aggregate export) | Nest integrations + vault + real connectors |

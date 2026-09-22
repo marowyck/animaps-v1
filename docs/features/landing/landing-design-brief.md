@@ -116,7 +116,7 @@ No Figma. Source of truth: this brief + code in `apps/web`.
     2. Password + confirm, live strength checklist, show/hide eye toggle; strong-password rules (min 8, uppercase, special)
   - Login: email/password (revealable) + Google CTA (UI-only) + link to register
   - Outcome feedback (validation, success, “coming soon”) via **toasts** — never permanent inline status under the form
-  - No landing Header/Footer/ClickSpark on these pages
+  - No landing Header/Footer on these pages
 
 ### Header (BubbleMenu)
 
@@ -203,7 +203,7 @@ Model: clean multi-column + oversized cropped brand wordmark (Tinder-like struct
 
 ### Bits (`apps/web/src/components/bits/`)
 
-`ClickSpark`, `AnimatedContent` (elastic pop, `once`), `ScrollReveal` (simple or cinematic word-unblur), `Magnet`, `TiltedCard`, `DotGrid`, `CurvedLoop`, plus kit extras **not required on `/` today**: `Aurora` (WebGL via `ogl`), `SpotlightCard`, `GlareHover`, `GradualBlur`, `SplitText`, `ScrollFloat`, `ScrollStack`.
+`AnimatedContent` (elastic pop, `once`) and `CurvedLoop`. Unused kit pieces were removed.
 
 Hero title splitting uses **GSAP `SplitText`** directly (not the bits wrapper).
 
@@ -213,7 +213,7 @@ Hero title splitting uses **GSAP `SplitText`** directly (not the bits wrapper).
 
 **Clay:** `ClayFigure` (asset catalog + wiggle + `clay-float`) used in Hero / How it works / Audience / Differentials. `ClayStage` is a framed podium helper — exported, not composed on `/` today.
 
-**Available, not in public flow:** `WaitlistSection`, `OrganicBlob`, `PortalScene` (hand-drawn SVG layers), `FloatingDecor` (parallax clouds/paws).
+**Available, not in public flow:** `WaitlistSection`. `OrganicBlob`, `PortalScene`, and `FloatingDecor` were removed.
 
 ### Auth (`apps/web/src/features/auth/`)
 
@@ -256,7 +256,6 @@ Intensity: **expressive and playful**, without competing with reading. Lenis kep
 | Marquee ribbons | CurvedLoop | GSAP `x` loop |
 | Magnetic / fill hover | `Button` | pointer pull optional; clipPath fill on `md` fill variants; CSS hover on `white` / compact `pink` (no scale on `sm` pink) |
 | Toast enter/exit | Toast stack | CSS translate + opacity swipe |
-| Click sparks | Page wrapper | ClickSpark |
 
 Required: `prefers-reduced-motion` (Lenis off + timelines skip + native anchor fallback).
 

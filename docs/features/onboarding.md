@@ -87,7 +87,7 @@ Register asks **AccountType** first (`PERSON` / `ORGANIZATION` / `INSTITUTION` /
 
 Post-complete home: `PERSON` / `OTHER` → `/discover`; org / clinic / institution → `/dashboard`.
 
-Shared steps (`location`, `services`) branch internally on flow key (org vs clinic forms) instead of duplicating route ids.
+Shared steps (`location`, `services`) branch internally on flow key. Clinic uses `draft.veterinary`, organizations use `draft.organization`, and institutions write city/state/area onto `draft.institution`. `OnboardingLayout` shows Skip when `STEP_DEFINITIONS[step].skippable` is true, unless the step passes `showSkip` explicitly.
 
 ---
 

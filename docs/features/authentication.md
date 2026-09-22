@@ -10,11 +10,11 @@ Related: [user-flow.md](user-flow.md) · [onboarding.md](onboarding.md) · [user
 
 | Route | Role |
 |---|---|
-| `/register` | Two-step create-account UI; step 1 collects `UserType` via `UserTypeSelector` + waitlist lead |
+| `/register` | Two-step create-account UI; step 1 collects the account type via `AccountTypeSelector` + waitlist lead |
 | `/login` | Login UI placeholder |
-| `/verify-email` | 6-digit email OTP |
+| `/verify-email` | 6-digit email OTP, inside `AuthSplitLayout` |
 
-Query: `/verify-email?email=user@example.com` (optional; falls back to draft / placeholder).
+Query: `/verify-email?email=user@example.com`. Without an email, the form asks the person to go back to login. It does not invent an address.
 
 **Single auth path for all user types** — do not fork register/login per type. `userType` only selects the post-verify onboarding flow.
 
@@ -22,15 +22,17 @@ Query: `/verify-email?email=user@example.com` (optional; falls back to draft / p
 
 ## Screen — verify email
 
-**Copy (intent):** “Enter your code” · “We sent a one-time code to {email}” · “Expires in 10 minutes.”
+**Copy (intent):** “Enter your code” · preview for {email}, no email is sent · any 6 digits except `000000`.
 
 ### UI
 
-- Back + close (`IconButton`)
-- Brand wordmark text (no forced logo asset yet)
-- `CodeInput` (6 cells)
+Same chrome as login and register: carousel on large screens, locale menu, form column. No second header.
+
+- Back link to `/login`
+- `CodeInput` (6 cells) inside a form, so Enter submits
 - Resend with cooldown counter
-- Continue (enabled when 6 digits present)
+- Continue (enabled when 6 digits are present)
+- Copy states that this is a preview: no email is sent
 
 ### States
 
@@ -58,9 +60,10 @@ Query: `/verify-email?email=user@example.com` (optional; falls back to draft / p
 
 | Concern | Current | Future (Nest `identity`) |
 |---|---|---|
-| Send code | Client mock delay | Email provider + hashed token |
-| Verify | Accept any 6 digits **or** demo code `123456`; reject `000000` as invalid demo | Consume `email_verification_tokens` |
-| Expiry | Client timer messaging (10 min copy) | Server `expires_at` |
+| Send code | No email. Resend only clears the field and shows an info toast | Email provider + hashed token |
+| Verify | Accept any 6 digits; reject `000000` | Consume `email_verification_tokens` |
+| Expiry | Copy explains the demo rule. There is no 10-minute timer | Server `expires_at` |
+| Login password | Not checked. Toast says so before the code screen | Credential check |
 | Rate limit | Resend cooldown (~45s) UI-only | IP/user rate limits |
 | Session | None | JWT + refresh |
 
@@ -80,4 +83,4 @@ Query: `/verify-email?email=user@example.com` (optional; falls back to draft / p
 - Flat `/verify-email` route (consistent with `/login`).
 - Demo codes documented for QA without a mailer.
 - Success always routes into onboarding guidelines gate.
-- Register step 1 selects `UserType` (shared auth); type only affects onboarding/dashboard afterward.
+- Register step 1 selects the account type (shared auth); type only affects onboarding/dashboard afterward.

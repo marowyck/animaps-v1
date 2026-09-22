@@ -16,8 +16,7 @@ Sources: Phase 1 decisions + visual design round + [architecture.md](../../archi
 | Smooth scroll | **`lenis`** (`lenis/react`) — `autoRaf: false` + sync on `gsap.ticker` + **`anchors`** |
 | Animation | **GSAP** + `@gsap/react` + `ScrollTrigger` + **`SplitText`** — easings `back.out` / `elastic.out` |
 | Icons | **`lucide-react`** (+ small inline SVGs for social brands in Footer) |
-| UI bits | **React Bits–style** copy in `components/bits/` (ClickSpark, CurvedLoop, AnimatedContent, …) |
-| WebGL (optional) | **`ogl`** — used by `Aurora` (not composed on `/` today) |
+| UI bits | `components/bits/`: `CurvedLoop`, `AnimatedContent` |
 | Imagery | Clay mascots via `next/image` (`public/images/clay/`, WebP + PNG) |
 | Fonts | **Bagel Fat One** (display) + **Nunito** (body) via `next/font/google` |
 | Monorepo app | `apps/web` (`@animaps/web`) |
@@ -61,7 +60,7 @@ Implementation: [`apps/web/src/app/providers.tsx`](../../../apps/web/src/app/pro
 
 Copy-paste style components, brand-reskinned. Always respect `prefers-reduced-motion` where motion is involved.
 
-Notable: **`CurvedLoop`** — continuous ribbon + **`bridgeAbove`** (section color meets the wave) + **`bridgeBelow`** (pink ribbon paints into footer `#1a1214`). **`AnimatedContent`** defaults to an elastic pop and plays **once** (avoids Lenis leaving nodes at `opacity: 0`). **`ScrollReveal`** has a simple fade and an optional cinematic word-unblur mode.
+Notable: **`CurvedLoop`** — continuous ribbon + **`bridgeAbove`** (section color meets the wave) + **`bridgeBelow`** (pink ribbon paints into footer `#1a1214`). **`AnimatedContent`** defaults to an elastic pop and plays **once** (avoids Lenis leaving nodes at `opacity: 0`). Unused bits (`ClickSpark`, `ScrollReveal`, `Aurora`, and the rest of the old kit) were removed.
 
 **Performance note:** avoid `will-change-transform` on every marquee character (hundreds of layers) — keep it on the track only. Clay idle motion is CSS (`clay-float`), not a GSAP loop. Large figures go through `next/image` (AVIF/WebP, extra device widths); the family PNG uses `unoptimized` for fidelity. `experimental.optimizePackageImports` covers `lucide-react`, `gsap`, `@gsap/react`.
 
@@ -88,15 +87,9 @@ components/                    # design system (app-wide reuse)
   Select.tsx                   # trigger composes Button field
   Checkbox.tsx
   AccordionItem.tsx            # question row composes Button ghost
-  bits/                        # React Bits–style motion/décor
+  bits/                        # motion still used on `/`
     CurvedLoop.tsx             # bridgeAbove + bridgeBelow
-    ClickSpark.tsx
     AnimatedContent.tsx        # elastic pop, once
-    ScrollReveal.tsx
-    DotGrid.tsx
-    TiltedCard.tsx
-    Aurora.tsx                 # ogl; not on `/` today
-    …
 
 i18n/                          # client locale (no path prefixes)
   LocaleProvider.tsx
@@ -134,10 +127,7 @@ features/landing/components/
   FAQ.tsx                      # bg-pastel-pink (feeds pink CurvedLoop bridge)
   WaitlistSection.tsx          # optional section chrome; form embeds in RegisterForm
   Footer.tsx                   # showDivider={false} on `/`; columns + locale + wordmark
-  OrganicBlob.tsx
   SectionDivider.tsx
-  PortalScene.tsx              # SVG portal layers; not on `/` today
-  FloatingDecor.tsx            # parallax décor; not on `/` today
 
 features/waitlist/
   WaitlistForm.tsx             # profile fields; optional onContinue for multi-step

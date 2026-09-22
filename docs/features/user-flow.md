@@ -71,7 +71,7 @@ flowchart TD
 
 Legacy aliases: `/onboarding/intention` → intentions; `/onboarding/animal-type|animal-size|preferences` still work via composite step.
 
-Documented, not built yet: `/animals`, `/matches`, `/messages`, `/reports`, `/favorites`, `/profile`, `/settings`, `/adoption-requests`, `/volunteers`, `/donations`, `/organization`, `/services`, `/location`, `/reviews`.
+Built: `/matches`, `/favorites`, `/profile`, `/settings` (institution settings stay on the institution profile; other accounts link to `/profile`). Still placeholders: `/animals`, `/messages`, `/adoption-requests`, `/volunteers`, `/donations`, `/services`, `/location`, `/reviews`. Reports use `/cases`. Organization nav opens `/profile`.
 
 Messages, donations, reviews, and volunteers have **no schema** yet — keep as “coming soon”. Favorites map to `animal_favorites`.
 

@@ -33,7 +33,7 @@ Related: [design-system.md](design-system.md) · [ui-patterns.md](ui-patterns.md
 | `NavigationItem` | `NavigationItem.tsx` | Sidebar / list nav row |
 | `EmptyState` / `LoadingState` / `ErrorState` / `SuccessState` | `StateBlocks.tsx` | Screen-level states |
 
-Motion kit: `components/bits/*` (landing-oriented).
+Motion kit: `components/bits/AnimatedContent` and `CurvedLoop` only.
 
 ### Modal / overlay rule
 
@@ -48,7 +48,10 @@ Motion kit: `components/bits/*` (landing-oriented).
 | `OnboardingFlow` | Dynamic `/onboarding/[step]` router + redirects |
 | `OnboardingLayout` | Progress, back, skip, continue |
 | `OnboardingProgress` / `OnboardingStep` | Thin helpers / wrappers |
-| `UserTypeSelector` | Register type cards |
+| `TypeSelector` | Shared single/multi card grid. Account, user, organization, institution, and intention selectors are thin catalogs on top of it |
+| `UserTypeSelector` | Legacy Wave 2 type cards (kept; prefer `AccountTypeSelector` at signup) |
+| `AccountTypeSelector` | Signup account cards |
+| `OrganizationTypeSelector` / `InstitutionTypeSelector` | Subtype cards |
 | `IntentionSelector` | Multi/single card grid (intentions, other roles) |
 | `InterestSelector` | Search + tags (max 5) |
 | `AnimalPreferenceForm` | Species / size / filters composite |
@@ -80,6 +83,12 @@ Config: `DASHBOARD_CONFIGS` / `getDashboardConfig` / `filterNavByPermissions` in
 |---|---|
 | `AuthSplitLayout` | Register / login |
 | Discover stack | `features/discover` (domain cards; compose shared `Card` / `Button`) |
+| `InstitutionGatedPage` / `useInstitutionGuard` | Institution-only routes: loading, redirect, shell |
+| `CityMap` | Leaflet + OpenStreetMap city map (`ssr: false`) |
+| `MapMarker` / `ReportMarker` / `AnimalMarker` / `OrganizationMarker` | Circle markers by kind |
+| `LocationPopup` | Marker popup (label + count) |
+
+Institution map pins are **city centroids**, never reporter coordinates. Unknown cities stay in the aggregate list.
 
 ---
 
@@ -98,3 +107,4 @@ Config: `DASHBOARD_CONFIGS` / `getDashboardConfig` / `filterNavByPermissions` in
 - OTP, selectable cards, and form rows are shared so auth and onboarding stay visually consistent.
 - Modal portal is mandatory after viewport blur was clipped by animated parents.
 - Onboarding / dashboard building blocks stay feature-local; only true primitives graduate to `components/`.
+- Type cards share `TypeSelector`. Institution routes share `InstitutionGatedPage` instead of copying the gate.

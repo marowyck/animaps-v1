@@ -38,7 +38,7 @@ Related: [user-flow.md](user-flow.md) · [permissions.md](../security/permission
 
 ## Nav catalogs (initial)
 
-Placeholder routes use `placeholder: true` (“coming soon”). Some items also set `permission`.
+`/profile`, `/matches`, and `/favorites` are live. Messages, animals, and other unfinished modules stay `placeholder: true` (“coming soon”). Some items also set `permission`.
 
 ### PERSON
 

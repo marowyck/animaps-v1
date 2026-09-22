@@ -22,6 +22,8 @@ Docs live in a **taxonomy** (Phase C): `architecture/` · `domains/` · `feature
 | [architecture/migration-plan.md](architecture/migration-plan.md) | Charter ETAPA 3 — phased migration backlog |
 | [architecture/conventions.md](architecture/conventions.md) | Engineering norms: naming, UserType, onboarding, docs checklist |
 | [architecture/bounded-contexts.md](architecture/bounded-contexts.md) | DDD contexts (identity, adoption, occurrence, …) |
+| [architecture/ui-guidelines.md](architecture/ui-guidelines.md) | How to apply the brand on new screens |
+| [architecture/responsive.md](architecture/responsive.md) | Breakpoints and layout rules |
 | [decisions/ADR-001-monorepo-staged-rollout.md](decisions/ADR-001-monorepo-staged-rollout.md) | ADR — pnpm monorepo, wave-gated apps/packages |
 | [decisions/ADR-002-feature-based-frontend.md](decisions/ADR-002-feature-based-frontend.md) | ADR — `features/` organization + public barrels |
 | [decisions/ADR-003-modular-backend-when-scaffolded.md](decisions/ADR-003-modular-backend-when-scaffolded.md) | ADR — Nest modules when `apps/api` starts |
