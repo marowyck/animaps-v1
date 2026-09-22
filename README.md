@@ -10,7 +10,7 @@ Ideal match between guardians and animals + georeferenced reports — care and t
 [![React](https://img.shields.io/badge/React-19-149ECA?logo=react&logoColor=white)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
-[![NestJS](https://img.shields.io/badge/NestJS-planned-E0234E?logo=nestjs&logoColor=white)](https://nestjs.com/)
+[![NestJS](https://img.shields.io/badge/NestJS-scaffold-E0234E?logo=nestjs&logoColor=white)](https://nestjs.com/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-%2B PostGIS-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![pnpm](https://img.shields.io/badge/pnpm-workspaces-F69220?logo=pnpm&logoColor=white)](https://pnpm.io/)
 [![License](https://img.shields.io/badge/license-TBD-lightgrey)](#license)
@@ -57,7 +57,7 @@ ANIMAPS connects people who care for animals:
 |---|---|---|
 | **Phase 0** | Architecture, data model, permissions, LGPD, governance | Done |
 | **Phase 1** | Institutional landing + waitlist (`apps/web`) + onboarding/dashboard shells (frontend mocks) | In progress |
-| **Phase 2** | NestJS API (DDD) + auth + real persistence | Planned |
+| **Phase 2** | NestJS API (DDD) + auth + real persistence | Scaffolded (`@animaps/api`: health + waitlist); auth pending |
 | **Phase 3** | Full web product (matching, map, dashboards) | Planned |
 | **Phase 4** | Mobile apps (Android/iOS) on the same API | Planned |
 
@@ -93,7 +93,7 @@ flowchart LR
     analytics --> db
 ```
 
-Details: [`docs/bounded-contexts.md`](docs/bounded-contexts.md) · data model: [`docs/der.dbml`](docs/der.dbml), [`docs/schema.prisma`](docs/schema.prisma) · evolution: [`docs/schema-evolution.md`](docs/schema-evolution.md).
+Details: [`docs/bounded-contexts.md`](docs/architecture/bounded-contexts.md) · data model: [`docs/der.dbml`](docs/database/der.dbml), [`docs/schema.prisma`](docs/database/schema.prisma) · evolution: [`docs/schema-evolution.md`](docs/database/schema-evolution.md).
 
 **Naming:** English in code and DB (`camelCase` API / `snake_case` DB); UI in **Portuguese (default) + English + Spanish** via client dictionaries (no `/en` or `/es` routes).
 
@@ -138,16 +138,15 @@ Details: [`docs/bounded-contexts.md`](docs/bounded-contexts.md) · data model: [
 ```text
 animaps/
 ├── apps/
-│   └── web/                         # @animaps/web — Next.js
-│       └── src/
-│           ├── app/                 # routes, layout, providers, API routes
-│           │   └── api/waitlist/    # temporary; moves to apps/api in Wave 2
-│           ├── features/
-│           │   ├── landing/         # marketing + clay mascots
-│           │   ├── auth/            # /register + /login
-│           │   ├── waitlist/
-│           │   └── consent/
-│           └── components/          # shared UI primitives + bits/
+│   ├── web/                         # @animaps/web — Next.js
+│   │   └── src/
+│   │       ├── app/                 # routes, layout, providers, API routes
+│   │       │   └── api/waitlist/    # temporary; cut over to Nest when ready
+│   │       ├── features/
+│   │       └── components/
+│   └── api/                         # @animaps/api — NestJS + Prisma
+│       ├── prisma/schema.prisma
+│       └── src/modules/{health,marketing,identity}
 ├── docs/
 ├── package.json
 └── pnpm-workspace.yaml              # apps/* (packages/ when 2+ consumers need them)
@@ -166,9 +165,21 @@ pnpm install
 pnpm dev
 ```
 
-App: [http://localhost:3000](http://localhost:3000).
+Web: [http://localhost:3000](http://localhost:3000).
 
-No required env vars in Phase 1 (waitlist persistence is a placeholder). See [`apps/web/.env.example`](apps/web/.env.example). DB/JWT secrets belong only to future `apps/api`.
+API (optional Wave 2):
+
+```bash
+docker compose up -d
+cp .env.example .env   # or apps/api/.env.example → apps/api/.env
+pnpm prisma:generate
+pnpm prisma:migrate
+pnpm dev:api
+```
+
+API: [http://localhost:3001/health](http://localhost:3001/health). See [`apps/api/README.md`](apps/api/README.md).
+
+Web env: [`apps/web/.env.example`](apps/web/.env.example). DB secrets: root [`.env.example`](.env.example) / [`apps/api/.env.example`](apps/api/.env.example).
 
 ---
 
@@ -177,17 +188,19 @@ No required env vars in Phase 1 (waitlist persistence is a placeholder). See [`a
 | Command | Description |
 |---|---|
 | `pnpm dev` | Start `@animaps/web` |
-| `pnpm build` | Production build |
-| `pnpm lint` | ESLint |
+| `pnpm dev:api` | Start `@animaps/api` (watch) |
+| `pnpm build` | Build all workspace apps |
+| `pnpm lint` | Lint all workspace apps |
 | `pnpm typecheck` | Recursive typecheck |
-
+| `pnpm prisma:generate` | Generate Prisma client |
+| `pnpm prisma:migrate` | Run Prisma migrate (API) |
 ---
 
 ## Design system
 
 Shared primitives in `apps/web/src/components/`: `Button`, `Input`, `Select`, `Checkbox`, `AccordionItem`, `Toast`, `LocaleSwitcher`, plus product UI (`CodeInput`, `Modal`, `SelectableCard`, `InterestTag`, `ProgressIndicator`, `FormSection`, …). Motion kit in `components/bits/`. Clay mascots: `features/landing` (`ClayFigure`) + assets in `apps/web/public/images/clay/`.
 
-Tokens: [`apps/web/src/app/globals.css`](apps/web/src/app/globals.css) (includes semantic `--success` / `--warning` / `--error`). Visual brief: [`docs/landing-design-brief.md`](docs/landing-design-brief.md) · [`docs/design-system.md`](docs/design-system.md).
+Tokens: [`apps/web/src/app/globals.css`](apps/web/src/app/globals.css) (includes semantic `--success` / `--warning` / `--error`). Visual brief: [`docs/landing-design-brief.md`](docs/features/landing/landing-design-brief.md) · [`docs/design-system.md`](docs/features/design-system.md).
 
 ---
 
@@ -201,14 +214,16 @@ All product, domain, and process docs live in [`docs/`](docs/). Full index: [`do
 | Doc | Content |
 |---|---|
 | [architecture.md](docs/architecture.md) | Monorepo boundaries, web/mobile/API roadmap |
-| [bounded-contexts.md](docs/bounded-contexts.md) | DDD contexts |
-| [database.md](docs/database.md) | Onboarding-related schema proposals |
-| [schema-evolution.md](docs/schema-evolution.md) | How to change the DB safely |
-| [der.dbml](docs/der.dbml) | ER diagram — paste into [dbdiagram.io](https://dbdiagram.io) (not Prisma) |
-| [data-dictionary.md](docs/data-dictionary.md) | Fields, types, rules |
-| [schema.prisma](docs/schema.prisma) | Prisma draft (docs only until API) |
-| [permissions-matrix.md](docs/permissions-matrix.md) | Roles and actions |
-| [personas.md](docs/personas.md) | Product personas |
+| [overview.md](docs/domains/overview.md) | Ecosystem layers: PERSON / ORGANIZATION / INSTITUTION + Case |
+| [api.md](docs/api/overview.md) | REST contract (identity + waitlist + onboarding) |
+| [bounded-contexts.md](docs/architecture/bounded-contexts.md) | DDD contexts |
+| [database.md](docs/database/overview.md) | OnboardingDraft → tables map + Wave 2 freeze |
+| [schema-evolution.md](docs/database/schema-evolution.md) | How to change the DB safely |
+| [der.dbml](docs/database/der.dbml) | ER diagram — paste into [dbdiagram.io](https://dbdiagram.io) (not Prisma) |
+| [data-dictionary.md](docs/database/data-dictionary.md) | Fields, types, rules |
+| [schema.prisma](docs/database/schema.prisma) | Prisma draft (docs only until API) |
+| [permissions-matrix.md](docs/security/permissions-matrix.md) | Roles and actions |
+| [personas.md](docs/roadmap/personas.md) | Product personas |
 
 </details>
 
@@ -217,16 +232,16 @@ All product, domain, and process docs live in [`docs/`](docs/). Full index: [`do
 
 | Doc | Content |
 |---|---|
-| [user-flow.md](docs/user-flow.md) | Signup → onboarding → dashboard |
-| [authentication.md](docs/authentication.md) | Email OTP UI |
-| [onboarding.md](docs/onboarding.md) | Progressive steps |
-| [verification.md](docs/verification.md) | Selfie verification |
-| [profile.md](docs/profile.md) | Optional profile fields |
-| [dashboard.md](docs/dashboard.md) | App chrome & home |
-| [matching.md](docs/matching.md) | Discover mocks & future match |
-| [roadmap.md](docs/roadmap.md) | Product phases 01–09 |
-| [design-system.md](docs/design-system.md) | Tokens & states |
-| [components.md](docs/components.md) | Shared UI catalog |
+| [user-flow.md](docs/features/user-flow.md) | Signup → onboarding → dashboard |
+| [authentication.md](docs/features/authentication.md) | Email OTP UI |
+| [onboarding.md](docs/features/onboarding.md) | Progressive steps |
+| [verification.md](docs/features/verification.md) | Selfie verification |
+| [profile.md](docs/domains/profiles.md) | Optional profile fields |
+| [dashboard.md](docs/features/dashboard.md) | App chrome & home |
+| [matching.md](docs/domains/matching.md) | Discover mocks & future match |
+| [roadmap.md](docs/roadmap/roadmap.md) | Product phases 01–09 |
+| [design-system.md](docs/features/design-system.md) | Tokens & states |
+| [components.md](docs/features/components.md) | Shared UI catalog |
 
 </details>
 
@@ -235,9 +250,9 @@ All product, domain, and process docs live in [`docs/`](docs/). Full index: [`do
 
 | Doc | Content |
 |---|---|
-| [landing-content-brief.md](docs/landing-content-brief.md) | Goals, audiences, tone, sections |
-| [landing-design-brief.md](docs/landing-design-brief.md) | Palette, type, motion, UI |
-| [landing-tech-plan.md](docs/landing-tech-plan.md) | Stack, form, SEO, deploy |
+| [landing-content-brief.md](docs/features/landing/landing-content-brief.md) | Goals, audiences, tone, sections |
+| [landing-design-brief.md](docs/features/landing/landing-design-brief.md) | Palette, type, motion, UI |
+| [landing-tech-plan.md](docs/features/landing/landing-tech-plan.md) | Stack, form, SEO, deploy |
 
 </details>
 
@@ -246,11 +261,11 @@ All product, domain, and process docs live in [`docs/`](docs/). Full index: [`do
 
 | Doc | Content |
 |---|---|
-| [lgpd-checklist.md](docs/lgpd-checklist.md) | Minimum LGPD checklist for MVP |
-| [privacy-policy-draft.md](docs/privacy-policy-draft.md) | Internal privacy draft (consumer PT copy may follow) |
-| [git-and-ci.md](docs/git-and-ci.md) | Branches, Conventional Commits, CI |
-| [pilot-ngo.md](docs/pilot-ngo.md) | Pilot NGO selection/onboarding |
-| [ui-patterns.md](docs/ui-patterns.md) | Toasts, language, auth chrome |
+| [lgpd-checklist.md](docs/security/lgpd-checklist.md) | Minimum LGPD checklist for MVP |
+| [privacy-policy-draft.md](docs/security/privacy-policy-draft.md) | Internal privacy draft (consumer PT copy may follow) |
+| [git-and-ci.md](docs/infrastructure/git-and-ci.md) | Branches, Conventional Commits, CI |
+| [pilot-ngo.md](docs/roadmap/pilot-ngo.md) | Pilot NGO selection/onboarding |
+| [ui-patterns.md](docs/features/ui-patterns.md) | Toasts, language, auth chrome |
 
 </details>
 
@@ -258,7 +273,7 @@ All product, domain, and process docs live in [`docs/`](docs/). Full index: [`do
 
 ## Contribution
 
-See [`docs/git-and-ci.md`](docs/git-and-ci.md):
+See [`docs/git-and-ci.md`](docs/infrastructure/git-and-ci.md):
 
 - **Branches:** `main` · `develop` · `feature/<slug>` · `hotfix/<slug>`
 - **Commits:** [Conventional Commits](https://www.conventionalcommits.org/)

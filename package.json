@@ -4,8 +4,12 @@
   "packageManager": "pnpm@10.28.2",
   "scripts": {
     "dev": "pnpm --filter @animaps/web dev",
-    "build": "pnpm --filter @animaps/web build",
-    "lint": "pnpm --filter @animaps/web lint",
-    "typecheck": "pnpm -r run typecheck"
+    "dev:api": "pnpm --filter @animaps/api start:dev",
+    "dev:web": "pnpm --filter @animaps/web dev",
+    "build": "pnpm -r run build",
+    "lint": "pnpm -r run lint",
+    "typecheck": "pnpm -r run typecheck",
+    "prisma:generate": "pnpm --filter @animaps/api prisma:generate",
+    "prisma:migrate": "pnpm --filter @animaps/api prisma:migrate"
   }
 }

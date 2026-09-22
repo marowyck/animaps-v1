@@ -1,0 +1,26 @@
+# Local Postgres + PostGIS for apps/api (Nest + Prisma).
+# apps/web does not connect to this database.
+# Copy .env.example → .env and keep secrets out of git.
+# Start: docker compose up -d
+
+services:
+  postgres:
+    image: postgis/postgis:16-3.5
+    container_name: animaps-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: animaps
+      POSTGRES_PASSWORD: animaps
+      POSTGRES_DB: animaps
+    ports:
+      - "5432:5432"
+    volumes:
+      - animaps_pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U animaps -d animaps"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  animaps_pg:
