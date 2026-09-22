@@ -1,10 +1,13 @@
-// ANIMAPS — Prisma schema draft (documentation only)
-// Move to apps/api/prisma/schema.prisma when scaffolding the API.
-// Evolution rules: docs/schema-evolution.md
-// dbdiagram.io: paste docs/der.dbml (DBML) — do NOT paste this Prisma file.
+// ANIMAPS — Prisma schema draft (docs mirror)
+// Runtime source of truth: apps/api/prisma/schema.prisma
+// Evolution rules: docs/database/schema-evolution.md
+// Field map (onboarding draft → tables): docs/database/overview.md
+// REST contract: docs/api/overview.md
+// dbdiagram.io: paste docs/database/der.dbml (DBML) — do NOT paste this Prisma file.
 // PostGIS: enable extension + GIST index on occurrences.location via raw SQL in migration.
 //   CREATE EXTENSION IF NOT EXISTS postgis;
 //   CREATE INDEX occurrences_location_gix ON occurrences USING GIST (location);
+// Animal origin: at least one of organization_id / person_id / veterinary_id — CHECK in raw SQL.
 
 generator client {
   provider        = "prisma-client-js"
@@ -24,6 +27,160 @@ enum UserType {
   other
   public_agency
   biologist
+}
+
+enum AccountStatus {
+  active
+  pending_verification
+  suspended
+}
+
+/// Ecosystem layer (nullable until cutover). user_type remains authoritative for current UI.
+/// Mapping: person/other/biologist → person; ong/veterinary_clinic → organization; public_agency → institution.
+enum AccountType {
+  person
+  organization
+  institution
+}
+
+enum OrganizationType {
+  ngo
+  animal_shelter
+  veterinary_clinic
+  veterinary_hospital
+  animal_business
+  animal_service
+  private_institution
+  other
+}
+
+enum InstitutionVerificationStatus {
+  draft
+  pending_verification
+  under_review
+  approved
+  rejected
+  suspended
+}
+
+enum JurisdictionType {
+  national
+  state
+  municipal
+  regional
+  local
+}
+
+enum RoleScope {
+  platform
+  organization
+  institution
+}
+
+enum MembershipStatus {
+  invited
+  active
+  suspended
+  left
+}
+
+enum CaseSource {
+  citizen
+  ngo
+  veterinary
+  institution
+  system
+  import
+  api
+  partner
+}
+
+enum CaseStatus {
+  new
+  triage
+  under_review
+  assigned
+  in_progress
+  waiting_information
+  resolved
+  closed
+  cancelled
+  duplicate
+  invalid
+}
+
+/// Citizen-facing derived/public status — never claim "sent to agency" without a routing match.
+enum CaseCitizenStatus {
+  registered_on_platform
+  awaiting_routing
+  routed
+  received
+  under_analysis
+  in_progress
+  resolved
+}
+
+enum CasePriority {
+  low
+  medium
+  high
+  critical
+}
+
+enum ReporterVisibility {
+  public
+  restricted
+  confidential
+  anonymous
+}
+
+enum DataClassification {
+  public
+  internal
+  restricted
+  confidential
+  sensitive
+}
+
+enum LocationPrecision {
+  exact
+  approximate
+  city
+  region
+  hidden
+}
+
+enum CaseCommentVisibility {
+  internal
+  public
+}
+
+enum CaseParticipantRole {
+  reporter
+  assignee
+  observer
+  routed_institution
+  origin_organization
+  responder
+}
+
+enum CaseRoutingReason {
+  initial
+  no_competence
+  out_of_region
+  out_of_type
+  partnership
+  specialization
+  other
+}
+
+enum IntegrationSyncStatus {
+  pending
+  syncing
+  success
+  failed
+  retrying
+  disabled
 }
 
 /// Catch-all signup path roles (OTHER user type). Add values only.
@@ -114,6 +271,14 @@ enum AuditAction {
   account_deleted
   data_exported
   occurrence_validated
+  institution_verified
+  institution_suspended
+  case_created
+  case_status_changed
+  case_assigned
+  case_routed
+  role_granted
+  membership_changed
 }
 
 enum OccurrenceReportReason {
@@ -130,6 +295,7 @@ enum WaitlistProfileType {
   ong
   veterinary_clinic
   other
+  institution
 }
 
 enum ClientType {
@@ -159,50 +325,126 @@ enum NotificationType {
   generic
 }
 
-model User {
-  id              String    @id @default(uuid()) @db.Uuid
-  name            String
-  email           String    @unique
-  username        String?   @unique
-  /// Hashed credential for email/password register (UI: min 8, uppercase, special).
-  /// Nullable for Google/OAuth — app rule: passwordHash OR external identity required.
-  /// Never store plaintext; never put passwords on WaitlistEntry.
-  passwordHash    String?   @map("password_hash")
-  userType        UserType  @map("user_type")
-  avatarUrl       String?   @map("avatar_url")
-  status          String?   @default("active")
-  phone           String?
-  city            String?
-  state           String?
-  lgpdConsent     Boolean   @default(false) @map("lgpd_consent")
-  lgpdConsentAt   DateTime? @map("lgpd_consent_at")
-  emailVerifiedAt DateTime? @map("email_verified_at")
-  deletedAt       DateTime? @map("deleted_at")
-  createdAt       DateTime  @default(now()) @map("created_at")
-  updatedAt       DateTime  @updatedAt @map("updated_at")
+/// PERSON multi-select intentions. Legacy values kept; new ecosystem values added.
+/// Map UI ADOPTER→adopt, REPORTER→report, COMMUNITY_MEMBER→community, LOST_PET_OWNER→lost_pet_owner, etc.
+enum UserIntentionKind {
+  adopt
+  pet_owner
+  help_animals
+  report
+  lost_animal
+  found_animal
+  community
+  explore
+  volunteer
+  foster_home
+  independent_protector
+  animal_professional
+  lost_pet_owner
+  found_pet_reporter
+  other
+}
 
-  personProfile       PersonProfile?
-  organizationProfile OrganizationProfile?
-  veterinaryProfile   VeterinaryProfile?
-  otherProfile        OtherProfile?
+enum LocationPermission {
+  granted
+  denied
+  not_requested
+}
+
+enum VerificationKind {
+  selfie
+  institutional
+}
+
+enum VerificationStatus {
+  pending
+  processing
+  approved
+  rejected
+  retry_required
+}
+
+enum PrivacyVisibility {
+  public
+  matches
+  private
+}
+
+enum AuthProvider {
+  google
+}
+
+model User {
+  id                    String        @id @default(uuid()) @db.Uuid
+  name                  String
+  email                 String        @unique
+  username              String?       @unique
+  /// Hashed credential for email/password register (UI: min 8, uppercase, special).
+  /// Nullable for Google/OAuth — app rule: passwordHash OR at least one AuthIdentity.
+  /// Never store plaintext; never put passwords on WaitlistEntry.
+  passwordHash          String?       @map("password_hash")
+  userType              UserType      @map("user_type")
+  /// Nullable until ecosystem cutover; derive from userType when unset.
+  accountType           AccountType?  @map("account_type")
+  avatarUrl             String?       @map("avatar_url")
+  status                AccountStatus @default(active)
+  phone                 String?
+  city                  String?
+  state                 String?
+  lgpdConsent           Boolean       @default(false) @map("lgpd_consent")
+  lgpdConsentAt         DateTime?     @map("lgpd_consent_at")
+  /// Snapshot of the published policy slug accepted at consent time (e.g. v1-draft).
+  privacyPolicyVersion  String?       @map("privacy_policy_version")
+  guidelinesAcceptedAt  DateTime?     @map("guidelines_accepted_at")
+  emailVerifiedAt       DateTime?     @map("email_verified_at")
+  deletedAt             DateTime?     @map("deleted_at")
+  createdAt             DateTime      @default(now()) @map("created_at")
+  updatedAt             DateTime      @updatedAt @map("updated_at")
+
+  personProfile         PersonProfile?
+  organizationProfile   OrganizationProfile?
+  veterinaryProfile     VeterinaryProfile?
+  otherProfile          OtherProfile?
 
   animalsAsOrganization Animal[]               @relation("AnimalOrganization")
   animalsAsPerson       Animal[]               @relation("AnimalPerson")
   animalsAsVeterinary   Animal[]               @relation("AnimalVeterinary")
   adoptionsAsPerson     Adoption[]             @relation("AdoptionPerson")
   adoptionsAsOrganization Adoption[]           @relation("AdoptionOrganization")
-  occurrences            Occurrence[]           @relation("OccurrenceAuthor")
-  validatedOccurrences   Occurrence[]           @relation("OccurrenceValidator")
-  occurrenceFollows      OccurrenceFollower[]
-  notifications          Notification[]
-  refreshTokens          RefreshToken[]
+  occurrences           Occurrence[]           @relation("OccurrenceAuthor")
+  validatedOccurrences  Occurrence[]           @relation("OccurrenceValidator")
+  occurrenceFollows     OccurrenceFollower[]
+  notifications         Notification[]
+  refreshTokens         RefreshToken[]
   emailVerificationTokens EmailVerificationToken[]
-  passwordResetTokens    PasswordResetToken[]
-  auditLogsAsActor       AuditLog[]             @relation("AuditActor")
-  occurrenceReports      OccurrenceReport[]     @relation("OccurrenceReportAuthor")
-  devicePushTokens       DevicePushToken[]
+  passwordResetTokens   PasswordResetToken[]
+  auditLogsAsActor      AuditLog[]             @relation("AuditActor")
+  occurrenceReports     OccurrenceReport[]     @relation("OccurrenceReportAuthor")
+  devicePushTokens      DevicePushToken[]
+  intentions            UserIntention[]
+  userInterests         UserInterest[]
+  animalPreference      AnimalPreference?
+  verificationRequests  VerificationRequest[]
+  userLocation          UserLocation?
+  profileFields         UserProfileField[]
+  animalFavorites       AnimalFavorite[]
+  authIdentities        AuthIdentity[]
+  notificationPreference NotificationPreference?
+  waitlistLead          WaitlistEntry?
+
+  organizationMemberships OrganizationMember[]
+  institutionMemberships  InstitutionMember[]
+  platformRoles           UserPlatformRole[]
+  casesReported           Case[]                 @relation("CaseReporter")
+  casesAssigned           Case[]                 @relation("CaseAssignee")
+  caseAssignments         CaseAssignment[]
+  caseComments            CaseComment[]
+  caseStatusChanges       CaseStatusHistory[]
+  caseParticipations      CaseParticipant[]
+  dataExports             DataExport[]
 
   @@index([deletedAt])
+  @@index([accountType])
   @@map("users")
 }
 
@@ -212,6 +454,7 @@ model PersonProfile {
   availableTime         AvailableTime?    @map("available_time")
   hasPreviousExperience Boolean           @default(false) @map("has_previous_experience")
   hasOtherPets          Boolean           @default(false) @map("has_other_pets")
+  /// Narrow denormalized hint for simple matching. Source of truth for onboarding: animal_preferences.
   preferredSize         PreferredSize?    @map("preferred_size")
   preferredSpecies      PreferredSpecies? @map("preferred_species")
   isRescuer             Boolean           @default(false) @map("is_rescuer")
@@ -225,7 +468,8 @@ model PersonProfile {
 
 model OrganizationProfile {
   userId              String   @id @map("user_id") @db.Uuid
-  companyTaxId        String   @map("company_tax_id")
+  /// Required by application before institutional verification / verified=true. Nullable on first persist.
+  companyTaxId        String?  @map("company_tax_id")
   tradeName           String   @map("trade_name")
   description         String?
   phone               String?
@@ -234,6 +478,8 @@ model OrganizationProfile {
   socialLinks         Json?    @map("social_links")
   city                String?
   state               String?
+  /// Free-text operating area from onboarding (`areaOfOperation`). Radius stays numeric for matching.
+  areaOfOperation     String?  @map("area_of_operation")
   animalTypesServed   String[] @default([]) @map("animal_types_served")
   hasShelter          Boolean  @default(false) @map("has_shelter")
   doesAdoptions       Boolean  @default(false) @map("does_adoptions")
@@ -252,7 +498,8 @@ model OrganizationProfile {
 
 model VeterinaryProfile {
   userId          String   @id @map("user_id") @db.Uuid
-  companyTaxId    String   @map("company_tax_id")
+  /// Required by application before institutional verification / verified=true. Nullable on first persist.
+  companyTaxId    String?  @map("company_tax_id")
   tradeName       String?  @map("trade_name")
   description     String?
   phone           String?
@@ -284,34 +531,175 @@ model OtherProfile {
   @@map("other_profiles")
 }
 
-model Animal {
-  id            String        @id @default(uuid()) @db.Uuid
-  organizationId String?      @map("organization_id") @db.Uuid
-  personId      String?       @map("person_id") @db.Uuid
-  veterinaryId  String?       @map("veterinary_id") @db.Uuid
-  name          String
-  species       AnimalSpecies
-  breed         String?
-  estimatedAge  String?       @map("estimated_age")
-  size          AnimalSize?
-  temperament   String[]      @default([])
-  healthHistory String?       @map("health_history")
-  /// MVP: object-storage URLs. Promote to MediaAsset in a dedicated wave (see schema-evolution.md).
-  photos        String[]      @default([])
-  status        AnimalStatus  @default(available)
-  deletedAt     DateTime?     @map("deleted_at")
-  createdAt     DateTime      @default(now()) @map("created_at")
-  updatedAt     DateTime      @updatedAt @map("updated_at")
+model UserIntention {
+  userId     String             @map("user_id") @db.Uuid
+  intention  UserIntentionKind
+  createdAt  DateTime           @default(now()) @map("created_at")
 
-  organization User?      @relation("AnimalOrganization", fields: [organizationId], references: [id])
-  person       User?      @relation("AnimalPerson", fields: [personId], references: [id])
-  veterinary   User?      @relation("AnimalVeterinary", fields: [veterinaryId], references: [id])
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, intention])
+  @@map("user_intentions")
+}
+
+/// Seed slugs aligned to frontend INTEREST_CATALOG (dogs, cats, adoption, …).
+model Interest {
+  id        String   @id
+  sortOrder Int      @default(0) @map("sort_order")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  users UserInterest[]
+
+  @@map("interests")
+}
+
+model UserInterest {
+  userId     String   @map("user_id") @db.Uuid
+  interestId String   @map("interest_id")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  interest Interest @relation(fields: [interestId], references: [id], onDelete: Cascade)
+
+  @@id([userId, interestId])
+  @@map("user_interests")
+}
+
+model AnimalPreference {
+  userId         String   @id @map("user_id") @db.Uuid
+  species        String[] @default([])
+  sizes          String[] @default([])
+  ages           String[] @default([])
+  sex            String[] @default([])
+  vaccination    String[] @default([])
+  neutered       String[] @default([])
+  specialNeeds   String[] @default([]) @map("special_needs")
+  compatibility  String[] @default([])
+  energyLevel    String[] @default([]) @map("energy_level")
+  environment    String[] @default([])
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("animal_preferences")
+}
+
+model VerificationRequest {
+  id               String             @id @default(uuid()) @db.Uuid
+  userId           String             @map("user_id") @db.Uuid
+  kind             VerificationKind
+  status           VerificationStatus @default(pending)
+  provider         String?
+  providerRef      String?            @map("provider_ref")
+  /// Private / short-lived object-storage URL. Never public profiles.
+  mediaUrl         String?            @map("media_url")
+  rejectionReason  String?            @map("rejection_reason")
+  createdAt        DateTime           @default(now()) @map("created_at")
+  updatedAt        DateTime           @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, kind, createdAt])
+  @@map("verification_requests")
+}
+
+model UserLocation {
+  userId           String             @id @map("user_id") @db.Uuid
+  permission       LocationPermission @default(not_requested)
+  city             String?
+  state            String?
+  neighborhood     String?
+  /// Approximate only — round in application before persist (LGPD). Do not store raw GPS.
+  approxLatitude   Decimal?           @map("approx_latitude") @db.Decimal(8, 3)
+  approxLongitude  Decimal?           @map("approx_longitude") @db.Decimal(8, 3)
+  updatedAt        DateTime           @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_locations")
+}
+
+model UserProfileField {
+  userId     String            @map("user_id") @db.Uuid
+  fieldKey   String            @map("field_key")
+  value      String?
+  visibility PrivacyVisibility @default(private)
+  updatedAt  DateTime          @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, fieldKey])
+  @@map("user_profile_fields")
+}
+
+model AuthIdentity {
+  id              String       @id @default(uuid()) @db.Uuid
+  userId          String       @map("user_id") @db.Uuid
+  provider        AuthProvider
+  providerSubject String       @map("provider_subject")
+  createdAt       DateTime     @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerSubject])
+  @@index([userId])
+  @@map("auth_identities")
+}
+
+model NotificationPreference {
+  userId    String   @id @map("user_id") @db.Uuid
+  inApp     Boolean  @default(true) @map("in_app")
+  email     Boolean  @default(true)
+  push      Boolean  @default(false)
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notification_preferences")
+}
+
+model Animal {
+  id             String        @id @default(uuid()) @db.Uuid
+  organizationId String?       @map("organization_id") @db.Uuid
+  personId       String?       @map("person_id") @db.Uuid
+  veterinaryId   String?       @map("veterinary_id") @db.Uuid
+  name           String
+  species        AnimalSpecies
+  breed          String?
+  estimatedAge   String?       @map("estimated_age")
+  size           AnimalSize?
+  temperament    String[]      @default([])
+  healthHistory  String?       @map("health_history")
+  /// MVP: object-storage URLs. Promote to MediaAsset in a dedicated wave (see schema-evolution.md).
+  photos         String[]      @default([])
+  status         AnimalStatus  @default(available)
+  deletedAt      DateTime?     @map("deleted_at")
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
+
+  organization User?            @relation("AnimalOrganization", fields: [organizationId], references: [id])
+  person       User?            @relation("AnimalPerson", fields: [personId], references: [id])
+  veterinary   User?            @relation("AnimalVeterinary", fields: [veterinaryId], references: [id])
   adoptions    Adoption[]
+  favorites    AnimalFavorite[]
 
   @@index([status])
   @@index([species, size])
   @@index([deletedAt])
   @@map("animals")
+}
+
+model AnimalFavorite {
+  userId    String   @map("user_id") @db.Uuid
+  animalId  String   @map("animal_id") @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  animal Animal @relation(fields: [animalId], references: [id], onDelete: Cascade)
+
+  @@id([userId, animalId])
+  @@index([animalId])
+  @@map("animal_favorites")
 }
 
 model Adoption {
@@ -336,25 +724,33 @@ model Adoption {
 }
 
 model Occurrence {
-  id          String           @id @default(uuid()) @db.Uuid
-  userId      String?          @map("user_id") @db.Uuid
-  type        OccurrenceType
-  description String?
+  id             String           @id @default(uuid()) @db.Uuid
+  userId         String?          @map("user_id") @db.Uuid
+  type           OccurrenceType
+  description    String?
   /// PostGIS geography(Point, 4326) — queries via $queryRaw (ST_DWithin, etc.)
-  location    Unsupported("geography(Point, 4326)")
-  photos      String[]         @default([])
-  status      OccurrenceStatus @default(open)
-  validatedBy String?          @map("validated_by") @db.Uuid
-  createdAt   DateTime         @default(now()) @map("created_at")
-  updatedAt   DateTime         @updatedAt @map("updated_at")
+  location       Unsupported("geography(Point, 4326)")
+  /// Denormalized for LGPD-safe aggregates (export/heatmap). Never substitute for precise location.
+  city           String?
+  neighborhood   String?
+  photos         String[]         @default([])
+  status         OccurrenceStatus @default(open)
+  validatedBy    String?          @map("validated_by") @db.Uuid
+  /// Hash only. Plaintext claim token returned once to the anonymous reporter.
+  claimTokenHash String?          @unique @map("claim_token_hash")
+  geoConsentAt   DateTime?        @map("geo_consent_at")
+  createdAt      DateTime         @default(now()) @map("created_at")
+  updatedAt      DateTime         @updatedAt @map("updated_at")
 
   author    User?                @relation("OccurrenceAuthor", fields: [userId], references: [id])
   validator User?                @relation("OccurrenceValidator", fields: [validatedBy], references: [id])
   followers OccurrenceFollower[]
   reports   OccurrenceReport[]
+  cases     Case[]
 
   @@index([status, type])
   @@index([createdAt])
+  @@index([city, neighborhood])
   @@map("occurrences")
 }
 
@@ -451,16 +847,20 @@ model DevicePushToken {
 
 /// Marketing lead from `/register` step 1 (name, email, profile, city/state, LGPD).
 /// Step 2 password is validated in the web UI only today and must NOT be persisted here.
-/// When identity auth ships: create `User` (+ hash) and optionally link/convert this lead.
+/// When identity auth ships: create `User` (+ hash) and set converted_user_id.
 model WaitlistEntry {
-  id              String              @id @default(uuid()) @db.Uuid
-  name            String
-  email           String              @unique
-  profileType     WaitlistProfileType @map("profile_type")
-  city            String?
-  state           String?
-  lgpdConsentAt   DateTime            @map("lgpd_consent_at")
-  createdAt       DateTime            @default(now()) @map("created_at")
+  id                   String              @id @default(uuid()) @db.Uuid
+  name                 String
+  email                String              @unique
+  profileType          WaitlistProfileType @map("profile_type")
+  city                 String?
+  state                String?
+  lgpdConsentAt        DateTime            @map("lgpd_consent_at")
+  privacyPolicyVersion String?             @map("privacy_policy_version")
+  convertedUserId      String?             @unique @map("converted_user_id") @db.Uuid
+  createdAt            DateTime            @default(now()) @map("created_at")
+
+  convertedUser User? @relation(fields: [convertedUserId], references: [id], onDelete: SetNull)
 
   @@index([createdAt])
   @@map("waitlist_entries")
@@ -495,4 +895,495 @@ model OccurrenceReport {
 
   @@index([occurrenceId])
   @@map("occurrence_reports")
+}
+
+// =============================================================================
+// Ecosystem layer (Fase 1 foundation) — additive; see docs/overview.md
+// Case supersedes Occurrence for institutional flows; Occurrence kept for Wave 2 map.
+// =============================================================================
+
+model Organization {
+  id          String           @id @default(uuid()) @db.Uuid
+  /// Creating user (owner); memberships hold the team.
+  ownerUserId String?          @map("owner_user_id") @db.Uuid
+  organizationType OrganizationType @map("organization_type")
+  tradeName   String           @map("trade_name")
+  legalName   String?          @map("legal_name")
+  description String?
+  companyTaxId String?         @map("company_tax_id")
+  email       String?
+  phone       String?
+  website     String?
+  socialLinks Json?            @map("social_links")
+  city        String?
+  state       String?
+  country     String?          @default("BR")
+  verified    Boolean          @default(false)
+  deletedAt   DateTime?        @map("deleted_at")
+  createdAt   DateTime         @default(now()) @map("created_at")
+  updatedAt   DateTime         @updatedAt @map("updated_at")
+
+  members OrganizationMember[]
+  cases   Case[]               @relation("CaseOrganization")
+
+  @@index([organizationType])
+  @@index([verified])
+  @@map("organizations")
+}
+
+model OrganizationMember {
+  id             String           @id @default(uuid()) @db.Uuid
+  organizationId String           @map("organization_id") @db.Uuid
+  userId         String           @map("user_id") @db.Uuid
+  roleId         String           @map("role_id") @db.Uuid
+  status         MembershipStatus @default(active)
+  createdAt      DateTime         @default(now()) @map("created_at")
+  updatedAt      DateTime         @updatedAt @map("updated_at")
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role         Role         @relation(fields: [roleId], references: [id])
+
+  @@unique([organizationId, userId])
+  @@index([userId])
+  @@map("organization_members")
+}
+
+/// Lookup-backed institution kinds — add rows, not enum migrations.
+model InstitutionType {
+  id        String   @id
+  labelKey  String   @map("label_key")
+  sortOrder Int      @default(0) @map("sort_order")
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  institutions Institution[]
+
+  @@map("institution_types")
+}
+
+model Institution {
+  id                   String                        @id @default(uuid()) @db.Uuid
+  institutionTypeId    String                        @map("institution_type_id")
+  officialName         String                        @map("official_name")
+  publicName           String                        @map("public_name")
+  description          String?
+  city                 String?
+  state                String?
+  country              String?                       @default("BR")
+  email                String?
+  emailDomain          String?                       @map("email_domain")
+  phone                String?
+  website              String?
+  socialLinks          Json?                         @map("social_links")
+  address              String?
+  responsibleDepartment String?                      @map("responsible_department")
+  dataResponsibleArea  String?                       @map("data_responsible_area")
+  verificationStatus   InstitutionVerificationStatus @default(draft) @map("verification_status")
+  verifiedAt           DateTime?                     @map("verified_at")
+  deletedAt            DateTime?                     @map("deleted_at")
+  createdAt            DateTime                      @default(now()) @map("created_at")
+  updatedAt            DateTime                      @updatedAt @map("updated_at")
+
+  institutionType InstitutionType           @relation(fields: [institutionTypeId], references: [id])
+  departments     InstitutionDepartment[]
+  teams           InstitutionTeam[]
+  members         InstitutionMember[]
+  jurisdictions   InstitutionJurisdiction[]
+  capabilities    InstitutionCapability[]
+  reportPolicy    InstitutionReportPolicy?
+  cases           Case[]                    @relation("CaseInstitution")
+  routingsFrom    CaseRouting[]             @relation("RoutingFrom")
+  routingsTo      CaseRouting[]             @relation("RoutingTo")
+  integrations    IntegrationConnection[]
+
+  @@index([institutionTypeId])
+  @@index([verificationStatus])
+  @@map("institutions")
+}
+
+model InstitutionDepartment {
+  id                 String   @id @default(uuid()) @db.Uuid
+  institutionId      String   @map("institution_id") @db.Uuid
+  parentDepartmentId String?  @map("parent_department_id") @db.Uuid
+  name               String
+  description        String?
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  institution      Institution            @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  parentDepartment InstitutionDepartment? @relation("DepartmentTree", fields: [parentDepartmentId], references: [id])
+  childDepartments InstitutionDepartment[] @relation("DepartmentTree")
+  teams            InstitutionTeam[]
+  members          InstitutionMember[]
+
+  @@index([institutionId])
+  @@map("institution_departments")
+}
+
+model InstitutionTeam {
+  id           String   @id @default(uuid()) @db.Uuid
+  institutionId String  @map("institution_id") @db.Uuid
+  departmentId String?  @map("department_id") @db.Uuid
+  name         String
+  description  String?
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  institution Institution            @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  department  InstitutionDepartment? @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+  members     InstitutionMember[]
+  assignments CaseAssignment[]
+
+  @@index([institutionId])
+  @@map("institution_teams")
+}
+
+model InstitutionMember {
+  id             String           @id @default(uuid()) @db.Uuid
+  institutionId  String           @map("institution_id") @db.Uuid
+  userId         String           @map("user_id") @db.Uuid
+  roleId         String           @map("role_id") @db.Uuid
+  departmentId   String?          @map("department_id") @db.Uuid
+  teamId         String?          @map("team_id") @db.Uuid
+  status         MembershipStatus @default(active)
+  createdAt      DateTime         @default(now()) @map("created_at")
+  updatedAt      DateTime         @updatedAt @map("updated_at")
+
+  institution Institution            @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  user        User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role        Role                   @relation(fields: [roleId], references: [id])
+  department  InstitutionDepartment? @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+  team        InstitutionTeam?       @relation(fields: [teamId], references: [id], onDelete: SetNull)
+
+  @@unique([institutionId, userId])
+  @@index([userId])
+  @@map("institution_members")
+}
+
+model InstitutionJurisdiction {
+  id              String          @id @default(uuid()) @db.Uuid
+  institutionId   String          @map("institution_id") @db.Uuid
+  jurisdictionType JurisdictionType @map("jurisdiction_type")
+  /// Free-text or code (city name, IBGE code, state UF, etc.)
+  value           String
+  country         String?         @default("BR")
+  createdAt       DateTime        @default(now()) @map("created_at")
+
+  institution Institution @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+
+  @@index([institutionId, jurisdictionType])
+  @@index([value])
+  @@map("institution_jurisdictions")
+}
+
+model InstitutionCapability {
+  id            String   @id @default(uuid()) @db.Uuid
+  institutionId String   @map("institution_id") @db.Uuid
+  caseTypeId    String   @map("case_type_id")
+  accepts       Boolean  @default(true)
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  institution Institution @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  caseType    CaseType    @relation(fields: [caseTypeId], references: [id], onDelete: Cascade)
+
+  @@unique([institutionId, caseTypeId])
+  @@map("institution_capabilities")
+}
+
+model InstitutionReportPolicy {
+  institutionId       String   @id @map("institution_id") @db.Uuid
+  anonymousReports    Boolean  @default(true) @map("anonymous_reports")
+  requiredFields      Json?    @map("required_fields")
+  acceptedCaseTypeIds String[] @default([]) @map("accepted_case_type_ids")
+  routingRules        Json?    @map("routing_rules")
+  responseVisibility  String?  @map("response_visibility")
+  updatedAt           DateTime @updatedAt @map("updated_at")
+
+  institution Institution @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+
+  @@map("institution_report_policies")
+}
+
+model Role {
+  id          String    @id @default(uuid()) @db.Uuid
+  /// Stable key e.g. INSTITUTION_ADMIN, ORGANIZATION_MEMBER
+  key         String    @unique
+  scope       RoleScope
+  description String?
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  permissions            RolePermission[]
+  organizationMembers    OrganizationMember[]
+  institutionMembers     InstitutionMember[]
+  userPlatformRoles      UserPlatformRole[]
+
+  @@index([scope])
+  @@map("roles")
+}
+
+model Permission {
+  id          String   @id @default(uuid()) @db.Uuid
+  /// Stable key e.g. VIEW_INCOMING_REPORTS, CREATE_ANIMAL
+  key         String   @unique
+  domain      String
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  roles RolePermission[]
+
+  @@index([domain])
+  @@map("permissions")
+}
+
+model RolePermission {
+  roleId       String @map("role_id") @db.Uuid
+  permissionId String @map("permission_id") @db.Uuid
+
+  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+  @@map("role_permissions")
+}
+
+model UserPlatformRole {
+  userId    String   @map("user_id") @db.Uuid
+  roleId    String   @map("role_id") @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([userId, roleId])
+  @@map("user_platform_roles")
+}
+
+model Location {
+  id                String             @id @default(uuid()) @db.Uuid
+  /// Optional precise point — prefer approx + city for public surfaces.
+  latitude          Decimal?           @db.Decimal(10, 7)
+  longitude         Decimal?           @db.Decimal(10, 7)
+  city              String?
+  state             String?
+  country           String?            @default("BR")
+  neighborhood      String?
+  postalCode        String?            @map("postal_code")
+  formattedAddress  String?            @map("formatted_address")
+  precision         LocationPrecision  @default(approximate)
+  privacyLevel      DataClassification @default(restricted) @map("privacy_level")
+  createdAt         DateTime           @default(now()) @map("created_at")
+  updatedAt         DateTime           @updatedAt @map("updated_at")
+
+  cases Case[]
+
+  @@index([city, state])
+  @@map("locations")
+}
+
+model CaseType {
+  id          String   @id
+  labelKey    String   @map("label_key")
+  sortOrder   Int      @default(0) @map("sort_order")
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  cases        Case[]
+  capabilities InstitutionCapability[]
+
+  @@map("case_types")
+}
+
+/// Central work item — denunciations, lost/found, help requests, risk situations, etc.
+/// Supersedes Occurrence for institutional routing; Occurrence remains for legacy map MVP.
+model Case {
+  id                 String              @id @default(uuid()) @db.Uuid
+  referenceNumber    String              @unique @map("reference_number")
+  caseTypeId         String              @map("case_type_id")
+  status             CaseStatus          @default(new)
+  citizenStatus      CaseCitizenStatus   @default(registered_on_platform) @map("citizen_status")
+  priority           CasePriority        @default(medium)
+  source             CaseSource
+  title              String?
+  description        String?
+  locationId         String?             @map("location_id") @db.Uuid
+  reporterId         String?             @map("reporter_id") @db.Uuid
+  organizationId     String?             @map("organization_id") @db.Uuid
+  institutionId      String?             @map("institution_id") @db.Uuid
+  assignedUserId     String?             @map("assigned_user_id") @db.Uuid
+  assignedTeamId     String?             @map("assigned_team_id") @db.Uuid
+  reporterVisibility ReporterVisibility  @default(restricted) @map("reporter_visibility")
+  classification     DataClassification  @default(internal)
+  /// Optional link to Wave 2 Occurrence until expand-contract unifies models.
+  occurrenceId       String?             @map("occurrence_id") @db.Uuid
+  /// Hash only for anonymous claim (mirrors Occurrence.claimTokenHash).
+  claimTokenHash     String?             @unique @map("claim_token_hash")
+  geoConsentAt       DateTime?           @map("geo_consent_at")
+  closedAt           DateTime?           @map("closed_at")
+  createdAt          DateTime            @default(now()) @map("created_at")
+  updatedAt          DateTime            @updatedAt @map("updated_at")
+
+  caseType     CaseType          @relation(fields: [caseTypeId], references: [id])
+  location     Location?         @relation(fields: [locationId], references: [id])
+  reporter     User?             @relation("CaseReporter", fields: [reporterId], references: [id], onDelete: SetNull)
+  organization Organization?     @relation("CaseOrganization", fields: [organizationId], references: [id], onDelete: SetNull)
+  institution  Institution?      @relation("CaseInstitution", fields: [institutionId], references: [id], onDelete: SetNull)
+  assignedUser User?             @relation("CaseAssignee", fields: [assignedUserId], references: [id], onDelete: SetNull)
+  occurrence   Occurrence?       @relation(fields: [occurrenceId], references: [id], onDelete: SetNull)
+  statusHistory CaseStatusHistory[]
+  assignments  CaseAssignment[]
+  routings     CaseRouting[]
+  comments     CaseComment[]
+  attachments  CaseAttachment[]
+  participants CaseParticipant[]
+
+  @@index([status, priority])
+  @@index([citizenStatus])
+  @@index([caseTypeId])
+  @@index([institutionId, status])
+  @@index([occurrenceId])
+  @@index([createdAt])
+  @@map("cases")
+}
+
+model CaseStatusHistory {
+  id          String             @id @default(uuid()) @db.Uuid
+  caseId      String             @map("case_id") @db.Uuid
+  fromStatus  CaseStatus?        @map("from_status")
+  toStatus    CaseStatus         @map("to_status")
+  fromCitizen CaseCitizenStatus? @map("from_citizen_status")
+  toCitizen   CaseCitizenStatus? @map("to_citizen_status")
+  actorId     String?            @map("actor_id") @db.Uuid
+  note        String?
+  createdAt   DateTime           @default(now()) @map("created_at")
+
+  case  Case  @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  actor User? @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([caseId, createdAt])
+  @@map("case_status_history")
+}
+
+model CaseAssignment {
+  id        String    @id @default(uuid()) @db.Uuid
+  caseId    String    @map("case_id") @db.Uuid
+  userId    String?   @map("user_id") @db.Uuid
+  teamId    String?   @map("team_id") @db.Uuid
+  assignedBy String?  @map("assigned_by") @db.Uuid
+  note      String?
+  createdAt DateTime  @default(now()) @map("created_at")
+  endedAt   DateTime? @map("ended_at")
+
+  case Case             @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  user User?            @relation(fields: [userId], references: [id], onDelete: SetNull)
+  team InstitutionTeam? @relation(fields: [teamId], references: [id], onDelete: SetNull)
+
+  @@index([caseId, createdAt])
+  @@map("case_assignments")
+}
+
+model CaseRouting {
+  id                 String            @id @default(uuid()) @db.Uuid
+  caseId             String            @map("case_id") @db.Uuid
+  fromInstitutionId  String?           @map("from_institution_id") @db.Uuid
+  toInstitutionId    String?           @map("to_institution_id") @db.Uuid
+  reason             CaseRoutingReason @default(initial)
+  note               String?
+  createdAt          DateTime          @default(now()) @map("created_at")
+
+  case             Case         @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  fromInstitution  Institution? @relation("RoutingFrom", fields: [fromInstitutionId], references: [id], onDelete: SetNull)
+  toInstitution    Institution? @relation("RoutingTo", fields: [toInstitutionId], references: [id], onDelete: SetNull)
+
+  @@index([caseId, createdAt])
+  @@map("case_routing")
+}
+
+model CaseComment {
+  id         String                @id @default(uuid()) @db.Uuid
+  caseId     String                @map("case_id") @db.Uuid
+  authorId   String?               @map("author_id") @db.Uuid
+  body       String
+  visibility CaseCommentVisibility @default(internal)
+  createdAt  DateTime              @default(now()) @map("created_at")
+  updatedAt  DateTime              @updatedAt @map("updated_at")
+
+  case   Case  @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  author User? @relation(fields: [authorId], references: [id], onDelete: SetNull)
+
+  @@index([caseId, createdAt])
+  @@map("case_comments")
+}
+
+model CaseAttachment {
+  id        String   @id @default(uuid()) @db.Uuid
+  caseId    String   @map("case_id") @db.Uuid
+  url       String
+  mimeType  String?  @map("mime_type")
+  kind      String?  @default("photo")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  case Case @relation(fields: [caseId], references: [id], onDelete: Cascade)
+
+  @@index([caseId])
+  @@map("case_attachments")
+}
+
+model CaseParticipant {
+  id        String              @id @default(uuid()) @db.Uuid
+  caseId    String              @map("case_id") @db.Uuid
+  userId    String?             @map("user_id") @db.Uuid
+  role      CaseParticipantRole
+  createdAt DateTime            @default(now()) @map("created_at")
+
+  case Case  @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([caseId])
+  @@map("case_participants")
+}
+
+model DataExport {
+  id            String   @id @default(uuid()) @db.Uuid
+  requestedById String?  @map("requested_by_id") @db.Uuid
+  institutionId String?  @map("institution_id") @db.Uuid
+  format        String
+  purpose       String?
+  filters       Json?
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  requestedBy User? @relation(fields: [requestedById], references: [id], onDelete: SetNull)
+
+  @@index([createdAt])
+  @@map("data_exports")
+}
+
+model IntegrationConnection {
+  id            String                @id @default(uuid()) @db.Uuid
+  institutionId String?               @map("institution_id") @db.Uuid
+  name          String
+  provider      String?
+  status        IntegrationSyncStatus @default(pending)
+  config        Json?
+  createdAt     DateTime              @default(now()) @map("created_at")
+  updatedAt     DateTime              @updatedAt @map("updated_at")
+
+  institution Institution?      @relation(fields: [institutionId], references: [id], onDelete: SetNull)
+  logs        IntegrationLog[]
+
+  @@map("integration_connections")
+}
+
+model IntegrationLog {
+  id           String                @id @default(uuid()) @db.Uuid
+  connectionId String                @map("connection_id") @db.Uuid
+  status       IntegrationSyncStatus
+  message      String?
+  payload      Json?
+  createdAt    DateTime              @default(now()) @map("created_at")
+
+  connection IntegrationConnection @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+
+  @@index([connectionId, createdAt])
+  @@map("integration_logs")
 }

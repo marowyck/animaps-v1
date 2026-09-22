@@ -22,7 +22,7 @@ Depending on use, we may process:
 
 | Category | Examples |
 |---|---|
-| Account | Name, email, password (hashed), phone, city/state, profile type (`guardian`, NGO, clinic, public agency, biologist) |
+| Account | Name, email, password (hashed), phone, city/state, profile type (`person`, ONG, veterinary clinic, public agency, biologist) |
 | Tax IDs | `taxId` / `companyTaxId` when required (adoption request or institutional signup) |
 | Adoption preferences | Space, time, experience, size/species prefs |
 | Animals & adoptions | Animal info, status, adoption history |

@@ -13,7 +13,7 @@ CI workflow (`.github/workflows/ci.yml`) evolves with apps; workspace is `apps/*
 | CI | **GitHub Actions** |
 | Human review | Solo MVP — **no** required approval; self-review + CI |
 | Branches | `main` = production · `develop` = staging · `feature/*` → `develop` · `hotfix/*` → `main` (+ backport `develop`) |
-| CI on PR | `lint` + `typecheck` + `test` + `build` (per existing app) |
+| CI on PR | `lint` + `typecheck` + `build` (add `test` when a runner exists) |
 
 ---
 
@@ -83,7 +83,7 @@ ci: define lint typecheck test build matrix
 - [ ] No secrets (.env, tokens, keys) in the diff
 - [ ] Code/schema identifiers in English
 - [ ] Aligned with domain docs (bounded contexts / permissions / LGPD) if touching rules
-- [ ] CI green (lint, typecheck, test, build) — when pipeline exists
+- [ ] CI green (lint, typecheck, build) — when pipeline exists
 - [ ] Self-review done (diff reread)
 ```
 
@@ -104,7 +104,7 @@ ci: define lint typecheck test build matrix
   package.json    # root scripts
 ```
 
-**No `packages/*` required today.** Extract shared packages (`types`, `validation`, `api-client`) only when a second app needs the same contracts — see [`architecture.md`](architecture.md).
+**No `packages/*` required today.** Extract shared packages (`types`, `validation`, `api-client`) only when a second app needs the same contracts — see [`architecture.md`](../architecture.md).
 
 **Root scripts** (recursive over apps):
 
@@ -129,8 +129,10 @@ Filters: `pnpm --filter @animaps/web <cmd>` (and future `@animaps/api`, etc.).
 1. Checkout + setup pnpm + install (`pnpm install --frozen-lockfile`)
 2. `lint`
 3. `typecheck`
-4. `test`
-5. `build`
+4. `build`
+5. `test` — **when** the app has a test script (web does not yet)
+
+Workflow: [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml).
 
 **Notes**
 
@@ -144,7 +146,7 @@ Filters: `pnpm --filter @animaps/web <cmd>` (and future `@animaps/api`, etc.).
 
 | Environment | Typical branch | Hosting (planned) |
 |---|---|---|
-| Local | any | Docker/local Postgres+PostGIS (API Wave 2) |
+| Local | any | `docker compose up` PostGIS (API Wave 2) + `pnpm dev` (web) |
 | Staging | `develop` | Railway/Render (api) + Vercel preview/staging (web) |
 | Production | `main` | Same providers, separate prod project |
 
@@ -162,7 +164,8 @@ Use GitHub Actions secrets / host env vars.
 ## 7. Intent checklist
 
 - [x] `pnpm-workspace.yaml` with `apps/*` (no packages required)
-- [ ] `.github/workflows/ci.yml` for existing apps
+- [x] `.github/workflows/ci.yml` for existing apps (`lint` + `typecheck` + `build`)
 - [ ] Protect `main` and `develop` (required checks; approvals = 0 solo MVP)
 - [ ] Staging ≠ production (separate URLs and secrets)
 - [ ] Add `api` / `mobile` to CI matrix when scaffolded
+- [ ] Add `test` job when a runner exists

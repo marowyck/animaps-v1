@@ -10,7 +10,9 @@ Flags: `verified` (ONG / clinic), `isRescuer` (person).
 
 **Auth:** `anon` = no login · `auth` = any authenticated user · `own` = resource owner.
 
-Related: [permissions.md](permissions.md) (UI capability catalog) · [user-types.md](user-types.md) · [bounded-contexts.md](bounded-contexts.md) · [data-dictionary.md](data-dictionary.md).
+Related: [permissions.md](permissions.md) (UI capability catalog) · [roles-and-permissions.md](../domains/roles-and-permissions.md) (future RBAC) · [user-types.md](../domains/user-types.md) · [bounded-contexts.md](../architecture/bounded-contexts.md) · [data-dictionary.md](../database/data-dictionary.md).
+
+Institutional actions (inbox, assign, route, export) will move to **RBAC memberships** when that API ships. This matrix stays the Wave 2 target for adoption / occurrence / identity guards keyed by `user_type` + `verified` / `isRescuer`.
 
 ---
 
@@ -35,8 +37,8 @@ Related: [permissions.md](permissions.md) (UI capability catalog) · [user-types
 | `RegisterUser` | allow | deny* | deny* | deny* | deny* | deny* |
 | `EditOwnProfile` | deny | allow | allow | allow | allow | allow |
 | `DeleteOwnAccount` | deny | allow | allow | allow | allow | allow |
-| `VerifyNgo` (admin) | deny | deny | deny | deny | cond¹ | deny |
-| `VerifyClinic` (admin) | deny | deny | deny | deny | cond¹ | deny |
+| `VerifyOrganization` (admin) | deny | deny | deny | deny | cond¹ | deny |
+| `VerifyVeterinary` (admin) | deny | deny | deny | deny | cond¹ | deny |
 
 \* Already authenticated does not re-register the same type in MVP (separate flow if needed).  
 ¹ MVP: `public_agency` may verify institutions; or internal manual process — document operator.
@@ -99,7 +101,7 @@ Related: [permissions.md](permissions.md) (UI capability catalog) · [user-types
 | `GetRegionalDashboard` | deny | deny | cond³ | deny | allow | allow |
 | `GetWideAggregateDashboard` | deny | deny | deny | deny | allow | allow |
 | `ExportAnonymizedData` | deny | deny | deny | deny | allow | allow |
-| `VerifyNgo` / `VerifyClinic` | deny | deny | deny | deny | cond¹ | deny |
+| `VerifyOrganization` / `VerifyVeterinary` | deny | deny | deny | deny | cond¹ | deny |
 
 ---
 

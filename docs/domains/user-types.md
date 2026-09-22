@@ -2,7 +2,7 @@
 
 `UserType` is the **single account discriminator**. Authentication is shared; type-specific data lives in 1:1 profile tables. Public signup exposes four types; two additional values are admin-assigned only.
 
-Related: [conventions.md](conventions.md) · [profiles.md](profiles.md) · [onboarding.md](onboarding.md) · [permissions.md](permissions.md) · [database.md](database.md) · [schema.prisma](schema.prisma).
+Related: [conventions.md](../architecture/conventions.md) · [profiles.md](profiles.md) · [onboarding.md](../features/onboarding.md) · [permissions.md](../security/permissions.md) · [database.md](../database/overview.md) · [account-types.md](account-types.md) · [overview.md](overview.md) · [schema.prisma](../database/schema.prisma).
 
 **Source (web):** `apps/web/src/features/user-types/`
 
@@ -69,6 +69,20 @@ There is **no** post-verify “choose your type” screen.
 
 ---
 
+## Ecosystem mapping
+
+`user_type` remains the **UI discriminator** (register, onboarding, dashboard, `hasPermission`). `users.account_type` is **additive and nullable** — it does not replace this catalog in this pass.
+
+| `user_type` | `account_type` |
+|---|---|
+| `person`, `other`, `biologist` | `person` |
+| `ong`, `veterinary_clinic` | `organization` |
+| `public_agency` | `institution` |
+
+OTHER folds into PERSON **intentions** later; PUBLIC_AGENCY maps to INSTITUTION membership; BIOLOGIST maps to PERSON + `animal_professional` + a permission. Full tables: [account-types.md](account-types.md).
+
+---
+
 ## Downstream consumers
 
 | Consumer | How it uses `userType` |
@@ -85,3 +99,4 @@ There is **no** post-verify “choose your type” screen.
 - One enum avoids `UserRole` vs waitlist `profileType` drift.
 - Admin-only types share the enum so Nest guards stay uniform.
 - Profile tables remain 1:1 with `users.id` for LGPD boundaries and `verified` flags (org/clinic), instead of large JSON columns on `users`.
+- `account_type` is additive and nullable; `user_type` stays the UI discriminator until cutover ([account-types.md](account-types.md)).

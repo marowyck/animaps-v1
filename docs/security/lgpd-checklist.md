@@ -1,6 +1,6 @@
 # ANIMAPS — LGPD checklist (minimum)
 
-Phase 0 artifact. Cross-check [`data-dictionary.md`](data-dictionary.md) and [`privacy-policy-draft.md`](privacy-policy-draft.md).
+Phase 0 artifact. Cross-check [`data-dictionary.md`](../database/data-dictionary.md) and [`privacy-policy-draft.md`](privacy-policy-draft.md).
 
 **Status:** product decisions closed; **controller not yet named** (blocking for public launch).
 
@@ -28,13 +28,13 @@ Phase 0 artifact. Cross-check [`data-dictionary.md`](data-dictionary.md) and [`p
 | `email` | `users` | yes | unique; login |
 | `passwordHash` | `users` | yes | never expose via API |
 | `phone` | `users` | yes | |
-| `taxId` | `guardian_profiles` | yes | required only for adoption |
-| `companyTaxId` | `ngo_profiles` / `clinic_profiles` | yes | |
-| `location` (lat/lng) | `occurrences` | yes* | *geo needed — do not export raw |
+| `taxId` | `person_profiles` | yes | required only for adoption |
+| `companyTaxId` | `organization_profiles` / `veterinary_profiles` | yes | nullable until institutional verification |
+| `location` (lat/lng) | `occurrences` | yes* | *geo needed — do not export raw; aggregates use `city` / `neighborhood` |
 | Photos (URL + EXIF) | object storage + refs | yes if identifiable | strip EXIF on upload (Phase 4) |
 | IP / user-agent | anon occurrence rate-limit logs | yes | short log retention |
-| Guardian preferences | `guardian_profiles` | yes | light behavioral profile |
-| Waitlist lead | `WaitlistEntry` | yes | name, email, profile type, city |
+| Person preferences | `person_profiles` / `animal_preferences` | yes | light behavioral profile |
+| Waitlist lead | `waitlist_entries` | yes | name, email, profile type, city |
 
 Not personal by themselves: species, animal status, neighborhood aggregates.
 
@@ -122,7 +122,7 @@ Fields: `users.lgpdConsent` (boolean) + `users.lgpdConsentAt` (timestamp). Waitl
 
 | Event | Why |
 |---|---|
-| `VerifyNgo` / `VerifyClinic` | Institutional decision |
+| `VerifyOrganization` / `VerifyVeterinary` | Institutional decision |
 | Role / `verified` / `isRescuer` changes | Authorization |
 | `DeleteAccount` | Data-subject rights |
 | `ExportAnonymizedData` | Data egress trail |

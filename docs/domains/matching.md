@@ -2,13 +2,13 @@
 
 Conceptual “match” experience for **animals, people, NGOs, protectors** — not a visual Tinder clone. Algorithm deferred; frontend ships structure, types, and mocks.
 
-Related: [dashboard.md](dashboard.md) · [onboarding.md](onboarding.md) · [bounded-contexts.md](bounded-contexts.md) (`adoption`).
+Related: [dashboard.md](../features/dashboard.md) · [onboarding.md](../features/onboarding.md) · [bounded-contexts.md](../architecture/bounded-contexts.md) (`adoption`).
 
 ---
 
 ## Discover UI
 
-Route: `/discover` (primary app home; `/dashboard` redirects here).
+Route: `/discover` is the primary home for **PERSON** and **OTHER**. `/dashboard` redirects to `/discover` **only for PERSON**; ONG / clinic (and OTHER) keep `/dashboard` as documented in [dashboard.md](../features/dashboard.md) / [user-flow.md](../features/user-flow.md).
 
 - Large full-height `DiscoverCard`
 - No page title above the card

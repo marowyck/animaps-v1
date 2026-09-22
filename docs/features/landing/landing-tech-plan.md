@@ -1,9 +1,9 @@
 # Landing Page — Tech Plan (Phase 1)
 
 Technical plan for the ANIMAPS institutional landing.  
-Sources: Phase 1 decisions + visual design round + [`ANIMAPS_Roadmap.md`](../ANIMAPS_Roadmap.md) §1.4–1.6 + content/design briefs.
+Sources: Phase 1 decisions + visual design round + [architecture.md](../../architecture.md) + content/design briefs.
 
-**Status:** Pink/green friendly landing in [`apps/web`](../apps/web) (Bagel Fat One + Nunito, clay mascots, BubbleMenu, shared `Button` / `LocaleSwitcher` / `Toast`, waves, React Bits, GSAP, client i18n PT/EN/ES). Public `/` is product-only **fullscreen sections**. Account capture on **`/register`** (two-step UI → waitlist API); **`/login`** split UI (email/password + Google CTA UI-only). Header exposes **Log in** + **Create account**.
+**Status:** Pink/green friendly landing in [`apps/web`](../../../apps/web) (Bagel Fat One + Nunito, clay mascots, BubbleMenu, shared `Button` / `LocaleSwitcher` / `Toast`, waves, React Bits, GSAP, client i18n PT/EN/ES). Public `/` is product-only **fullscreen sections**. Account capture on **`/register`** (two-step UI → waitlist API); **`/login`** split UI (email/password + Google CTA UI-only). Header exposes **Log in** + **Create account**.
 
 ---
 
@@ -30,7 +30,7 @@ Custom cursor: out of scope.
 
 ### Lenis + GSAP (confirmed pattern)
 
-Implementation: [`apps/web/src/app/providers.tsx`](../apps/web/src/app/providers.tsx)
+Implementation: [`apps/web/src/app/providers.tsx`](../../../apps/web/src/app/providers.tsx)
 
 - Package: `lenis` → `import { ReactLenis, useLenis } from "lenis/react"`
 - Sync: `lenis.on("scroll", ScrollTrigger.update)` + `gsap.ticker.add((t) => lenis.raf(t * 1000))` with `autoRaf: false`
@@ -152,7 +152,7 @@ features/consent/
 
 **Button rule:** feature code must not hardcode styled `<button>` / CTA `<a>` — use `Button` or `LocaleSwitcher`. See design brief § Header / Button system.
 
-**Toast rule:** any outcome the user must notice uses `useToast` — never permanent inline status under forms. See [`ui-patterns.md`](ui-patterns.md).
+**Toast rule:** any outcome the user must notice uses `useToast` — never permanent inline status under forms. See [`ui-patterns.md`](../ui-patterns.md).
 
 Visual specs: [`landing-design-brief.md`](landing-design-brief.md).
 
@@ -182,7 +182,7 @@ Visual specs: [`landing-design-brief.md`](landing-design-brief.md).
 
 - `name` (string, required)
 - `email` (string, required, validated)
-- `profileType` (enum: `guardian` | `ngo` | `clinic` | `other`, required)
+- `profileType` (enum: `person` | `ong` | `veterinary_clinic` | `other`, required)
 - `city` / `state` (optional)
 - `lgpdConsent` (boolean, required = true)
 
@@ -215,9 +215,9 @@ Field/code names: **English** (`camelCase` API / `snake_case` DB); UI in **PT / 
 - Default: **Portuguese** (`pt`)
 - Also: **English** (`en`), **Spanish** (`es`)
 - **No locale path prefixes** (`/en`, `/es`) — same app routes; English path names: `/`, `/register`, `/login`, and section hashes `/#top`, `/#solution`, `/#how-it-works`, `/#audience`, `/#faq`, `/#privacy`, `/#terms`
-- Implementation: [`apps/web/src/i18n/`](../apps/web/src/i18n/) — typed message dictionaries + `LocaleProvider` / `useT()` / `useLocale()`
+- Implementation: [`apps/web/src/i18n/`](../../../apps/web/src/i18n/) — typed message dictionaries + `LocaleProvider` / `useT()` / `useLocale()`
 - Preference: `localStorage` key `animaps-locale`; first visit falls back to `navigator.language`
-- Language UI: **`LocaleSwitcher`** (`variant="menu"` — Language label + icon dropdown) in Header, Footer, and auth; see [`ui-patterns.md`](ui-patterns.md)
+- Language UI: **`LocaleSwitcher`** (`variant="menu"` — Language label + icon dropdown) in Header, Footer, and auth; see [`ui-patterns.md`](../ui-patterns.md)
 - Provider wraps the app **outside** Lenis so locale works with reduced motion; `ToastProvider` sits inside `LocaleProvider`
 - SSR metadata in `layout.tsx` stays PT default; client syncs title after hydrate
 - Nav keys include `language` / `languageAria`; auth includes `showPassword` / `hidePassword`
@@ -256,7 +256,7 @@ Required at launch:
 |---|---|
 | Own domain | **Pending** |
 | Vercel deploy + HTTPS | Planned |
-| Staging | Prefer `develop` → Vercel preview (see [`git-and-ci.md`](git-and-ci.md)) |
+| Staging | Prefer `develop` → Vercel preview (see [`git-and-ci.md`](../../infrastructure/git-and-ci.md)) |
 | Production | Branch `main` |
 
 ---
@@ -324,8 +324,8 @@ Required at launch:
 - Roadmap §1.4–1.6
 - [`landing-content-brief.md`](landing-content-brief.md)
 - [`landing-design-brief.md`](landing-design-brief.md)
-- [`ui-patterns.md`](ui-patterns.md) — toasts, language menu, password rules, reveal toggle
-- [`git-and-ci.md`](git-and-ci.md)
-- [`lgpd-checklist.md`](lgpd-checklist.md)
-- [`privacy-policy-draft.md`](privacy-policy-draft.md)
-- [`architecture.md`](architecture.md)
+- [`ui-patterns.md`](../ui-patterns.md) — toasts, language menu, password rules, reveal toggle
+- [`git-and-ci.md`](../../infrastructure/git-and-ci.md)
+- [`lgpd-checklist.md`](../../security/lgpd-checklist.md)
+- [`privacy-policy-draft.md`](../../security/privacy-policy-draft.md)
+- [`architecture.md`](../../architecture.md)

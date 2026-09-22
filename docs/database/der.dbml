@@ -4,7 +4,7 @@
 
 Project animaps {
   database_type: 'PostgreSQL'
-  Note: 'Responsible adoption + georeferenced animal occurrences. UserType (person/ong/veterinary_clinic/other/…) on users; type-specific 1:1 profiles. /register is two-step UI: waitlist_entries stores the lead only; password hashes belong on users.password_hash when identity auth ships (never on waitlist).'
+  Note: 'Responsible adoption + georeferenced animal occurrences. UserType on users; type-specific 1:1 profiles. /register is two-step UI: waitlist_entries stores the lead only; password hashes belong on users.password_hash when identity auth ships (never on waitlist). Wave 2 identity tables: user_intentions, interests, animal_preferences, verification_requests, user_locations, user_profile_fields, auth_identities. Ecosystem layer (Fase 1, additive): nullable account_type on users; organizations and institutions; RBAC; Case (supersedes Occurrence for institutional flows); routing; integrations.'
 }
 
 Enum user_type {
@@ -14,6 +14,12 @@ Enum user_type {
   other
   public_agency
   biologist
+}
+
+Enum account_status {
+  active
+  pending_verification
+  suspended
 }
 
 Enum other_role {
@@ -101,6 +107,7 @@ Enum waitlist_profile_type {
   ong
   veterinary_clinic
   other
+  institution
 }
 
 Enum client_type {
@@ -136,6 +143,14 @@ Enum audit_action {
   account_deleted
   data_exported
   occurrence_validated
+  institution_verified
+  institution_suspended
+  case_created
+  case_status_changed
+  case_assigned
+  case_routed
+  role_granted
+  membership_changed
 }
 
 Enum occurrence_report_reason {
@@ -145,20 +160,215 @@ Enum occurrence_report_reason {
   inappropriate_content
 }
 
+Enum user_intention_kind {
+  adopt
+  pet_owner
+  help_animals
+  report
+  lost_animal
+  found_animal
+  community
+  explore
+  volunteer
+  foster_home
+  independent_protector
+  animal_professional
+  lost_pet_owner
+  found_pet_reporter
+  other
+}
+
+Enum location_permission {
+  granted
+  denied
+  not_requested
+}
+
+Enum verification_kind {
+  selfie
+  institutional
+}
+
+Enum verification_status {
+  pending
+  processing
+  approved
+  rejected
+  retry_required
+}
+
+Enum privacy_visibility {
+  public
+  matches
+  private
+}
+
+Enum auth_provider {
+  google
+}
+
+Enum account_type {
+  person
+  organization
+  institution
+}
+
+Enum organization_type {
+  ngo
+  animal_shelter
+  veterinary_clinic
+  veterinary_hospital
+  animal_business
+  animal_service
+  private_institution
+  other
+}
+
+Enum institution_verification_status {
+  draft
+  pending_verification
+  under_review
+  approved
+  rejected
+  suspended
+}
+
+Enum jurisdiction_type {
+  national
+  state
+  municipal
+  regional
+  local
+}
+
+Enum role_scope {
+  platform
+  organization
+  institution
+}
+
+Enum membership_status {
+  invited
+  active
+  suspended
+  left
+}
+
+Enum case_source {
+  citizen
+  ngo
+  veterinary
+  institution
+  system
+  import
+  api
+  partner
+}
+
+Enum case_status {
+  new
+  triage
+  under_review
+  assigned
+  in_progress
+  waiting_information
+  resolved
+  closed
+  cancelled
+  duplicate
+  invalid
+}
+
+Enum case_citizen_status {
+  registered_on_platform
+  awaiting_routing
+  routed
+  received
+  under_analysis
+  in_progress
+  resolved
+}
+
+Enum case_priority {
+  low
+  medium
+  high
+  critical
+}
+
+Enum location_precision {
+  exact
+  approximate
+  city
+  region
+  hidden
+}
+
+Enum data_classification {
+  public
+  internal
+  restricted
+  confidential
+  sensitive
+}
+
+Enum reporter_visibility {
+  public
+  restricted
+  confidential
+  anonymous
+}
+
+Enum case_comment_visibility {
+  internal
+  public
+}
+
+Enum case_participant_role {
+  reporter
+  assignee
+  observer
+  routed_institution
+  origin_organization
+  responder
+}
+
+Enum case_routing_reason {
+  initial
+  no_competence
+  out_of_region
+  out_of_type
+  partnership
+  specialization
+  other
+}
+
+Enum integration_sync_status {
+  pending
+  syncing
+  success
+  failed
+  retrying
+  disabled
+}
+
 Table users {
   id uuid [pk]
   name varchar [not null]
   email varchar [unique, not null]
   username varchar [unique, note: 'Optional public handle']
-  password_hash varchar [note: 'Email/password register hash (strong password in UI). Nullable for Google/OAuth — app rule: hash OR external identity. Never plaintext.']
+  password_hash varchar [note: 'Email/password hash. Nullable for Google/OAuth — app rule: hash OR auth_identities row. Never plaintext.']
   user_type user_type [not null]
+  account_type account_type [note: 'Nullable until ecosystem cutover; derive from user_type when unset']
   avatar_url varchar
-  status varchar [default: 'active']
+  status account_status [not null, default: 'active']
   phone varchar
   city varchar
   state varchar
   lgpd_consent boolean [not null, default: false]
   lgpd_consent_at timestamp
+  privacy_policy_version varchar [note: 'Policy slug accepted at consent (e.g. v1-draft)']
+  guidelines_accepted_at timestamp
   email_verified_at timestamp
   deleted_at timestamp [note: 'Soft delete / LGPD erasure readiness']
   created_at timestamp [not null, default: `now()`]
@@ -166,6 +376,7 @@ Table users {
 
   indexes {
     deleted_at
+    account_type
   }
 }
 
@@ -175,16 +386,16 @@ Table person_profiles {
   available_time available_time
   has_previous_experience boolean [not null, default: false]
   has_other_pets boolean [not null, default: false]
-  preferred_size preferred_size
+  preferred_size preferred_size [note: 'Narrow hint; source of truth is animal_preferences']
   preferred_species preferred_species
-  is_rescuer boolean [not null, default: false, note: 'Allows person to register animals']
+  is_rescuer boolean [not null, default: false, note: 'Allows person to register animals. Not collected in current onboarding.']
   tax_id varchar [note: 'Individual tax id (e.g. CPF in BR)']
   updated_at timestamp [not null]
 }
 
 Table organization_profiles {
   user_id uuid [pk, ref: - users.id]
-  company_tax_id varchar [not null]
+  company_tax_id varchar [note: 'Nullable on first persist; required before verified=true']
   trade_name varchar [not null]
   description text
   phone varchar
@@ -193,6 +404,7 @@ Table organization_profiles {
   social_links jsonb
   city varchar
   state varchar
+  area_of_operation varchar [note: 'Free-text from onboarding areaOfOperation']
   animal_types_served "varchar[]" [default: '{}']
   has_shelter boolean [not null, default: false]
   does_adoptions boolean [not null, default: false]
@@ -207,7 +419,7 @@ Table organization_profiles {
 
 Table veterinary_profiles {
   user_id uuid [pk, ref: - users.id]
-  company_tax_id varchar [not null]
+  company_tax_id varchar [note: 'Nullable on first persist; required before verified=true']
   trade_name varchar
   description text
   phone varchar
@@ -228,6 +440,108 @@ Table other_profiles {
   user_id uuid [pk, ref: - users.id]
   other_role other_role
   notes text
+  updated_at timestamp [not null]
+}
+
+Table user_intentions {
+  user_id uuid [not null, ref: > users.id]
+  intention user_intention_kind [not null]
+  created_at timestamp [not null, default: `now()`]
+
+  indexes {
+    (user_id, intention) [pk]
+  }
+}
+
+Table interests {
+  id varchar [pk, note: 'Slug matching frontend INTEREST_CATALOG']
+  sort_order int [not null, default: 0]
+  created_at timestamp [not null, default: `now()`]
+}
+
+Table user_interests {
+  user_id uuid [not null, ref: > users.id]
+  interest_id varchar [not null, ref: > interests.id]
+  created_at timestamp [not null, default: `now()`]
+
+  indexes {
+    (user_id, interest_id) [pk]
+  }
+}
+
+Table animal_preferences {
+  user_id uuid [pk, ref: - users.id]
+  species "varchar[]" [default: '{}']
+  sizes "varchar[]" [default: '{}']
+  ages "varchar[]" [default: '{}']
+  sex "varchar[]" [default: '{}']
+  vaccination "varchar[]" [default: '{}']
+  neutered "varchar[]" [default: '{}']
+  special_needs "varchar[]" [default: '{}']
+  compatibility "varchar[]" [default: '{}']
+  energy_level "varchar[]" [default: '{}']
+  environment "varchar[]" [default: '{}']
+  updated_at timestamp [not null]
+}
+
+Table verification_requests {
+  id uuid [pk]
+  user_id uuid [not null, ref: > users.id]
+  kind verification_kind [not null]
+  status verification_status [not null, default: 'pending']
+  provider varchar
+  provider_ref varchar
+  media_url text [note: 'Private short-lived URL; not a biometric template']
+  rejection_reason varchar
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp [not null]
+
+  indexes {
+    (user_id, kind, created_at)
+  }
+}
+
+Table user_locations {
+  user_id uuid [pk, ref: - users.id]
+  permission location_permission [not null, default: 'not_requested']
+  city varchar
+  state varchar
+  neighborhood varchar
+  approx_latitude decimal [note: 'Rounded in app before persist']
+  approx_longitude decimal
+  updated_at timestamp [not null]
+}
+
+Table user_profile_fields {
+  user_id uuid [not null, ref: > users.id]
+  field_key varchar [not null, note: 'e.g. animal_experience, housing_type']
+  value varchar
+  visibility privacy_visibility [not null, default: 'private']
+  updated_at timestamp [not null]
+
+  indexes {
+    (user_id, field_key) [pk]
+  }
+}
+
+Table auth_identities {
+  id uuid [pk]
+  user_id uuid [not null, ref: > users.id]
+  provider auth_provider [not null]
+  provider_subject varchar [not null]
+  created_at timestamp [not null, default: `now()`]
+
+  indexes {
+    (provider, provider_subject) [unique]
+    user_id
+  }
+}
+
+Table notification_preferences {
+  user_id uuid [pk, ref: - users.id]
+  in_app boolean [not null, default: true]
+  email boolean [not null, default: true]
+  push boolean [not null, default: false]
   updated_at timestamp [not null]
 }
 
@@ -256,6 +570,17 @@ Table animals {
   }
 }
 
+Table animal_favorites {
+  user_id uuid [not null, ref: > users.id]
+  animal_id uuid [not null, ref: > animals.id]
+  created_at timestamp [not null, default: `now()`]
+
+  indexes {
+    (user_id, animal_id) [pk]
+    animal_id
+  }
+}
+
 Table adoptions {
   id uuid [pk]
   animal_id uuid [not null, ref: > animals.id]
@@ -280,15 +605,20 @@ Table occurrences {
   type occurrence_type [not null]
   description text
   location geography [not null, note: 'PostGIS geography(Point, 4326); GIST index via raw SQL']
+  city varchar [note: 'Denormalized for LGPD-safe aggregates']
+  neighborhood varchar
   photos "text[]"
   status occurrence_status [not null, default: 'open']
   validated_by uuid [ref: > users.id, note: 'Organization or public_agency user id']
+  claim_token_hash varchar [unique, note: 'Hash only; plaintext returned once to anonymous reporter']
+  geo_consent_at timestamp
   created_at timestamp [not null, default: `now()`]
   updated_at timestamp [not null]
 
   indexes {
     (status, type)
     created_at
+    (city, neighborhood)
   }
 }
 
@@ -382,6 +712,8 @@ Table waitlist_entries {
   city varchar
   state varchar
   lgpd_consent_at timestamp [not null]
+  privacy_policy_version varchar
+  converted_user_id uuid [unique, ref: - users.id, note: 'Set when identity RegisterUser consumes this lead']
   created_at timestamp [not null, default: `now()`]
 
   Note: '/register step 1 lead only. Do NOT store passwords here — credentials go to users.password_hash when auth ships.'
@@ -418,21 +750,422 @@ Table occurrence_reports {
   }
 }
 
+// Ecosystem layer (Fase 1 foundation) — additive; see docs/overview.md
+// Case supersedes Occurrence for institutional flows; Occurrence kept for Wave 2 map.
+
+Table organizations {
+  id uuid [pk]
+  owner_user_id uuid [ref: > users.id, note: 'Creating user (owner); memberships hold the team']
+  organization_type organization_type [not null]
+  trade_name varchar [not null]
+  legal_name varchar
+  description text
+  company_tax_id varchar
+  email varchar
+  phone varchar
+  website varchar
+  social_links jsonb
+  city varchar
+  state varchar
+  country varchar [default: 'BR']
+  verified boolean [not null, default: false]
+  deleted_at timestamp
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp [not null]
+
+  indexes {
+    organization_type
+    verified
+  }
+}
+
+Table organization_members {
+  id uuid [pk]
+  organization_id uuid [not null, ref: > organizations.id]
+  user_id uuid [not null, ref: > users.id]
+  role_id uuid [not null, ref: > roles.id]
+  status membership_status [not null, default: 'active']
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp [not null]
+
+  indexes {
+    (organization_id, user_id) [unique]
+    user_id
+  }
+}
+
+Table institution_types {
+  id varchar [pk, note: 'Lookup-backed institution kinds — add rows, not enum migrations']
+  label_key varchar [not null]
+  sort_order int [not null, default: 0]
+  active boolean [not null, default: true]
+  created_at timestamp [not null, default: `now()`]
+}
+
+Table institutions {
+  id uuid [pk]
+  institution_type_id varchar [not null, ref: > institution_types.id]
+  official_name varchar [not null]
+  public_name varchar [not null]
+  description text
+  city varchar
+  state varchar
+  country varchar [default: 'BR']
+  email varchar
+  email_domain varchar
+  phone varchar
+  website varchar
+  social_links jsonb
+  address varchar
+  responsible_department varchar
+  data_responsible_area varchar
+  verification_status institution_verification_status [not null, default: 'draft']
+  verified_at timestamp
+  deleted_at timestamp
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp [not null]
+
+  indexes {
+    institution_type_id
+    verification_status
+  }
+}
+
+Table institution_departments {
+  id uuid [pk]
+  institution_id uuid [not null, ref: > institutions.id]
+  parent_department_id uuid [ref: > institution_departments.id]
+  name varchar [not null]
+  description text
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp [not null]
+
+  indexes {
+    institution_id
+  }
+}
+
+Table institution_teams {
+  id uuid [pk]
+  institution_id uuid [not null, ref: > institutions.id]
+  department_id uuid [ref: > institution_departments.id]
+  name varchar [not null]
+  description text
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp [not null]
+
+  indexes {
+    institution_id
+  }
+}
+
+Table institution_members {
+  id uuid [pk]
+  institution_id uuid [not null, ref: > institutions.id]
+  user_id uuid [not null, ref: > users.id]
+  role_id uuid [not null, ref: > roles.id]
+  department_id uuid [ref: > institution_departments.id]
+  team_id uuid [ref: > institution_teams.id]
+  status membership_status [not null, default: 'active']
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp [not null]
+
+  indexes {
+    (institution_id, user_id) [unique]
+    user_id
+  }
+}
+
+Table institution_jurisdictions {
+  id uuid [pk]
+  institution_id uuid [not null, ref: > institutions.id]
+  jurisdiction_type jurisdiction_type [not null]
+  value varchar [not null, note: 'Free-text or code (city name, IBGE code, state UF, etc.)']
+  country varchar [default: 'BR']
+  created_at timestamp [not null, default: `now()`]
+
+  indexes {
+    (institution_id, jurisdiction_type)
+    value
+  }
+}
+
+Table institution_capabilities {
+  id uuid [pk]
+  institution_id uuid [not null, ref: > institutions.id]
+  case_type_id varchar [not null, ref: > case_types.id]
+  accepts boolean [not null, default: true]
+  created_at timestamp [not null, default: `now()`]
+
+  indexes {
+    (institution_id, case_type_id) [unique]
+  }
+}
+
+Table institution_report_policies {
+  institution_id uuid [pk, ref: - institutions.id]
+  anonymous_reports boolean [not null, default: true]
+  required_fields jsonb
+  accepted_case_type_ids "varchar[]" [default: '{}']
+  routing_rules jsonb
+  response_visibility varchar
+  updated_at timestamp [not null]
+}
+
+Table roles {
+  id uuid [pk]
+  "key" varchar [unique, not null, note: 'Stable key e.g. INSTITUTION_ADMIN, ORGANIZATION_MEMBER']
+  scope role_scope [not null]
+  description text
+  created_at timestamp [not null, default: `now()`]
+
+  indexes {
+    scope
+  }
+}
+
+Table permissions {
+  id uuid [pk]
+  "key" varchar [unique, not null, note: 'Stable key e.g. VIEW_INCOMING_REPORTS, CREATE_ANIMAL']
+  domain varchar [not null]
+  description text
+  created_at timestamp [not null, default: `now()`]
+
+  indexes {
+    domain
+  }
+}
+
+Table role_permissions {
+  role_id uuid [not null, ref: > roles.id]
+  permission_id uuid [not null, ref: > permissions.id]
+
+  indexes {
+    (role_id, permission_id) [pk]
+  }
+}
+
+Table user_platform_roles {
+  user_id uuid [not null, ref: > users.id]
+  role_id uuid [not null, ref: > roles.id]
+  created_at timestamp [not null, default: `now()`]
+
+  indexes {
+    (user_id, role_id) [pk]
+  }
+}
+
+Table locations {
+  id uuid [pk]
+  latitude decimal [note: 'Optional precise point — prefer approx + city for public surfaces']
+  longitude decimal
+  city varchar
+  state varchar
+  country varchar [default: 'BR']
+  neighborhood varchar
+  postal_code varchar
+  formatted_address varchar
+  precision location_precision [not null, default: 'approximate']
+  privacy_level data_classification [not null, default: 'restricted']
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp [not null]
+
+  indexes {
+    (city, state)
+  }
+}
+
+Table case_types {
+  id varchar [pk]
+  label_key varchar [not null]
+  sort_order int [not null, default: 0]
+  active boolean [not null, default: true]
+  created_at timestamp [not null, default: `now()`]
+}
+
+Table cases {
+  id uuid [pk]
+  reference_number varchar [unique, not null]
+  case_type_id varchar [not null, ref: > case_types.id]
+  status case_status [not null, default: 'new']
+  citizen_status case_citizen_status [not null, default: 'registered_on_platform']
+  priority case_priority [not null, default: 'medium']
+  source case_source [not null]
+  title varchar
+  description text
+  location_id uuid [ref: > locations.id]
+  reporter_id uuid [ref: > users.id]
+  organization_id uuid [ref: > organizations.id]
+  institution_id uuid [ref: > institutions.id]
+  assigned_user_id uuid [ref: > users.id]
+  assigned_team_id uuid [ref: > institution_teams.id]
+  reporter_visibility reporter_visibility [not null, default: 'restricted']
+  classification data_classification [not null, default: 'internal']
+  occurrence_id uuid [ref: > occurrences.id, note: 'Optional Wave 2 link until expand-contract']
+  claim_token_hash varchar [unique, note: 'Hash only for anonymous claim (mirrors occurrences.claim_token_hash)']
+  geo_consent_at timestamp
+  closed_at timestamp
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp [not null]
+
+  Note: 'Central work item — denunciations, lost/found, help requests, risk situations. Supersedes Occurrence for institutional routing; Occurrence remains for legacy map MVP.'
+
+  indexes {
+    (status, priority)
+    citizen_status
+    case_type_id
+    (institution_id, status)
+    created_at
+  }
+}
+
+Table case_status_history {
+  id uuid [pk]
+  case_id uuid [not null, ref: > cases.id]
+  from_status case_status
+  to_status case_status [not null]
+  from_citizen_status case_citizen_status
+  to_citizen_status case_citizen_status
+  actor_id uuid [ref: > users.id]
+  "note" text
+  created_at timestamp [not null, default: `now()`]
+
+  indexes {
+    (case_id, created_at)
+  }
+}
+
+Table case_assignments {
+  id uuid [pk]
+  case_id uuid [not null, ref: > cases.id]
+  user_id uuid [ref: > users.id]
+  team_id uuid [ref: > institution_teams.id]
+  assigned_by uuid [ref: > users.id]
+  "note" text
+  created_at timestamp [not null, default: `now()`]
+  ended_at timestamp
+
+  indexes {
+    (case_id, created_at)
+  }
+}
+
+Table case_routing {
+  id uuid [pk]
+  case_id uuid [not null, ref: > cases.id]
+  from_institution_id uuid [ref: > institutions.id]
+  to_institution_id uuid [ref: > institutions.id]
+  reason case_routing_reason [not null, default: 'initial']
+  "note" text
+  created_at timestamp [not null, default: `now()`]
+
+  indexes {
+    (case_id, created_at)
+  }
+}
+
+Table case_comments {
+  id uuid [pk]
+  case_id uuid [not null, ref: > cases.id]
+  author_id uuid [ref: > users.id]
+  body text [not null]
+  visibility case_comment_visibility [not null, default: 'internal']
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp [not null]
+
+  indexes {
+    (case_id, created_at)
+  }
+}
+
+Table case_attachments {
+  id uuid [pk]
+  case_id uuid [not null, ref: > cases.id]
+  url varchar [not null]
+  mime_type varchar
+  kind varchar [default: 'photo']
+  created_at timestamp [not null, default: `now()`]
+
+  indexes {
+    case_id
+  }
+}
+
+Table case_participants {
+  id uuid [pk]
+  case_id uuid [not null, ref: > cases.id]
+  user_id uuid [ref: > users.id]
+  role case_participant_role [not null]
+  created_at timestamp [not null, default: `now()`]
+
+  indexes {
+    case_id
+  }
+}
+
+Table data_exports {
+  id uuid [pk]
+  requested_by_id uuid [ref: > users.id]
+  institution_id uuid [ref: > institutions.id]
+  format varchar [not null]
+  purpose varchar
+  filters jsonb
+  created_at timestamp [not null, default: `now()`]
+
+  indexes {
+    created_at
+  }
+}
+
+Table integration_connections {
+  id uuid [pk]
+  institution_id uuid [ref: > institutions.id]
+  name varchar [not null]
+  provider varchar
+  status integration_sync_status [not null, default: 'pending']
+  config jsonb
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp [not null]
+}
+
+Table integration_logs {
+  id uuid [pk]
+  connection_id uuid [not null, ref: > integration_connections.id]
+  status integration_sync_status [not null]
+  message text
+  payload jsonb
+  created_at timestamp [not null, default: `now()`]
+
+  indexes {
+    (connection_id, created_at)
+  }
+}
+
 TableGroup identity {
   users
   person_profiles
   organization_profiles
   veterinary_profiles
   other_profiles
+  user_intentions
+  interests
+  user_interests
+  animal_preferences
+  verification_requests
+  user_locations
+  user_profile_fields
+  auth_identities
   refresh_tokens
   email_verification_tokens
   password_reset_tokens
   device_push_tokens
+  notification_preferences
 }
 
 TableGroup adoption {
   animals
   adoptions
+  animal_favorites
 }
 
 TableGroup occurrence {
@@ -451,4 +1184,45 @@ TableGroup marketing {
 
 TableGroup audit {
   audit_logs
+}
+
+TableGroup organization {
+  organizations
+  organization_members
+}
+
+TableGroup institution {
+  institution_types
+  institutions
+  institution_departments
+  institution_teams
+  institution_members
+  institution_jurisdictions
+  institution_capabilities
+  institution_report_policies
+}
+
+TableGroup rbac {
+  roles
+  permissions
+  role_permissions
+  user_platform_roles
+}
+
+TableGroup cases {
+  locations
+  case_types
+  cases
+  case_status_history
+  case_assignments
+  case_routing
+  case_comments
+  case_attachments
+  case_participants
+  data_exports
+}
+
+TableGroup integrations {
+  integration_connections
+  integration_logs
 }

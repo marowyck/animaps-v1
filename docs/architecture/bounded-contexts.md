@@ -1,6 +1,6 @@
 # ANIMAPS — Bounded Contexts
 
-NestJS modular monolith (DDD). Entities: [`ANIMAPS_Roadmap.md`](../ANIMAPS_Roadmap.md) §0.5. DER: [`der.dbml`](der.dbml). Dictionary: [`data-dictionary.md`](data-dictionary.md). Evolution: [`schema-evolution.md`](schema-evolution.md). Permissions: [`permissions-matrix.md`](permissions-matrix.md).
+NestJS modular monolith (DDD). Overview: [`architecture.md`](../architecture.md) · REST: [`api.md`](../api/overview.md). DER: [`der.dbml`](../database/der.dbml). Dictionary: [`data-dictionary.md`](../database/data-dictionary.md). Evolution: [`schema-evolution.md`](../database/schema-evolution.md). Permissions: [`permissions-matrix.md`](../security/permissions-matrix.md).
 
 **Target folders:** `apps/api/src/modules/<context>/` with `domain/`, `application/`, `infrastructure/`, `interfaces/http/`.
 
@@ -16,7 +16,7 @@ NestJS modular monolith (DDD). Entities: [`ANIMAPS_Roadmap.md`](../ANIMAPS_Roadm
 | Validate Occurrence | NGO verified / `public_agency`; `biologist` only for `wildlife_sighting` |
 | Parallel adoption | Many requests per animal; origin chooses; `in_process` on first `approved` |
 | Person `taxId` | Optional at signup; required for `RequestAdoption` |
-| Soft delete | `User.deletedAt`, `Animal.deletedAt` — see [`schema-evolution.md`](schema-evolution.md) |
+| Soft delete | `User.deletedAt`, `Animal.deletedAt` — see [`schema-evolution.md`](../database/schema-evolution.md) |
 
 ---
 
@@ -24,14 +24,16 @@ NestJS modular monolith (DDD). Entities: [`ANIMAPS_Roadmap.md`](../ANIMAPS_Roadm
 
 | Context | Folder | Entities | Role |
 |---|---|---|---|
-| `identity` | `modules/identity/` | `User`, `PersonProfile`, `OrganizationProfile`, `VeterinaryProfile`, `OtherProfile`, `RefreshToken`, `EmailVerificationToken`, `PasswordResetToken`, `DevicePushToken` | Accounts, profiles, auth, institutional verification, push tokens |
+| `identity` | `modules/identity/` | `User`, profiles, intentions, prefs, verification, `AuthIdentity`, tokens | Accounts, onboarding persist, auth, institutional verification, push tokens |
 | `adoption` | `modules/adoption/` | `Animal`, `Adoption` | Animal listing, matching, adoption flow |
 | `occurrence` | `modules/occurrence/` | `Occurrence`, `OccurrenceFollower`, `OccurrenceReport` | Geo occurrences, moderation, claim, reports |
 | `notifications` | `modules/notifications/` | `Notification` | Preferences, delivery, history |
 | `analytics` | `modules/analytics/` | (reads/aggregations only in MVP) | KPIs, anonymized export |
 | `marketing` | `modules/marketing/` (Wave 2) | `WaitlistEntry` | Landing waitlist (today: Next `/api/waitlist`) |
 
-`AuditLog` is **cross-cutting** (shared port): written by `identity`, `occurrence`, `analytics` on sensitive actions — not its own bounded context in the MVP.
+`AuditLog` is **cross-cutting** (shared port): written by `identity`, `occurrence`, `analytics`, and future `cases` / `institutions` on sensitive actions — not its own bounded context in the MVP.
+
+Future ecosystem contexts (docs only until cutover): `organizations`, `institutions`, `cases` — see [overview.md](../domains/overview.md) · [cases.md](../domains/cases.md). Today's `occurrence` module remains for the geo map MVP; `Case` supersedes it for institutional routing.
 
 `identity` is the **source of truth** for users and profiles. Other contexts reference `userId` / `organizationId` / `personId` / `veterinaryId` **without** duplicating profile data.
 
@@ -43,7 +45,7 @@ NestJS modular monolith (DDD). Entities: [`ANIMAPS_Roadmap.md`](../ANIMAPS_Roadm
 flowchart LR
   adoption["adoption"] -->|"AdoptionRequested / AdoptionCompleted / AnimalRegisteredForMatching"| notifications
   occurrence["occurrence"] -->|"OccurrenceCreated / OccurrenceStatusChanged"| notifications
-  identity["identity"] -->|"UserRegistered / NgoVerified / ClinicVerified"| notifications
+  identity["identity"] -->|"UserRegistered / OrganizationVerified / VeterinaryVerified"| notifications
   adoption -->|"AdoptionCompleted"| analytics
   occurrence -->|"OccurrenceResolved"| analytics
 ```
@@ -51,8 +53,8 @@ flowchart LR
 | Event | Published by | Consumed by |
 |---|---|---|
 | `UserRegistered` | `identity` | `notifications` |
-| `NgoVerified` | `identity` | `notifications` |
-| `ClinicVerified` | `identity` | `notifications` |
+| `OrganizationVerified` | `identity` | `notifications` |
+| `VeterinaryVerified` | `identity` | `notifications` |
 | `AdoptionRequested` | `adoption` | `notifications` |
 | `AdoptionCompleted` | `adoption` | `notifications`, `analytics` |
 | `AnimalRegisteredForMatching` | `adoption` | `notifications` (may emit `NewCompatibleAnimalAvailable` — matching detail Phase 3) |
@@ -81,16 +83,18 @@ Identity, auth, profile authorization, institutional verification.
 - **Other** — catch-all public signup (`OTHER`) via `OtherProfile`
 - **Public agency / Biologist** — admin-assigned types for validation and aggregated-data roles
 
-Legacy names: `GuardianProfile` → `PersonProfile`, `NgoProfile` → `OrganizationProfile`, `ClinicProfile` → `VeterinaryProfile`. See [user-types.md](user-types.md).
+Legacy names: `GuardianProfile` → `PersonProfile`, `NgoProfile` → `OrganizationProfile`, `ClinicProfile` → `VeterinaryProfile`. See [user-types.md](../domains/user-types.md).
 
 ### Entities
 
-- `User` (soft delete via `deletedAt`; carries `user_type`)
+- `User` (soft delete via `deletedAt`; carries `user_type`, `account_status`, consent + policy version)
 - `PersonProfile` (`isRescuer`)
-- `OrganizationProfile` / `VeterinaryProfile` (`verified`)
+- `OrganizationProfile` / `VeterinaryProfile` (`verified`; `companyTaxId` nullable until verification)
 - `OtherProfile` (role metadata for `OTHER`)
-- `RefreshToken`, `EmailVerificationToken`, `PasswordResetToken` (hash only)
+- `UserIntention`, `Interest` / `UserInterest`, `AnimalPreference`, `UserLocation`, `UserProfileField`, `VerificationRequest`
+- `AuthIdentity`, `RefreshToken`, `EmailVerificationToken`, `PasswordResetToken` (hash only)
 - `DevicePushToken` (APNs/FCM — mobile Wave 3)
+- `NotificationPreference`
 
 ### Main use cases
 
@@ -107,6 +111,7 @@ Legacy names: `GuardianProfile` → `PersonProfile`, `NgoProfile` → `Organizat
 | `VerifyOrganization` | Manual approval → `OrganizationVerified` + `AuditLog` |
 | `UpdateVeterinaryProfile` | Services and hours |
 | `SubmitVeterinaryDocuments` / `VerifyVeterinary` | Manual approval → `VeterinaryVerified` + `AuditLog` |
+| `SaveOnboarding` | Upsert intentions / prefs / interests / profile fields / locations (`PUT /me/onboarding`) |
 | `DeleteAccount` | Soft-delete + right to be forgotten + `AuditLog` (hard purge PII at T+90d) |
 | `RegisterDevicePushToken` | Upsert `DevicePushToken` (Wave 3) |
 
@@ -118,7 +123,7 @@ Legacy names: `GuardianProfile` → `PersonProfile`, `NgoProfile` → `Organizat
 
 ### Dependencies
 
-- **Publishes:** `UserRegistered`, `NgoVerified`, `ClinicVerified`
+- **Publishes:** `UserRegistered`, `OrganizationVerified`, `VeterinaryVerified`
 - **Consumes:** none (root)
 
 ---
@@ -251,7 +256,7 @@ Preferences, dispatch, and in-app notification history (email/push later).
 | Event | Action |
 |---|---|
 | `UserRegistered` | Welcome / verify email |
-| `NgoVerified` / `ClinicVerified` | Institution unlocked |
+| `OrganizationVerified` / `VeterinaryVerified` | Institution unlocked |
 | `AdoptionRequested` | Notify NGO/origin |
 | `AdoptionCompleted` | Notify parties |
 | `AnimalRegisteredForMatching` | Compatible guardians → `NewCompatibleAnimalAvailable` (Phase 3) |

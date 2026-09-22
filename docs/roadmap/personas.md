@@ -2,7 +2,7 @@
 
 Personas for UX and product rules. Source: roadmap §0.3 (+ Phase 0 validation expansions).
 
-Related: [`permissions-matrix.md`](permissions-matrix.md) · [`bounded-contexts.md`](bounded-contexts.md).
+Related: [`permissions-matrix.md`](../security/permissions-matrix.md) · [`bounded-contexts.md`](../architecture/bounded-contexts.md).
 
 ---
 

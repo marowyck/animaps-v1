@@ -2,7 +2,7 @@
 
 Rules for changing the data model as the product grows (web → API → iOS/Android).
 
-Related: [schema.prisma](schema.prisma) · [der.dbml](der.dbml) · [data-dictionary.md](data-dictionary.md) · [database.md](database.md) · [conventions.md](conventions.md).
+Related: [schema.prisma](schema.prisma) · [der.dbml](der.dbml) · [data-dictionary.md](data-dictionary.md) · [database.md](./overview.md) · [conventions.md](../architecture/conventions.md) · [overview.md](../domains/overview.md).
 
 ---
 
@@ -38,10 +38,10 @@ Clients (`apps/web`, future `apps/mobile`) **never** access Postgres. Sync via A
 
 ## UserType + profiles
 
-- `users.user_type` is the single discriminator ([user-types.md](user-types.md)).
+- `users.user_type` is the single discriminator ([user-types.md](../domains/user-types.md)).
 - Profile tables are 1:1 (`person_profiles`, `organization_profiles`, `veterinary_profiles`, `other_profiles`).
 - When adding a public type: enum value + profile table (if needed) + waitlist enum value + docs in the **same** change set.
-- Wave 2 onboarding tables (`user_intentions`, `animal_preferences`, `verification_requests`, …) are documented in [database.md](database.md) — add them additively; do not overload `person_profiles` with multi-select arrays that belong in dedicated tables.
+- Onboarding tables (`user_intentions`, `animal_preferences`, `verification_requests`, `user_locations`, `user_profile_fields`, …) are in the docs Prisma — do not overload `person_profiles` with multi-select arrays.
 
 ---
 
@@ -64,10 +64,9 @@ Clients (`apps/web`, future `apps/mobile`) **never** access Postgres. Sync via A
 ## Auth evolution
 
 - `/register` is a **two-step UI**: (1) profile lead → `waitlist_entries` (`profile_type`); (2) strong password validated client-side only until identity auth persists a hash on `users.password_hash`.
-- **Never** add password columns to `waitlist_entries`.
-- `passwordHash` is nullable so Google/OAuth can land without a full `AuthProvider` table yet.
-- App rule until then: require `passwordHash` **or** an external identity (document when OAuth ships).
-- Google CTA on web is UI-only today; add an identity/provider table only when OAuth is implemented (additive).
+- **Never** add password columns to `waitlist_entries`. Conversion is `converted_user_id`.
+- `passwordHash` is nullable; `auth_identities` holds Google (and future) subjects. App rule: `passwordHash` **or** ≥1 `auth_identities` row.
+- Web refresh: httpOnly cookie; access token in memory ([api.md](../api/overview.md)).
 
 ---
 
@@ -85,7 +84,24 @@ Clients (`apps/web`, future `apps/mobile`) **never** access Postgres. Sync via A
 - [ ] Enum change is additive (post-production)
 - [ ] Mobile/web clients do not need a breaking API change in the same release (or versioned)
 - [ ] No secrets / full PII in `AuditLog.metadata` or `Notification.payload`
-- [ ] User-type / profile renames reflected in [user-types.md](user-types.md) / [profiles.md](profiles.md)
+- [ ] User-type / profile renames reflected in [user-types.md](../domains/user-types.md) / [profiles.md](../domains/profiles.md)
+
+---
+
+## Ecosystem foundation (Fase 1)
+
+Additive layer beside the Wave 2 freeze. Product entry: [overview.md](../domains/overview.md). Closed mapping: [account-types.md](../domains/account-types.md).
+
+| Change | Rule |
+|---|---|
+| `users.account_type` | **Nullable** column. Fill by mapping from `user_type` when known. Do not make it required in the same release as the first production data. |
+| New tables | Organizations, institutions (+ types, depts, teams, members, jurisdictions, capabilities, report policies), RBAC (`roles`, `permissions`, `role_permissions`, `user_platform_roles`), Case family (`locations`, `case_types`, `cases`, history, assignments, routing, comments, attachments, participants), `data_exports`, `integration_connections` / `integration_logs`. |
+| Occurrence vs Case | **Keep** `occurrences`. Case supersedes Occurrence for **institutional routing**. Fold or link (`occurrence_id`) later when the Case API ships — expand-contract, do not drop the map MVP in this pass. |
+| Profile FKs | `organization_profiles` / `veterinary_profiles` remain PK/FK on `users.id`. **Do not reparent** to `organizations.id` yet. Future expand-contract when multi-member orgs are the source of truth. |
+| Intention enum | **Add values only** (`volunteer`, `foster_home`, `independent_protector`, `animal_professional`, `lost_pet_owner`, `found_pet_reporter`, `other`). Do **not** rename persisted slugs (`adopt`, `report`, `help_animals`, …) after production. |
+| Frontend | `features/account-types` and `features/rbac` are **additive** catalogs. `user-types`, `permissions`, `onboarding`, and `dashboard` stay untouched until a dedicated cutover. |
+
+`user_type` remains the live UI discriminator until clients and Nest guards cut over together.
 
 ---
 
@@ -93,3 +109,12 @@ Clients (`apps/web`, future `apps/mobile`) **never** access Postgres. Sync via A
 
 - Pre-launch vocabulary alignment (`person` / `organization` / `veterinary`) accepted while schema is docs-only.
 - `OtherRole` promoted from free varchar to enum once the OTHER onboarding catalog stabilized.
+- Wave 2 onboarding tables promoted into Prisma/DBML (still docs-only until `apps/api`).
+- `users.status` → `account_status` enum; `company_tax_id` nullable until verification; occurrence `city`/`neighborhood` + `claim_token_hash`.
+- Messages / donations / reviews / volunteers stay **out** of the DER (nav placeholders are not schema).
+- Fase 1: additive nullable `account_type` on `users`; do not require it until cutover.
+- New org / institution / RBAC / Case tables are additive; Wave 2 identity + occurrence tables stay.
+- Occurrence kept alongside Case. Case supersedes for institutional routing; fold/migration later when the API ships.
+- `organization_profiles` / `veterinary_profiles` not reparented to `organizations.id` (future expand-contract).
+- Intention enum values added, not renamed, so persisted Wave 2 slugs stay valid post-production.
+- Frontend: `account-types` + `rbac` modules additive; `user-types` / `permissions` / `onboarding` / `dashboard` untouched.

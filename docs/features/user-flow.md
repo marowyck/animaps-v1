@@ -2,7 +2,7 @@
 
 End-to-end journey from first visit through dashboard. UX inspiration (progressive onboarding, preference cards, discovery) may resemble dating apps; **visual identity remains ANIMAPS** (pink/green, clay companions, professional trust).
 
-Related: [onboarding.md](onboarding.md) · [user-types.md](user-types.md) · [authentication.md](authentication.md) · [verification.md](verification.md) · [dashboard.md](dashboard.md) · [conventions.md](conventions.md).
+Related: [onboarding.md](onboarding.md) · [user-types.md](../domains/user-types.md) · [authentication.md](authentication.md) · [verification.md](verification.md) · [dashboard.md](dashboard.md) · [conventions.md](../architecture/conventions.md).
 
 ---
 
@@ -71,7 +71,9 @@ flowchart TD
 
 Legacy aliases: `/onboarding/intention` → intentions; `/onboarding/animal-type|animal-size|preferences` still work via composite step.
 
-Documented, not built yet: `/animals`, `/matches`, `/messages`, `/reports`, `/profile`, `/settings`, `/adoption-requests`, `/volunteers`, `/organization`, `/services`, `/location`.
+Documented, not built yet: `/animals`, `/matches`, `/messages`, `/reports`, `/favorites`, `/profile`, `/settings`, `/adoption-requests`, `/volunteers`, `/donations`, `/organization`, `/services`, `/location`, `/reviews`.
+
+Messages, donations, reviews, and volunteers have **no schema** yet — keep as “coming soon”. Favorites map to `animal_favorites`.
 
 ---
 
@@ -79,7 +81,7 @@ Documented, not built yet: `/animals`, `/matches`, `/messages`, `/reports`, `/pr
 
 | Concern | Current (frontend-only) | Future (Wave 2+) |
 |---|---|---|
-| Persistence | `localStorage` draft + mocks | Nest `identity` + Prisma |
+| Persistence | `localStorage` draft + mocks | Nest `PUT /me/onboarding` ([api.md](../api/overview.md) · [database.md](../database/overview.md)) |
 | Email code | Simulated send/verify | `EmailVerificationToken` + rate limits |
 | Selfie | Simulated async status | Verification provider + `verification_requests` |
 | Matching | UI mocks only | Compatibility service in `adoption` |

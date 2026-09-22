@@ -1,8 +1,8 @@
 # ANIMAPS — Authentication (frontend)
 
-Email verification and relation to existing `/register` + `/login`. Backend auth design remains in [architecture.md](architecture.md) and [bounded-contexts.md](bounded-contexts.md) (`identity`).
+Email verification and relation to existing `/register` + `/login`. Backend auth design remains in [architecture.md](../architecture.md) and [bounded-contexts.md](../architecture/bounded-contexts.md) (`identity`).
 
-Related: [user-flow.md](user-flow.md) · [onboarding.md](onboarding.md) · [user-types.md](user-types.md) · [ui-patterns.md](ui-patterns.md).
+Related: [user-flow.md](user-flow.md) · [onboarding.md](onboarding.md) · [user-types.md](../domains/user-types.md) · [ui-patterns.md](ui-patterns.md).
 
 ---
 
@@ -69,7 +69,7 @@ Query: `/verify-email?email=user@example.com` (optional; falls back to draft / p
 ## Security notes (design)
 
 - Never log plaintext codes in production.
-- Store only hashes server-side ([data-dictionary.md](data-dictionary.md)).
+- Store only hashes server-side ([data-dictionary.md](../database/data-dictionary.md)).
 - Cooldown + CAPTCHA later for spam prevention.
 - Frontend validates format only; server is source of truth.
 

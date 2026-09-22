@@ -1,7 +1,7 @@
 # Landing Page — Content Brief (Phase 1)
 
 Content and strategy for the ANIMAPS institutional landing.  
-Sources: Phase 1 alignment decisions + [`ANIMAPS_Roadmap.md`](../ANIMAPS_Roadmap.md) §1.1–1.2 + [`personas.md`](personas.md).
+Sources: Phase 1 alignment decisions + [architecture.md](../../architecture.md) + [`personas.md`](../../roadmap/personas.md).
 
 **Status:** decisions closed; public landing uses **account-first** CTAs that navigate to **`/register`** and **`/login`**. Register is a **two-step** create-account UI (profile → strong password); backend remains **waitlist** until real auth ships. Login is a UI placeholder (email/password + Google CTA). In-page section hashes and app paths are **English**.
 
@@ -52,7 +52,7 @@ Post-launch review window: **2 weeks** (roadmap §1.7).
 - Canonical matching term: **"Ideal Match"** / PT **"Match ideal"** / ES **"Match ideal"** (not “algorithm”, not “smart compatibility” in external copy).
 - Languages: **Portuguese (default) + English + Spanish** via client dictionaries (no `/en` or `/es` routes). Keep the three locales in sync when editing copy.
 
-Copy source of truth: [`apps/web/src/i18n/messages/pt.ts`](../apps/web/src/i18n/messages/pt.ts) (then `en.ts`, `es.ts`).
+Copy source of truth: [`apps/web/src/i18n/messages/pt.ts`](../../../apps/web/src/i18n/messages/pt.ts) (then `en.ts`, `es.ts`).
 
 ---
 
@@ -68,7 +68,7 @@ Copy source of truth: [`apps/web/src/i18n/messages/pt.ts`](../apps/web/src/i18n/
 - No market-stats carousel on the public page.
 - No guaranteed real testimonials yet.
 - Use **projected numbers with transparency** only if reintroduced — never as proven results.
-- When pilot NGO is confirmed ([`pilot-ngo.md`](pilot-ngo.md)), update this section.
+- When pilot NGO is confirmed ([`pilot-ngo.md`](../../roadmap/pilot-ngo.md)), update this section.
 
 ---
 
@@ -129,7 +129,7 @@ Primary action label: **Continue** (advances to step 2; does not call the API ye
 ### Microcopy guidelines
 
 - User-language labels (“I’m a guardian / Want to adopt”, “I’m an NGO”, etc.).
-- Errors and success that the user must notice: **toasts** ([`ui-patterns.md`](ui-patterns.md)). Client validation returns **message keys** mapped through i18n.
+- Errors and success that the user must notice: **toasts** ([`ui-patterns.md`](../ui-patterns.md)). Client validation returns **message keys** mapped through i18n.
 - Success: account/waitlist framing via **success toast** after step 2.
 - No documents (`taxId`) this phase.
 - UI may say **create account**; storage remains waitlist until auth.
@@ -138,9 +138,9 @@ Primary action label: **Continue** (advances to step 2; does not call the API ye
 
 ## 8. Privacy policy and terms
 
-- Adapt draft: [`privacy-policy-draft.md`](privacy-policy-draft.md). Final BR consumer copy may later need PT.
+- Adapt draft: [`privacy-policy-draft.md`](../../security/privacy-policy-draft.md). Final BR consumer copy may later need PT.
 - Publish a **minimum** landing version covering: waitlist fields (name, email, profile type, city), consent basis, retention, LGPD rights.
-- Controller remains **TBD** until pre-launch ([`lgpd-checklist.md`](lgpd-checklist.md)).
+- Controller remains **TBD** until pre-launch ([`lgpd-checklist.md`](../../security/lgpd-checklist.md)).
 - Minimum terms for site use / waitlist capture.
 - Footer keeps `/#privacy` and `/#terms` anchors.
 
@@ -154,7 +154,7 @@ Execution backlog (§1.7):
 
 - [ ] List target animal-protection Instagrams / communities (align Footer social URLs when official)
 - [ ] NGO WhatsApp/Telegram groups
-- [ ] Direct NGO contacts (align with [`pilot-ngo.md`](pilot-ngo.md))
+- [ ] Direct NGO contacts (align with [`pilot-ngo.md`](../../roadmap/pilot-ngo.md))
 - [ ] Launch post plan (PT; EN if channel exists)
 
 ---
@@ -176,8 +176,8 @@ Execution backlog (§1.7):
 ## References
 
 - Roadmap §1.1–1.2, §1.7
-- [`personas.md`](personas.md)
-- [`privacy-policy-draft.md`](privacy-policy-draft.md)
+- [`personas.md`](../../roadmap/personas.md)
+- [`privacy-policy-draft.md`](../../security/privacy-policy-draft.md)
 - [`landing-design-brief.md`](landing-design-brief.md)
 - [`landing-tech-plan.md`](landing-tech-plan.md)
-- [`ui-patterns.md`](ui-patterns.md)
+- [`ui-patterns.md`](../ui-patterns.md)

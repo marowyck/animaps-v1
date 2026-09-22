@@ -2,7 +2,7 @@
 
 Normative rules for keeping the codebase and docs consistent as multi-user-type features grow. Prefer this file over inventing parallel patterns.
 
-Related: [architecture.md](architecture.md) · [onboarding.md](onboarding.md) · [user-types.md](user-types.md) · [components.md](components.md) · [schema-evolution.md](schema-evolution.md).
+Related: [architecture.md](../architecture.md) · [onboarding.md](../features/onboarding.md) · [user-types.md](../domains/user-types.md) · [components.md](../features/components.md) · [schema-evolution.md](../database/schema-evolution.md).
 
 ---
 
@@ -92,8 +92,8 @@ Progress totals come from `getActiveSteps(userType, draft)`, not a global consta
 
 | Doc / module | Audience |
 |---|---|
-| `features/permissions` + [permissions.md](permissions.md) | Coarse UI capability flags |
-| [permissions-matrix.md](permissions-matrix.md) | Domain actions for future Nest guards |
+| `features/permissions` + [permissions.md](../security/permissions.md) | Coarse UI capability flags |
+| [permissions-matrix.md](../security/permissions-matrix.md) | Domain actions for future Nest guards |
 
 UI `hasPermission` is **not** authorization. Never rely on hidden nav alone for sensitive actions once the API exists.
 
@@ -103,12 +103,15 @@ UI `hasPermission` is **not** authorization. Never rely on hidden nav alone for 
 
 | Artifact | Role |
 |---|---|
-| [schema.prisma](schema.prisma) | Machine-readable draft (docs only until `apps/api`) |
-| [der.dbml](der.dbml) | dbdiagram.io ER |
-| [data-dictionary.md](data-dictionary.md) | Field-level contract + LGPD |
-| [database.md](database.md) | Wave 2 candidate tables not yet in Prisma |
+| [schema.prisma](../database/schema.prisma) | Machine-readable draft (docs only until `apps/api`) |
+| [der.dbml](../database/der.dbml) | dbdiagram.io ER |
+| [data-dictionary.md](../database/data-dictionary.md) | Field-level contract + LGPD |
+| [database.md](../database/overview.md) | OnboardingDraft → tables + closed Wave 2 decisions + ecosystem layer |
+| [overview.md](../domains/overview.md) / [account-types.md](../domains/account-types.md) | Ecosystem axis (`account_type`, Case, RBAC) — additive beside `UserType` |
 
-Keep Prisma, DBML, and dictionary in lockstep. Prefer additive changes ([schema-evolution.md](schema-evolution.md)).
+Frontend catalogs (not wired into pages yet): `features/account-types`, `features/rbac`. Do not replace `features/user-types` or `features/permissions` until cutover.
+
+Keep Prisma, DBML, and dictionary in lockstep. Prefer additive changes ([schema-evolution.md](../database/schema-evolution.md)).
 
 ---
 
@@ -118,7 +121,7 @@ Keep Prisma, DBML, and dictionary in lockstep. Prefer additive changes ([schema-
 2. Record **current (mock/frontend)** vs **future (API)** behavior.
 3. Append a short **Decision log** entry for non-obvious choices.
 4. If schema touched: Prisma + DBML + dictionary (+ this conventions file if a new pattern appears).
-5. Refresh [README.md](README.md) index when adding a top-level doc.
+5. Refresh [README.md](../README.md) index when adding a top-level doc.
 
 ---
 

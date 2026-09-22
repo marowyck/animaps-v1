@@ -1,8 +1,8 @@
 # ANIMAPS — Profiles
 
-Type-specific profile entities attached **1:1** to `User`. Optional PERSON enrichment rows (housing, experience, privacy) are documented in [profile.md](profile.md) and collected during onboarding via `ProfileForm`.
+Type-specific profile entities attached **1:1** to `User`, plus optional PERSON enrichment rows collected during onboarding via `ProfileForm`.
 
-Related: [user-types.md](user-types.md) · [database.md](database.md) · [onboarding.md](onboarding.md) · [data-dictionary.md](data-dictionary.md) · [schema.prisma](schema.prisma).
+Related: [user-types.md](user-types.md) · [database overview](../database/overview.md) · [../features/onboarding.md](../features/onboarding.md) · [../database/data-dictionary.md](../database/data-dictionary.md) · [../database/schema.prisma](../database/schema.prisma) · [../security/permissions-matrix.md](../security/permissions-matrix.md).
 
 ---
 
@@ -39,17 +39,43 @@ Onboarding also drafts: intentions, animal prefs, interests (max 5), additional-
 
 ---
 
+## PERSON enrichment (additional info / privacy)
+
+Optional enrichment rows collected during PERSON (and reused by OTHER) onboarding via `ProfileForm`. Fields are **optional** and oriented toward what NGOs / adoption flows need — not dating-style lifestyle trivia.
+
+| Key | Purpose for NGOs |
+|---|---|
+| `animal_experience` | Prior care experience |
+| `housing_type` | Apartment / house / rural |
+| `has_yard` | Outdoor space |
+| `other_pets` | Existing animals |
+| `children_at_home` | Household with children |
+| `available_time` | Capacity for daily care |
+| `adoption_readiness` | Timeline to adopt |
+| `foster_availability` | Temporary home capacity |
+| `volunteer_interest` | Willingness to help orgs |
+| `city_region` | Approximate area |
+
+Out of scope (intentionally avoided): zodiac, love language, drinks/smoking, dating-style socials.
+
+### Privacy model
+
+Per field: `public` | `matches` | `private` via `PrivacySelector`. Defaults lean `matches` / `private`.
+
+---
+
 ## OrganizationProfile (`organization_profiles`)
 
 | Field | Type | Notes |
 |---|---|---|
 | `user_id` | uuid PK/FK | |
-| `company_tax_id` | varchar | **PII** · required in schema |
+| `company_tax_id` | varchar | **PII** · nullable on first persist; required before `verified = true` |
 | `trade_name` | varchar | required |
 | `description` | text | |
 | `phone` / `email` / `website` | varchar | contact |
 | `social_links` | jsonb | e.g. `{ instagram, facebook, other }` |
 | `city` / `state` | varchar | |
+| `area_of_operation` | varchar | free-text from onboarding |
 | `animal_types_served` | varchar[] | |
 | `has_shelter` | boolean | |
 | `does_adoptions` | boolean | |
@@ -70,7 +96,7 @@ Onboarding steps: `organization-info` → `location` → `animal-types` → `ser
 | Field | Type | Notes |
 |---|---|---|
 | `user_id` | uuid PK/FK | |
-| `company_tax_id` | varchar | **PII** · required |
+| `company_tax_id` | varchar | **PII** · nullable on first persist; required before `verified = true` |
 | `trade_name` | varchar | optional display name |
 | `description` | text | |
 | `phone` / `email` / `website` | varchar | |
@@ -122,5 +148,6 @@ App rule: at least one of `organization_id` / `person_id` / `veterinary_id` on `
 ## Decision log
 
 - Institutional fields stay on org/clinic profiles — not on `users` — so PERSON accounts stay lean and verification flags are scoped.
-- PERSON selfie status uses Wave 2 `verification_requests`; org/clinic `verified` booleans remain the privilege gate for animal CRUD ([permissions-matrix.md](permissions-matrix.md)).
-- Enrichment lifestyle fields stay in [profile.md](profile.md) to avoid conflating adoption-readiness data with dating-style trivia (explicitly out of product scope).
+- PERSON selfie status uses Wave 2 `verification_requests`; org/clinic `verified` booleans remain the privilege gate for animal CRUD ([../security/permissions-matrix.md](../security/permissions-matrix.md)).
+- PERSON enrichment (formerly `profile.md`) is merged here to keep adoption-readiness data in one place and avoid dating-style trivia (explicitly out of product scope).
+- Phase C (2026-09-10): consolidated `docs/profile.md` + `docs/profiles.md` → `docs/domains/profiles.md`.

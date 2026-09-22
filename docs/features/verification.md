@@ -2,7 +2,7 @@
 
 Trust signals after (or during) onboarding. v1 focuses on **human presence** (selfie) for PERSON and a **placeholder institutional** path for ONG / veterinary clinics. Not invasive facial recognition / biometric identification.
 
-Related: [onboarding.md](onboarding.md) · [database.md](database.md) · [profiles.md](profiles.md) · [authentication.md](authentication.md) · [permissions-matrix.md](permissions-matrix.md).
+Related: [onboarding.md](onboarding.md) · [database.md](../database/overview.md) · [profiles.md](../domains/profiles.md) · [authentication.md](authentication.md) · [permissions-matrix.md](../security/permissions-matrix.md).
 
 **Source:** `features/onboarding/components/VerificationFlow.tsx` (primary) · `features/verification/` (mock helper + legacy export).
 
@@ -45,7 +45,7 @@ Users may reach dashboard / discover with non-approved status. Privileged domain
 
 ## Persistence (Wave 2)
 
-Table `verification_requests` with `kind` ∈ `selfie` \| `institutional` — see [database.md](database.md). Do not store invasive biometric templates.
+Table `verification_requests` with `kind` ∈ `selfie` \| `institutional` — now in [schema.prisma](../database/schema.prisma). See [database.md](../database/overview.md). Do not store invasive biometric templates.
 
 ---
 
@@ -53,7 +53,7 @@ Table `verification_requests` with `kind` ∈ `selfie` \| `institutional` — se
 
 - Media private; short-lived URLs.
 - Do not expose verification media on public profiles by default.
-- Audit sensitive status changes ([bounded-contexts.md](bounded-contexts.md)).
+- Audit sensitive status changes ([bounded-contexts.md](../architecture/bounded-contexts.md)).
 
 ---
 

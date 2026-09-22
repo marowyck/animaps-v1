@@ -2,7 +2,7 @@
 
 Type-aware app shell after onboarding. Navigation and home summaries come from config (`DASHBOARD_CONFIGS`), filtered by UI permissions — not from hard-coded sidebars per persona.
 
-Related: [user-flow.md](user-flow.md) · [permissions.md](permissions.md) · [user-types.md](user-types.md) · [matching.md](matching.md) · [components.md](components.md) · [conventions.md](conventions.md).
+Related: [user-flow.md](user-flow.md) · [permissions.md](../security/permissions.md) · [user-types.md](../domains/user-types.md) · [matching.md](../domains/matching.md) · [components.md](components.md) · [conventions.md](../architecture/conventions.md) · [institution-dashboard.md](institution-dashboard.md).
 
 **Source:** `apps/web/src/features/dashboard/`
 
@@ -20,6 +20,8 @@ Related: [user-flow.md](user-flow.md) · [permissions.md](permissions.md) · [us
 | `DashboardShell` | Reads `userType` / display name from onboarding draft; composes chrome |
 
 `userType` today comes from the onboarding draft (`OnboardingProvider`). Wave 2: session / identity API.
+
+**InstitutionDashboard** is **proposed only** ([institution-dashboard.md](institution-dashboard.md)). Existing `DynamicDashboard` / `DASHBOARD_CONFIGS` for PERSON / ONG / clinic / OTHER are **unchanged**. Do not render government modules from this shell.
 
 ---
 
@@ -95,6 +97,7 @@ Values are mocks (`SUMMARY_MOCK`) until Nest queries exist.
 | Static mocks | Nest queries per domain |
 | Permission-gated visibility only | Same rules on API |
 | Placeholder hrefs | Real pages per type |
+| `DynamicDashboard` by `UserType` | InstitutionDashboard proposed separately; this shell stays for PERSON / ONG / clinic |
 
 ---
 
@@ -102,4 +105,5 @@ Values are mocks (`SUMMARY_MOCK`) until Nest queries exist.
 
 - Config maps replace a single guardian-era `DASHBOARD_NAV`.
 - PERSON keeps Discover as home; institutions get an operational dashboard first.
-- Nav permissions reuse [permissions.md](permissions.md) — no duplicated type switches inside chrome components.
+- Nav permissions reuse [permissions.md](../security/permissions.md) — no duplicated type switches inside chrome components.
+- InstitutionDashboard remains a proposal; do not replace `DynamicDashboard` in this pass.

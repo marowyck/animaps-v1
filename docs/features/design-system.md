@@ -1,6 +1,6 @@
 # ANIMAPS — Design system
 
-Source of truth for visual tokens used in `apps/web`. Implementation: [`apps/web/src/app/globals.css`](../apps/web/src/app/globals.css). Landing brief: [landing-design-brief.md](landing-design-brief.md). Components: [components.md](components.md).
+Source of truth for visual tokens used in `apps/web`. Implementation: [`apps/web/src/app/globals.css`](../../apps/web/src/app/globals.css). Landing brief: [landing-design-brief.md](./landing/landing-design-brief.md). Components: [components.md](components.md).
 
 **Identity:** modern, trustworthy, animal-care — **not** childish, **not** a visual clone of dating apps.
 

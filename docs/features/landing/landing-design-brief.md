@@ -1,7 +1,7 @@
 # Landing Page — Design Brief (Phase 1)
 
 Visual identity and UX for the ANIMAPS institutional landing.  
-Sources: Phase 1 decisions + visual design round + **post-feedback pivots** + [`ANIMAPS_Roadmap.md`](../ANIMAPS_Roadmap.md) §1.3 + [`landing-content-brief.md`](landing-content-brief.md).
+Sources: Phase 1 decisions + visual design round + **post-feedback pivots** + [architecture.md](../../architecture.md) + [`landing-content-brief.md`](landing-content-brief.md).
 
 **Status:** **friendly / organic / pink+green** direction implemented in `apps/web` (no Figma). Public `/` is a **fullscreen-section** landing with **clay mascots** (puppy + cat frame the Hero; family / critter / monkey appear later). Shared `Button` + `LocaleSwitcher` + `Toast`; Header CTA cluster with **Log in** + **Create account** + soft green menu. **`/register`** and **`/login`** use an immersive split layout (image carousel + form card). Google CTA is UI-only until OAuth ships.
 
@@ -46,7 +46,7 @@ Primary audience: guardians and NGOs (balanced voice). Clinics get a dedicated c
 
 ## 2. Visual identity
 
-Final logo **does not exist yet**. Tokens in [`apps/web/src/app/globals.css`](../apps/web/src/app/globals.css).
+Final logo **does not exist yet**. Tokens in [`apps/web/src/app/globals.css`](../../../apps/web/src/app/globals.css).
 
 ### Palette guidelines
 
@@ -79,7 +79,7 @@ Final logo **does not exist yet**. Tokens in [`apps/web/src/app/globals.css`](..
 | Decision | Choice |
 |---|---|
 | Overall style | Friendly-organic (rounded, pink/green, bounce) |
-| Imagery | Custom **clay mascots** in [`apps/web/public/images/clay/`](../apps/web/public/images/clay/) (WebP + PNG). Catalog: `ClayFigure` (`puppy`, `cat`, `family`, `critter`, `monkey`) |
+| Imagery | Custom **clay mascots** in [`apps/web/public/images/clay/`](../../../apps/web/public/images/clay/) (WebP + PNG). Catalog: `ClayFigure` (`puppy`, `cat`, `family`, `critter`, `monkey`) |
 | Hero video | No |
 | Hero décor | Large clay companions framing centered copy on **white**; pastel pink/green washes; CSS `clay-float`; pointer parallax on layers |
 | Shadows | Soft on cards/CTAs; drop-shadow on clay figures |
@@ -152,14 +152,14 @@ Single reusable control for all CTAs and chrome actions — **no ad-hoc `<button
 - Prefer **`variant="menu"`**: localized “Language” / “Idioma” label + languages icon; dropdown lists full names (`LOCALE_NAMES`) so new locales can be added without a wider pill row
 - Optional `variant="pills"` for dense PT|EN|ES segments if needed
 - Used in Header, Footer, and auth form column
-- Details: [`ui-patterns.md`](ui-patterns.md)
+- Details: [`ui-patterns.md`](../ui-patterns.md)
 
 ### Toast (`components/Toast.tsx`)
 
 - **Required** for any outcome the user must notice (error / success / warning / info)
 - Bottom-right stack; Lucide tone icons (`Info`, `CircleCheck`, `CircleX`, `CircleAlert`) — **no emoji**
 - Swipe in from the right / swipe out to the right
-- Details: [`ui-patterns.md`](ui-patterns.md)
+- Details: [`ui-patterns.md`](../ui-patterns.md)
 
 ### Input (`components/Input.tsx`)
 
@@ -168,7 +168,7 @@ Single reusable control for all CTAs and chrome actions — **no ad-hoc `<button
 
 ### CurvedLoop (marquee ribbons)
 
-- Component: [`apps/web/src/components/bits/CurvedLoop.tsx`](../apps/web/src/components/bits/CurvedLoop.tsx)
+- Component: [`apps/web/src/components/bits/CurvedLoop.tsx`](../../../apps/web/src/components/bits/CurvedLoop.tsx)
 - Continuous sine ribbon (stroke) + upright per-letter wave
 - Prop **`bridgeAbove`**: solid fill from the previous section color down to the ribbon’s lower edge (same sine) so there is **no white gap** between FAQ↔pink ribbon or HowItWorks↔green ribbon
 - Prop **`bridgeBelow`**: fill from the ribbon’s lower sine **downward** (footer `#1a1214`) so marquee text rides the join into the dark footer — used on the pink ribbon; Footer then omits its own `SectionDivider`
@@ -226,7 +226,7 @@ Hero title splitting uses **GSAP `SplitText`** directly (not the bits wrapper).
 - Dropdown: use `Select`. Checkbox: use `Checkbox`.
 - Buttons: **only** `Button` (or composites like `LocaleSwitcher`). Do not hardcode styled `<button>` / CTA `<a>` in features.
 - `magnetic={false}` when pull feels heavy (Hero CTAs, compact chrome); fill/CSS hover still applies on fill variants.
-- Outcome feedback: **toasts only** — see [`ui-patterns.md`](ui-patterns.md).
+- Outcome feedback: **toasts only** — see [`ui-patterns.md`](../ui-patterns.md).
 
 ### Scrollbar & anchors
 
@@ -310,5 +310,5 @@ Required: `prefers-reduced-motion` (Lenis off + timelines skip + native anchor f
 
 - [`landing-content-brief.md`](landing-content-brief.md)
 - [`landing-tech-plan.md`](landing-tech-plan.md)
-- [`ui-patterns.md`](ui-patterns.md)
-- [`personas.md`](personas.md)
+- [`ui-patterns.md`](../ui-patterns.md)
+- [`personas.md`](../../roadmap/personas.md)

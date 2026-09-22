@@ -1,8 +1,8 @@
 # ANIMAPS — Onboarding
 
-Config-driven, multi-`UserType` onboarding after email verification. One dynamic route (`/onboarding/[step]`) resolves steps from registry + flow maps — never a hard-coded single-persona wizard.
+Config-driven, multi-account onboarding after email verification. Register collects **AccountType** (+ org/institution subtype); `resolveFlowKey` maps to Wave 2 flow keys. One dynamic route (`/onboarding/[step]`) resolves steps from registry + flow maps — never a hard-coded single-persona wizard.
 
-Related: [conventions.md](conventions.md) · [user-flow.md](user-flow.md) · [user-types.md](user-types.md) · [profiles.md](profiles.md) · [verification.md](verification.md) · [database.md](database.md).
+Related: [conventions.md](../architecture/conventions.md) · [user-flow.md](user-flow.md) · [user-types.md](../domains/user-types.md) · [account-types.md](../domains/account-types.md) · [profiles.md](../domains/profiles.md) · [verification.md](verification.md) · [database.md](../database/overview.md).
 
 **Source:** `apps/web/src/features/onboarding/`
 
@@ -70,18 +70,24 @@ Step components **must** call `useOnboardingNavigation` (or receive navigation f
 
 ---
 
-## Flows by `UserType`
+## Flows by AccountType / UserType
 
-| UserType | Steps after `guidelines` |
-|---|---|
-| `PERSON` | `intentions` → `animal-preferences`\* → `interests` → `additional-info` → `verification` |
-| `ONG` | `organization-info` → `location` → `animal-types` → `services` → `verification` |
-| `VETERINARY_CLINIC` | `clinic-info` → `location` → `services` → `animals-served` → `verification` |
-| `OTHER` | `role-selection` → `profile` → `additional-info` |
+Register asks **AccountType** first (`PERSON` / `ORGANIZATION` / `INSTITUTION` / `OTHER`). `resolveFlowKey(draft)` maps to a Wave 2 flow key:
 
-\* `animal-preferences` is active only when `draft.intentions.includes("adopt")`.
+| Signup | Flow key | Steps after `guidelines` |
+|---|---|---|
+| `PERSON` | `PERSON` | `intentions` → `animal-preferences`\* → `interests` → `additional-info` → `verification` |
+| `ORGANIZATION` → NGO / shelter / … | `ONG` | `organization-type`† → `organization-info` → `location` → `animal-types` → `services` → `verification` |
+| `ORGANIZATION` → clinic / hospital | `VETERINARY_CLINIC` | `organization-type`† → `clinic-info` → `location` → `services` → `animals-served` → `verification` |
+| `INSTITUTION` | `INSTITUTION` | `institution-type`† → `institution-info` → `location` → `verification` |
+| `OTHER` | `OTHER` | `role-selection` → `profile` → `additional-info` |
 
-Shared steps (`location`, `services`) branch internally on `userType` (org vs clinic forms) instead of duplicating route ids.
+\* `animal-preferences` is active only when `draft.intentions.includes("adopt")`.  
+† Type steps are skipped when already set at register (`conditions: !draft.organizationType` / `!draft.institutionTypeId`).
+
+Post-complete home: `PERSON` / `OTHER` → `/discover`; org / clinic / institution → `/dashboard`.
+
+Shared steps (`location`, `services`) branch internally on flow key (org vs clinic forms) instead of duplicating route ids.
 
 ---
 
@@ -89,7 +95,7 @@ Shared steps (`location`, `services`) branch internally on `userType` (org vs cl
 
 Catalog (`INTENTION_IDS`):
 
-`adopt` · `pet_owner` · `help_animals` · `report` · `lost_animal` · `found_animal` · `community` · `explore`
+`adopt` · `pet_owner` · `help_animals` · `volunteer` · `foster_home` · `independent_protector` · `animal_professional` · `report` · `lost_animal` · `found_animal` · `community` · `explore`
 
 - Multi-select via `IntentionSelector`.
 - At least one intention recommended before continue (UI toast gate).
@@ -103,7 +109,7 @@ Catalog (`OTHER_ROLE_IDS`):
 
 `independent_protector` · `foster_home` · `volunteer` · `animal_professional` · `animal_business` · `community_member` · `other`
 
-Single-select today; future sub-flows may branch on `otherRole` without changing the top-level `UserType`.
+Single-select today; maps toward PERSON intentions when AccountType cutover persists ([account-types.md](../domains/account-types.md)). OTHER remains a public signup option that sets `accountType: PERSON` + `userType: OTHER`.
 
 ---
 
@@ -112,9 +118,9 @@ Single-select today; future sub-flows may branch on `otherRole` without changing
 | Mode | Who | Behavior (current) |
 |---|---|---|
 | `selfie` | `PERSON` | Camera capture → mock pipeline → status badge |
-| `institutional` | `ONG`, `VETERINARY_CLINIC` | Placeholder submit → `pending` / `processing`; no selfie required |
+| `institutional` | `ONG`, `VETERINARY_CLINIC`, `INSTITUTION` | Placeholder submit → `pending` / `processing`; no selfie required |
 
-Implemented by `VerificationFlow` (`mode` inferred from `userType` when omitted). Soft gate: user may finish onboarding with non-approved status.
+Implemented by `VerificationFlow` (`mode` inferred from `userType` when omitted). Soft gate: user may finish onboarding with non-approved status. Institution workspace must not claim cases were “sent to government” while verification is pending.
 
 ---
 
@@ -124,11 +130,11 @@ Implemented by `VerificationFlow` (`mode` inferred from `userType` when omitted)
 |---|---|
 | Storage key | `animaps-onboarding-draft` |
 | Shape | `OnboardingDraft` in `types.ts` |
-| Critical fields | `userType`, `intentions`, `otherRole`, `organization`, `veterinary`, prefs, interests (max 5), `additionalInfo`, verification statuses |
+| Critical fields | `accountType`, `organizationType`, `institutionTypeId`, `userType`, `intentions`, `otherRole`, `organization`, `veterinary`, `institution`, prefs, interests (max 5), `additionalInfo`, verification statuses |
 
-Hydrated on mount; written after every reducer change. Wave 2 replaces this with Nest `identity` + profile / preference tables ([database.md](database.md)).
+Hydrated on mount; written after every reducer change. Wave 2 replaces this with Nest `identity` + profile / preference tables ([database.md](../database/overview.md)).
 
-`userType` is set at `/register` (`RegisterForm` → `patch({ userType })`), not on a separate onboarding picker.
+`RegisterForm` patches `accountType` / subtypes / `userType` after waitlist submit. Flow resolution prefers `accountType` via `resolveFlowKey`.
 
 ---
 
@@ -138,7 +144,9 @@ Hydrated on mount; written after every reducer change. Wave 2 replaces this with
 |---|---|
 | `OnboardingFlow` | Validates step ∈ active flow; redirects if filtered/out of scope |
 | `OnboardingLayout` | Progress + chrome; progress totals from active steps |
-| `UserTypeSelector` | Register type cards (`SelectableCard`) |
+| `AccountTypeSelector` | Register / waitlist AccountType cards (+ OTHER) |
+| `OrganizationTypeSelector` / `InstitutionTypeSelector` | Subtype cards |
+| `UserTypeSelector` | Legacy Wave 2 type cards (kept for compatibility) |
 | `IntentionSelector` | Generic multi/single card grid (intentions + other roles) |
 | `OrganizationForm` / `VeterinaryForm` | Modeled field groups (`info` \| `location` \| …) |
 | `AnimalPreferenceForm` | Composite PERSON adopt prefs |
@@ -163,9 +171,10 @@ Hydrated on mount; written after every reducer change. Wave 2 replaces this with
 
 | Current | Future |
 |---|---|
-| `localStorage` draft | Nest `identity` + profile / preference tables |
-| Static catalogs in `data.ts` | DB or CMS catalogs (`interests`) |
+| `localStorage` draft | Nest `PUT /me/onboarding` → tables in [database.md](../database/overview.md) |
+| Static catalogs in `data.ts` | Seeded `interests` table (same slugs) |
 | Mock verification | Provider + `verification_requests` (`kind`: selfie \| institutional) |
+| AccountType UI + `user_type` still persisted on waitlist | Persist `account_type` + memberships when Nest `identity` ships |
 
 ---
 
@@ -174,6 +183,8 @@ Hydrated on mount; written after every reducer change. Wave 2 replaces this with
 - **Config over duplication** — new types extend maps; do not fork `features/onboarding-*`.
 - **Universal guidelines** — one legal/community gate before type-specific collection.
 - **Conditional steps** via `conditions(draft)`, not nested routers.
-- **`userType` at register** selects the flow before the first onboarding URL.
+- **AccountType at register** selects the path; `resolveFlowKey` keeps Wave 2 ONG/clinic flows.
 - Legacy aliases preserved so bookmarks from the guardian-only era still resolve.
 - Progress is computed from **active** steps so skipping conditional steps does not strand the indicator.
+- OTHER stays a signup option but folds into `accountType: PERSON` for ecosystem modeling.
+- INSTITUTION completes to `/dashboard` with case/map/team nav mocks — soft-gated, no fake government routing promises.

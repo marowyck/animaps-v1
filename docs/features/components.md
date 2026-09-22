@@ -2,7 +2,7 @@
 
 Catalog of shared UI in `apps/web/src/components/` and feature-local building blocks. Import features only via their `index.ts`. Prefer extending this catalog over one-off markup.
 
-Related: [design-system.md](design-system.md) · [ui-patterns.md](ui-patterns.md) · [conventions.md](conventions.md) · [onboarding.md](onboarding.md).
+Related: [design-system.md](design-system.md) · [ui-patterns.md](ui-patterns.md) · [conventions.md](../architecture/conventions.md) · [onboarding.md](onboarding.md).
 
 ---
 

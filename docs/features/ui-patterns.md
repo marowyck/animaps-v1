@@ -4,9 +4,9 @@ Shared interaction patterns for `apps/web` (English source of truth).
 
 Keep this document aligned with:
 
-- [`landing-content-brief.md`](landing-content-brief.md)
-- [`landing-design-brief.md`](landing-design-brief.md)
-- [`landing-tech-plan.md`](landing-tech-plan.md)
+- [`landing-content-brief.md`](./landing/landing-content-brief.md)
+- [`landing-design-brief.md`](./landing/landing-design-brief.md)
+- [`landing-tech-plan.md`](./landing/landing-tech-plan.md)
 
 ---
 
@@ -43,8 +43,8 @@ Examples: form validation failures (“password doesn’t meet requirements”),
 
 ### Implementation
 
-- Provider: [`apps/web/src/components/Toast.tsx`](../apps/web/src/components/Toast.tsx) (`ToastProvider` + `useToast`).
-- Wired in [`apps/web/src/app/providers.tsx`](../apps/web/src/app/providers.tsx) inside `LocaleProvider` so copy can use `useT()`.
+- Provider: [`apps/web/src/components/Toast.tsx`](../../apps/web/src/components/Toast.tsx) (`ToastProvider` + `useToast`).
+- Wired in [`apps/web/src/app/providers.tsx`](../../apps/web/src/app/providers.tsx) inside `LocaleProvider` so copy can use `useT()`.
 - Call site example:
 
 ```ts
@@ -70,7 +70,7 @@ Locale switching supports growth beyond PT / EN / ES.
 
 - **Menu variant** (`LocaleSwitcher variant="menu"`): trigger shows localized **“Language” / “Idioma”** label + `Languages` icon; dropdown lists full names from `LOCALE_NAMES` (plus short codes). Used on auth pages, header bubble menu, and footer.
 - **Pills variant** (`variant="pills"`): legacy compact `PT | EN | ES` segments — still available if a dense chrome needs it.
-- Adding a locale: extend `LOCALES`, `LOCALE_LABELS`, `LOCALE_NAMES`, message catalogs, and `HTML_LANG` in [`apps/web/src/i18n/`](../apps/web/src/i18n/). No URL prefixes.
+- Adding a locale: extend `LOCALES`, `LOCALE_LABELS`, `LOCALE_NAMES`, message catalogs, and `HTML_LANG` in [`apps/web/src/i18n/`](../../apps/web/src/i18n/). No URL prefixes.
 
 ---
 
@@ -101,7 +101,7 @@ Strong password before submit:
 - At least one **uppercase** letter (`A–Z`)
 - At least one **special** character (any non-alphanumeric)
 
-Show a live checklist next to the fields. On submit, weak / mismatch / missing password feedback uses an **error toast**. Implementation: [`passwordValidation.ts`](../apps/web/src/features/auth/passwordValidation.ts).
+Show a live checklist next to the fields. On submit, weak / mismatch / missing password feedback uses an **error toast**. Implementation: [`passwordValidation.ts`](../../apps/web/src/features/auth/passwordValidation.ts).
 
 Password is validated in the UI only today — **not** persisted by `/api/waitlist` until real auth ships.
 
@@ -115,7 +115,7 @@ Password fields on `/register` (step 2) and `/login` use `Input` with `revealabl
 - i18n aria labels: `t.auth.showPassword` / `t.auth.hidePassword`
 - Toggle lives outside the `<label>` control association so clicks do not double-fire
 
-Implementation: [`apps/web/src/components/Input.tsx`](../apps/web/src/components/Input.tsx).
+Implementation: [`apps/web/src/components/Input.tsx`](../../apps/web/src/components/Input.tsx).
 
 ---
 
@@ -130,6 +130,6 @@ Implementation: [`apps/web/src/components/Input.tsx`](../apps/web/src/components
 
 ## Related
 
-- [`landing-tech-plan.md`](landing-tech-plan.md)
-- [`landing-design-brief.md`](landing-design-brief.md)
-- [`landing-content-brief.md`](landing-content-brief.md)
+- [`landing-tech-plan.md`](./landing/landing-tech-plan.md)
+- [`landing-design-brief.md`](./landing/landing-design-brief.md)
+- [`landing-content-brief.md`](./landing/landing-content-brief.md)
