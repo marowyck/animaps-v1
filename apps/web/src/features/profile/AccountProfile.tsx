@@ -73,11 +73,11 @@ function UserProfile() {
           <div className="min-w-0 pb-1">
             <h1 className="text-h1 truncate text-text">{name || t.profilePage.title}</h1>
             <p className="mt-1 flex items-center gap-1.5 text-body-sm text-text-secondary">
-              <MapPin className="size-4 text-(--pink-700)" aria-hidden />
+              <MapPin className="size-4 text-primary-ink" aria-hidden />
               {city || address || t.profilePage.subtitle}
             </p>
           </div>
-          <span className="ml-auto hidden size-14 items-center justify-center rounded-full bg-primary-soft text-(--pink-700) sm:flex">
+          <span className="ml-auto hidden size-14 items-center justify-center rounded-full bg-primary-soft text-primary-ink sm:flex">
             <PawPrint className="size-7" aria-hidden />
           </span>
         </div>
@@ -94,13 +94,16 @@ function UserProfile() {
           value={draft.email ?? ""}
           readOnly
         />
-        <p className="text-sm text-ink-muted">
-          {t.profilePage.type}: {userType ? labelUserType(t, userType) : t.userTypes.unknown}
+        <p className="flex items-center gap-2 text-body-sm text-text-secondary">
+          {t.profilePage.type}
+          <span className="rounded-full bg-secondary-soft px-2.5 py-0.5 text-caption font-semibold text-secondary-ink">
+            {userType ? labelUserType(t, userType) : t.userTypes.unknown}
+          </span>
         </p>
 
         {userType === "ONG" ? (
           <fieldset className="space-y-3">
-            <legend className="text-sm font-bold text-ink">
+            <legend className="text-h4 mb-1 text-text">
               {t.profilePage.orgSection}
             </legend>
             <Input
@@ -118,7 +121,7 @@ function UserProfile() {
 
         {userType === "VETERINARY_CLINIC" ? (
           <fieldset className="space-y-3">
-            <legend className="text-sm font-bold text-ink">
+            <legend className="text-h4 mb-1 text-text">
               {t.profilePage.clinicSection}
             </legend>
             <Input
@@ -134,7 +137,7 @@ function UserProfile() {
           </fieldset>
         ) : null}
 
-        <Button type="submit" variant="pink" size="sm">
+        <Button type="submit" variant="primary" className="self-start">
           {t.profilePage.save}
         </Button>
       </form>
@@ -151,7 +154,7 @@ function UserProfile() {
                   key={id}
                   className={[
                     "rounded-full px-3 py-1 text-caption font-semibold",
-                    ["bg-primary-soft text-(--pink-700)", "bg-success-soft text-(--mint-700)", "bg-warning-soft text-(--honey-700)", "bg-secondary-soft text-(--lilac-700)"][
+                    ["bg-primary-soft text-primary-ink", "bg-success-soft text-success-ink", "bg-warning-soft text-warning-ink", "bg-secondary-soft text-secondary-ink"][
                       index % 4
                     ],
                   ].join(" ")}
