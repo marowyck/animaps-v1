@@ -2,7 +2,6 @@
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { LogOut } from "lucide-react";
 import { useT } from "@/i18n";
 import type { PublicUserType } from "@/features/user-types";
 import {
@@ -23,10 +22,11 @@ export function MobileNav({ userType = "PERSON" }: MobileNavProps) {
 
   const itemClass = (active: boolean, placeholder = false) =>
     [
-      "flex flex-1 flex-col items-center gap-1 rounded-full px-1 py-1.5 text-[10px] font-semibold transition-colors duration-150",
+      "flex min-h-11 flex-1 flex-col items-center justify-center gap-1 rounded-2xl px-1.5 py-1.5 text-[11px] font-semibold transition-colors duration-150",
+      "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary",
       active
-        ? "bg-primary-soft text-(--pink-700)"
-        : "text-text-muted hover:text-text",
+        ? "bg-primary-soft text-primary-ink"
+        : "text-text-secondary hover:bg-surface-hover hover:text-text",
       placeholder ? "opacity-45 pointer-events-none" : "",
     ]
       .filter(Boolean)
@@ -34,20 +34,10 @@ export function MobileNav({ userType = "PERSON" }: MobileNavProps) {
 
   return (
     <nav
-      className="fixed inset-x-0 bottom-0 z-40 bg-background px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2 lg:hidden"
+      className="fixed inset-x-0 bottom-0 z-40 border-t border-border-subtle bg-surface/95 px-2.5 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-1.5 shadow-sm backdrop-blur-md lg:hidden"
       aria-label={t.chrome.mobileNav}
     >
       <ul className="mx-auto flex max-w-lg items-stretch justify-between gap-1">
-        <li className="flex-1">
-          <Link
-            href="/"
-            className="flex flex-1 flex-col items-center gap-1 rounded-full bg-danger-soft px-1 py-1.5 text-[10px] font-semibold text-(--coral-700)"
-            aria-label={t.dashboard.exit}
-          >
-            <LogOut className="size-5" aria-hidden />
-            {t.dashboard.exit}
-          </Link>
-        </li>
         {items.map((item) => {
           const Icon = item.icon;
           const active =
@@ -57,24 +47,24 @@ export function MobileNav({ userType = "PERSON" }: MobileNavProps) {
 
           if (item.placeholder) {
             return (
-              <li key={item.id} className="flex-1">
+              <li key={item.id} className="flex flex-1">
                 <span className={itemClass(false, true)} aria-disabled="true">
                   <Icon className="size-5" aria-hidden />
-                  {String(label)}
+                  <span className="max-w-full truncate">{String(label)}</span>
                 </span>
               </li>
             );
           }
 
           return (
-            <li key={item.id} className="flex-1">
+            <li key={item.id} className="flex flex-1">
               <Link
                 href={item.href}
                 className={itemClass(active)}
                 aria-current={active ? "page" : undefined}
               >
                 <Icon className="size-5" aria-hidden />
-                {String(label)}
+                <span className="max-w-full truncate">{String(label)}</span>
               </Link>
             </li>
           );

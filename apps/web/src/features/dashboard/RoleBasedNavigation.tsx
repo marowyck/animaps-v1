@@ -43,18 +43,18 @@ export function RoleBasedNavigation({
   }
 
   return (
-    <aside className="hidden h-full min-h-0 w-64 shrink-0 flex-col overflow-y-auto bg-background px-3 py-5 lg:flex">
-      <div className="mb-6 flex items-center gap-2 px-2">
-        <span className="flex size-10 items-center justify-center rounded-full bg-primary text-surface-elevated">
+    <aside className="hidden h-full min-h-0 w-64 shrink-0 flex-col overflow-y-auto border-r border-border-subtle bg-surface/65 px-3.5 py-5 lg:flex">
+      <div className="mb-6 flex items-center gap-2.5 px-2">
+        <span className="flex size-10 items-center justify-center rounded-full bg-primary text-surface-elevated shadow-sm">
           <PawDoodle className="size-6" />
         </span>
         <p className="font-display text-2xl text-text">ANIMAPS</p>
       </div>
-      <div className="mb-5 flex items-center gap-3 rounded-[1.4rem] bg-primary-soft px-3 py-3">
+      <div className="mb-5 flex items-center gap-3 rounded-[1.4rem] border border-primary/15 bg-primary-soft px-3 py-3">
         <ProfileAvatar name={name} size="sm" />
         <div className="min-w-0">
           <p className="truncate text-body-sm font-semibold text-text">{name}</p>
-          <p className="truncate text-caption text-(--pink-700)">
+          <p className="truncate text-caption font-semibold text-primary-ink">
             {labelUserType(t, userType)}
           </p>
         </div>
@@ -62,7 +62,7 @@ export function RoleBasedNavigation({
       <nav className="flex flex-1 flex-col gap-1" aria-label={t.chrome.dashboardNav}>
         {nav.map((item) => renderItem(item, pathname, t))}
       </nav>
-      <div className="mt-4 space-y-2 pt-3">
+      <div className="mt-4 space-y-2 border-t border-border-subtle pt-4">
         <LocaleSwitcher tone="light" variant="menu" />
         <NavigationItem
           href="/"
