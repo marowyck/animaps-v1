@@ -7,6 +7,7 @@ import { Input } from "@/components/Input";
 import { useToast } from "@/components/Toast";
 import { useOnboarding } from "@/features/onboarding";
 import { useT } from "@/i18n";
+import { AuthDivider } from "./AuthDivider";
 import { GoogleAuthButton } from "./GoogleAuthButton";
 
 export function LoginForm() {
@@ -30,17 +31,14 @@ export function LoginForm() {
   }
 
   return (
-    <div className="flex w-full flex-col pb-2">
-      <h1 className="font-display shrink-0 text-[1.35rem] leading-tight tracking-tight text-ink sm:text-2xl lg:text-[1.65rem]">
-        {t.auth.login.title}
-      </h1>
-      <p className="mt-1 shrink-0 text-xs leading-snug text-ink-muted sm:line-clamp-2">
-        {t.auth.login.subtitle}
-      </p>
+    <div className="flex w-full flex-col py-2">
+      <div data-enter>
+        <h1 className="text-h2 text-text">{t.auth.login.title}</h1>
+        <p className="text-body-sm mt-2 text-text-secondary">{t.auth.login.subtitle}</p>
+      </div>
 
-      <form onSubmit={onSubmit} className="mt-3 space-y-3" noValidate>
+      <form data-enter onSubmit={onSubmit} className="mt-6 space-y-4" noValidate>
         <Input
-          compact
           label={t.auth.login.email}
           name="email"
           type="email"
@@ -50,7 +48,6 @@ export function LoginForm() {
           required
         />
         <Input
-          compact
           revealable
           revealLabel={t.auth.showPassword}
           hideLabel={t.auth.hidePassword}
@@ -63,36 +60,24 @@ export function LoginForm() {
           required
         />
 
-        <Button
-          type="submit"
-          variant="pink"
-          size="sm"
-          magnetic={false}
-          className="!w-full !min-w-0"
-        >
+        <Button type="submit" variant="primary" magnetic={false} className="mt-2 w-full">
           {t.auth.login.submit}
         </Button>
       </form>
 
-      <div className="my-3 flex shrink-0 items-center gap-3">
-        <span className="h-px flex-1 bg-border-soft" aria-hidden />
-        <span className="text-[0.65rem] font-bold uppercase tracking-wider text-ink-muted">
-          {t.auth.or}
-        </span>
-        <span className="h-px flex-1 bg-border-soft" aria-hidden />
+      <div data-enter>
+        <AuthDivider label={t.auth.or} />
+        <GoogleAuthButton compact />
+        <p className="text-body-sm mt-6 text-center text-text-secondary">
+          {t.auth.login.noAccount}{" "}
+          <a
+            href="/register"
+            className="font-semibold text-primary-ink underline-offset-2 hover:underline"
+          >
+            {t.auth.login.registerLink}
+          </a>
+        </p>
       </div>
-
-      <GoogleAuthButton compact />
-
-      <p className="mt-3 shrink-0 text-center text-xs font-semibold text-ink-muted">
-        {t.auth.login.noAccount}{" "}
-        <a
-          href="/register"
-          className="cursor-pointer font-bold text-brand-pink underline-offset-2 hover:underline"
-        >
-          {t.auth.login.registerLink}
-        </a>
-      </p>
     </div>
   );
 }

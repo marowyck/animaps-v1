@@ -94,14 +94,14 @@ export function VerifyEmailForm() {
 
   if (!email) {
     return (
-      <div className="flex w-full flex-col pb-2">
-        <h1 className="font-display text-[1.35rem] leading-tight tracking-tight text-ink sm:text-2xl lg:text-[1.65rem]">
+      <div className="flex w-full flex-col py-2">
+        <h1 data-enter className="text-h2 text-text">
           {t.auth.verifyEmail.title}
         </h1>
-        <p className="mt-2 text-body-sm text-ink-muted">
+        <p data-enter className="text-body-sm mt-2 text-text-secondary">
           {t.auth.verifyEmail.missingEmail}
         </p>
-        <Button href="/login" variant="pink" size="sm" className="mt-6 !w-full !min-w-0">
+        <Button data-enter href="/login" variant="primary" className="mt-6 w-full">
           {t.auth.verifyEmail.missingCta}
         </Button>
       </div>
@@ -111,25 +111,25 @@ export function VerifyEmailForm() {
   const subtitle = t.auth.verifyEmail.subtitle.replace("{email}", email);
 
   return (
-    <div className="flex w-full flex-col pb-2">
-      <h1 className="font-display text-[1.35rem] leading-tight tracking-tight text-ink sm:text-2xl lg:text-[1.65rem]">
-        {t.auth.verifyEmail.title}
-      </h1>
-      <p className="mt-1 text-xs leading-snug text-ink-muted">
-        {subtitle.split(email).map((part, index, parts) =>
-          index < parts.length - 1 ? (
-            <span key={index}>
-              {part}
-              <strong className="font-bold text-ink">{email}</strong>
-            </span>
-          ) : (
-            <span key={index}>{part}</span>
-          ),
-        )}
-      </p>
-      <p className="mt-2 text-caption text-ink-muted">{t.auth.verifyEmail.expires}</p>
+    <div className="flex w-full flex-col py-2">
+      <div data-enter>
+        <h1 className="text-h2 text-text">{t.auth.verifyEmail.title}</h1>
+        <p className="text-body-sm mt-2 text-text-secondary">
+          {subtitle.split(email).map((part, index, parts) =>
+            index < parts.length - 1 ? (
+              <span key={index}>
+                {part}
+                <strong className="font-semibold break-all text-text">{email}</strong>
+              </span>
+            ) : (
+              <span key={index}>{part}</span>
+            ),
+          )}
+        </p>
+        <p className="text-caption mt-2 text-text-muted">{t.auth.verifyEmail.expires}</p>
+      </div>
 
-      <form onSubmit={onSubmit} className="mt-5">
+      <form data-enter onSubmit={onSubmit} className="mt-6">
         <CodeInput
           value={code}
           onChange={(value) => {
@@ -141,13 +141,13 @@ export function VerifyEmailForm() {
           label={t.auth.verifyEmail.codeLabel}
         />
 
-        <div className="mt-6 w-full space-y-3">
+        <div className="mt-6 w-full space-y-2">
           <Button
             type="submit"
-            variant="pink"
-            size="sm"
+            variant="primary"
             magnetic={false}
-            className="!w-full !min-w-0"
+            className="w-full"
+            loading={phase === "validating"}
             disabled={code.length < CODE_INPUT_LENGTH || phase === "validating" || phase === "success"}
           >
             {phase === "validating" ? t.onboarding.loading : t.auth.verifyEmail.continue}
@@ -156,23 +156,25 @@ export function VerifyEmailForm() {
             type="button"
             variant="ghost"
             size="sm"
-            className="!w-full"
+            className="w-full"
             disabled={cooldown > 0 || phase === "resending"}
             onClick={() => void onResend()}
           >
-            {phase === "resending"
-              ? t.auth.verifyEmail.resending
-              : cooldown > 0
-                ? t.auth.verifyEmail.resendIn.replace("{seconds}", String(cooldown))
-                : t.auth.verifyEmail.resend}
+            <span className="tabular-nums">
+              {phase === "resending"
+                ? t.auth.verifyEmail.resending
+                : cooldown > 0
+                  ? t.auth.verifyEmail.resendIn.replace("{seconds}", String(cooldown))
+                  : t.auth.verifyEmail.resend}
+            </span>
           </Button>
         </div>
       </form>
 
-      <p className="mt-4 text-center text-xs font-semibold text-ink-muted">
+      <p data-enter className="text-body-sm mt-6 text-center">
         <a
           href="/login"
-          className="font-bold text-brand-pink underline-offset-2 hover:underline"
+          className="font-semibold text-primary-ink underline-offset-2 hover:underline"
         >
           {t.auth.verifyEmail.back}
         </a>

@@ -25,7 +25,7 @@ export function AuthImageCarousel() {
 
   return (
     <div
-      className="relative h-full min-h-0 w-full overflow-hidden bg-ink"
+      className="relative h-full min-h-0 w-full overflow-hidden bg-footer"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onFocusCapture={() => setPaused(true)}
@@ -39,18 +39,26 @@ export function AuthImageCarousel() {
         const active = i === index;
         const alt = t.auth.slides[s.id].imageAlt;
         return (
-          <Image
+          <div
             key={s.id}
-            src={s.src}
-            alt={active ? alt : ""}
-            fill
-            priority={i === 0}
-            sizes="(max-width: 1023px) 100vw, 66vw"
-            className={`object-cover transition-opacity duration-700 ease-out ${
+            aria-hidden={!active}
+            className={`absolute inset-0 transition-opacity duration-1000 ease-(--ease-out) motion-reduce:transition-none ${
               active ? "opacity-100" : "opacity-0"
             }`}
-            aria-hidden={!active}
-          />
+          >
+            <Image
+              src={s.src}
+              alt={active ? alt : ""}
+              fill
+              priority={i === 0}
+              sizes="(max-width: 1023px) 100vw, 75vw"
+              className={`object-cover ease-linear motion-reduce:!scale-100 motion-reduce:transition-none ${
+                active
+                  ? "scale-[1.06] transition-transform duration-[7000ms]"
+                  : "scale-100 transition-none"
+              }`}
+            />
+          </div>
         );
       })}
 
@@ -60,15 +68,13 @@ export function AuthImageCarousel() {
       />
 
       <div className="absolute inset-x-0 bottom-0 z-10 p-6 md:p-10 lg:p-12">
-        <p className="font-display max-w-xl text-2xl leading-tight tracking-tight text-white md:text-3xl lg:text-4xl">
-          {copy.title}
-        </p>
-        <p className="mt-3 max-w-lg text-sm leading-relaxed text-white/85 md:text-base">
-          {copy.body}
-        </p>
+        <div key={slide.id} className="animate-fade-in-up" aria-live="polite">
+          <p className="text-h2 max-w-xl text-balance text-white">{copy.title}</p>
+          <p className="text-body mt-3 max-w-lg text-white/85">{copy.body}</p>
+        </div>
 
         <div
-          className="mt-6 flex gap-2"
+          className="mt-5 flex gap-1"
           role="tablist"
           aria-label={t.chrome.slides}
         >
@@ -80,12 +86,16 @@ export function AuthImageCarousel() {
               aria-selected={i === index}
               aria-label={`${t.auth.slides[s.id].title}`}
               onClick={() => setIndex(i)}
-              className={`h-2 cursor-pointer rounded-full transition-all ${
-                i === index
-                  ? "w-8 bg-brand-pink"
-                  : "w-2 bg-white/45 hover:bg-white/70"
-              }`}
-            />
+              className="group flex h-6 w-9 cursor-pointer items-center rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+            >
+              <span className="relative h-1.5 w-full overflow-hidden rounded-full bg-white/35 transition-colors duration-(--duration-fast) group-hover:bg-white/55">
+                <span
+                  className={`absolute inset-0 origin-left rounded-full bg-primary transition-transform duration-(--duration-slow) ease-(--ease-out) ${
+                    i === index ? "scale-x-100" : "scale-x-0"
+                  }`}
+                />
+              </span>
+            </button>
           ))}
         </div>
       </div>

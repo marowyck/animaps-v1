@@ -9,6 +9,7 @@ import { WaitlistForm, type WaitlistFormState } from "@/features/waitlist";
 import { submitWaitlist } from "@/features/waitlist/submitWaitlist";
 import { mapSignupOption, useOnboarding } from "@/features/onboarding";
 import { useT } from "@/i18n";
+import { AuthDivider } from "./AuthDivider";
 import { GoogleAuthButton } from "./GoogleAuthButton";
 import {
   checkPasswordRules,
@@ -84,28 +85,30 @@ export function RegisterForm() {
     .replace("{total}", "2");
 
   return (
-    <div className="flex w-full flex-col pb-2">
-      <div className="flex shrink-0 items-start justify-between gap-3">
-        <h1 className="font-display min-w-0 flex-1 text-[1.35rem] leading-tight tracking-tight text-ink sm:text-2xl lg:text-[1.65rem]">
-          {step === 1 ? t.auth.register.title : t.auth.register.step2Title}
-        </h1>
-        <span
-          className="mt-0.5 inline-flex shrink-0 items-center rounded-full border border-border-soft bg-gray-soft px-2.5 py-1 text-[0.7rem] font-bold tabular-nums tracking-tight text-ink-muted"
-          aria-label={stepLabel}
-          aria-live="polite"
-        >
-          {step}/2
-        </span>
+    <div className="flex w-full flex-col py-2">
+      <div data-enter>
+        <div className="flex items-start justify-between gap-3">
+          <h1 className="text-h2 min-w-0 flex-1 text-text">
+            {step === 1 ? t.auth.register.title : t.auth.register.step2Title}
+          </h1>
+          <span
+            className="mt-1.5 inline-flex shrink-0 items-center rounded-full bg-secondary-soft px-2.5 py-1 text-caption font-semibold tabular-nums text-secondary-ink"
+            aria-label={stepLabel}
+            aria-live="polite"
+          >
+            {step}/2
+          </span>
+        </div>
+        <p className="text-body-sm mt-2 text-text-secondary">
+          {step === 1
+            ? t.auth.register.subtitle
+            : t.auth.register.step2Subtitle}
+        </p>
       </div>
-      <p className="mt-1 shrink-0 text-xs leading-snug text-ink-muted sm:line-clamp-2">
-        {step === 1
-          ? t.auth.register.subtitle
-          : t.auth.register.step2Subtitle}
-      </p>
 
       {step === 1 ? (
-        <>
-          <div className="mt-3">
+        <div key="profile" className="animate-enter-from-start">
+          <div className="mt-5">
             <WaitlistForm
               embedded
               initialValues={profile ?? undefined}
@@ -117,24 +120,18 @@ export function RegisterForm() {
             />
           </div>
 
-          <div className="my-3 flex shrink-0 items-center gap-3">
-            <span className="h-px flex-1 bg-border-soft" aria-hidden />
-            <span className="text-[0.65rem] font-bold uppercase tracking-wider text-ink-muted">
-              {t.auth.or}
-            </span>
-            <span className="h-px flex-1 bg-border-soft" aria-hidden />
-          </div>
+          <AuthDivider label={t.auth.or} />
 
           <GoogleAuthButton compact />
-        </>
+        </div>
       ) : (
         <form
+          key="password"
           onSubmit={onPasswordSubmit}
-          className="mt-3 flex flex-col gap-3"
+          className="animate-enter-from-start mt-5 flex flex-col gap-4"
           noValidate
         >
           <Input
-            compact
             revealable
             revealLabel={t.auth.showPassword}
             hideLabel={t.auth.hidePassword}
@@ -147,7 +144,6 @@ export function RegisterForm() {
             required
           />
           <Input
-            compact
             revealable
             revealLabel={t.auth.showPassword}
             hideLabel={t.auth.hidePassword}
@@ -160,17 +156,17 @@ export function RegisterForm() {
             required
           />
 
-          <ul className="space-y-1" aria-label={t.auth.register.passwordHint}>
+          <ul className="space-y-1.5" aria-label={t.auth.register.passwordHint}>
             {rules.map((rule) => (
               <li
                 key={rule.id}
-                className={`flex items-center gap-2 text-[0.7rem] font-semibold ${
-                  rule.ok ? "text-brand-green" : "text-ink-muted"
+                className={`flex items-center gap-2 text-caption font-semibold transition-colors duration-(--duration-base) ${
+                  rule.ok ? "text-success-ink" : "text-text-muted"
                 }`}
               >
                 <span
-                  className={`inline-block size-1.5 shrink-0 rounded-full ${
-                    rule.ok ? "bg-brand-green" : "bg-border-soft"
+                  className={`inline-block size-1.5 shrink-0 rounded-full transition-[background-color,scale] duration-(--duration-base) ${
+                    rule.ok ? "scale-125 bg-success" : "bg-border"
                   }`}
                   aria-hidden
                 />
@@ -179,14 +175,14 @@ export function RegisterForm() {
             ))}
           </ul>
 
-          <div className="flex flex-col gap-2">
+          <div className="mt-2 flex flex-col gap-2">
             <Button
               type="submit"
               disabled={submitting}
-              variant="pink"
-              size="sm"
+              loading={submitting}
+              variant="primary"
               magnetic={false}
-              className="!w-full !min-w-0"
+              className="w-full"
             >
               {submitting ? t.form.submitting : t.form.submit}
             </Button>
@@ -195,7 +191,7 @@ export function RegisterForm() {
               variant="ghost"
               size="sm"
               magnetic={false}
-              className="!w-full !min-w-0"
+              className="w-full"
               onClick={() => setStep(1)}
             >
               {t.auth.register.back}
@@ -204,11 +200,11 @@ export function RegisterForm() {
         </form>
       )}
 
-      <p className="mt-3 shrink-0 text-center text-xs font-semibold text-ink-muted">
+      <p className="text-body-sm mt-6 text-center text-text-secondary">
         {t.auth.register.hasAccount}{" "}
         <a
           href="/login"
-          className="cursor-pointer font-bold text-brand-pink underline-offset-2 hover:underline"
+          className="font-semibold text-primary-ink underline-offset-2 hover:underline"
         >
           {t.auth.register.loginLink}
         </a>
