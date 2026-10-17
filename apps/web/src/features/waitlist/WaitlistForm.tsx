@@ -123,7 +123,7 @@ export function WaitlistForm({
       className={
         embedded
           ? "overflow-visible"
-          : "overflow-visible rounded-[2.5rem] border-2 border-border-soft bg-white p-6 shadow-sm md:col-span-7 md:p-8"
+          : "overflow-visible rounded-[2rem] bg-surface p-6 shadow-md md:col-span-7 md:p-8"
       }
       noValidate
     >
@@ -154,7 +154,7 @@ export function WaitlistForm({
         />
 
         <div className="col-span-2 space-y-1.5">
-          <p className="text-xs font-bold text-ink">{t.form.accountType}</p>
+          <p className="text-body-sm font-semibold text-text">{t.form.accountType}</p>
           <AccountTypeSelector
             compact={embedded}
             value={form.accountOption}
@@ -164,7 +164,7 @@ export function WaitlistForm({
 
         {form.accountOption === "ORGANIZATION" ? (
           <div className="col-span-2 space-y-1.5">
-            <p className="text-xs font-bold text-ink">
+            <p className="text-body-sm font-semibold text-text">
               {t.onboarding.organizationType.title}
             </p>
             <OrganizationTypeSelector
@@ -177,7 +177,7 @@ export function WaitlistForm({
 
         {form.accountOption === "INSTITUTION" ? (
           <div className="col-span-2 space-y-1.5">
-            <p className="text-xs font-bold text-ink">
+            <p className="text-body-sm font-semibold text-text">
               {t.onboarding.institutionType.title}
             </p>
             <InstitutionTypeSelector
@@ -237,8 +237,9 @@ export function WaitlistForm({
         <Button
           type="submit"
           disabled={status === "loading"}
-          variant="pink"
+          variant="primary"
           size={embedded ? "sm" : "md"}
+          loading={status === "loading"}
           magnetic={false}
           className={embedded ? "!w-full !min-w-0" : ""}
         >

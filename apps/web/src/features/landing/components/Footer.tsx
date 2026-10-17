@@ -86,7 +86,7 @@ type FooterProps = {
 };
 
 export function Footer({
-  dividerFill = "var(--gray-soft)",
+  dividerFill = "var(--background)",
   showDivider = true,
 }: FooterProps) {
   const t = useT();
@@ -150,10 +150,10 @@ export function Footer({
               <PawPrint size={18} aria-hidden />
               <span className="text-sm font-semibold tracking-wide">{t.brand}</span>
             </Link>
-            <p className="mt-4 text-xs leading-relaxed text-white/45">
+            <p className="mt-4 text-caption text-white/60">
               © {year} {t.brand}
             </p>
-            <p className="mt-3 max-w-[16rem] text-xs leading-relaxed text-white/40">
+            <p className="mt-3 max-w-[16rem] text-caption text-white/60">
               {t.footer.blurb}
             </p>
             <div className="mt-5">
@@ -170,7 +170,7 @@ export function Footer({
                     <Link
                       id={"id" in link ? link.id : undefined}
                       href={link.href}
-                      className="text-sm text-white/45 transition-colors hover:text-white/80"
+                      className="text-body-sm text-white/65 transition-colors duration-(--duration-fast) hover:text-white"
                     >
                       {link.label}
                     </Link>
@@ -191,7 +191,7 @@ export function Footer({
                       href={s.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 text-sm text-white/45 transition-colors hover:text-white/80"
+                      className="inline-flex items-center gap-2 text-body-sm text-white/65 transition-colors duration-(--duration-fast) hover:text-white"
                     >
                       <span>{s.label}</span>
                       <Icon size={14} />
@@ -205,12 +205,13 @@ export function Footer({
       </div>
 
       <div
-        className="pointer-events-none relative h-[13vw] select-none overflow-hidden"
+        className="pointer-events-none relative select-none overflow-hidden text-center"
         aria-hidden
+        style={{ fontSize: "clamp(8rem, 24vw, 20rem)", height: "0.65em" }}
       >
         <p
           ref={wordRef}
-          className="font-display absolute inset-x-0 top-0 text-center text-[42vw] leading-none tracking-tight text-white/30"
+          className="font-display whitespace-nowrap text-[1em] leading-none tracking-tight text-white/30"
         >
           {t.brand}
         </p>

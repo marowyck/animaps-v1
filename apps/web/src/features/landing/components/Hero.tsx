@@ -10,6 +10,7 @@ import { AnimatedHeading, Blob } from "@/components/bits";
 import { BoneDoodle, HeartDoodle, PawDoodle } from "@/components/illustrations/Doodles";
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
 import { useT } from "@/i18n";
+import { DISTANCE, DURATION, EASE } from "@/lib/motion";
 import { SectionDivider } from "./SectionDivider";
 
 /** Percentage polygon so the mask survives CSS transforms (url(#clip) often doesn't). */
@@ -25,39 +26,48 @@ export function Hero() {
     () => {
       const section = sectionRef.current;
       if (!section || reduced) return;
+      const q = gsap.utils.selector(section);
 
-      const floats = section.querySelectorAll<HTMLElement>("[data-float]");
-      floats.forEach((el, index) => {
+      const intro = gsap.timeline({ defaults: { ease: EASE.settle, duration: DURATION.enter } });
+      intro
+        .from(q("[data-hero='eyebrow']"), { y: DISTANCE.small, opacity: 0 })
+        .from(q("[data-hero='body']"), { y: DISTANCE.small, opacity: 0 }, 0.45)
+        .from(q("[data-hero='cta']"), { y: DISTANCE.small, opacity: 0 }, 0.55)
+        .from(q("[data-hero='photo']"), { scale: 0.98, opacity: 0, duration: 0.8 }, 0.2)
+        .from(q("[data-hero='chip']"), { y: 8, opacity: 0, stagger: 0.12 }, 0.75);
+
+      q("[data-float]").forEach((el, index) => {
         gsap.to(el, {
-          y: index % 2 === 0 ? -10 : 8,
-          rotation: index % 2 === 0 ? 6 : -5,
-          duration: 3.2 + index * 0.35,
+          y: index % 2 === 0 ? -8 : 6,
+          duration: 3.6 + index * 0.4,
           ease: "sine.inOut",
           yoyo: true,
           repeat: -1,
         });
       });
 
-      const layers = [...section.querySelectorAll<HTMLElement>("[data-depth]")].map(
-        (el) => ({
+      const mm = gsap.matchMedia();
+      mm.add("(pointer: fine) and (min-width: 1024px)", () => {
+        const layers = (q("[data-depth]") as HTMLElement[]).map((el) => ({
           depth: Number(el.dataset.depth ?? 1),
-          x: gsap.quickTo(el, "x", { duration: 0.7, ease: "power3.out" }),
-          y: gsap.quickTo(el, "y", { duration: 0.7, ease: "power3.out" }),
-        }),
-      );
+          x: gsap.quickTo(el, "x", { duration: 0.8, ease: EASE.settle }),
+          y: gsap.quickTo(el, "y", { duration: 0.8, ease: EASE.settle }),
+        }));
 
-      const onMove = (event: MouseEvent) => {
-        const rect = section.getBoundingClientRect();
-        const cx = (event.clientX - rect.left) / rect.width - 0.5;
-        const cy = (event.clientY - rect.top) / rect.height - 0.5;
-        layers.forEach((layer) => {
-          layer.x(cx * 18 * layer.depth);
-          layer.y(cy * 12 * layer.depth);
-        });
-      };
+        const onMove = (event: MouseEvent) => {
+          const rect = section.getBoundingClientRect();
+          const cx = (event.clientX - rect.left) / rect.width - 0.5;
+          const cy = (event.clientY - rect.top) / rect.height - 0.5;
+          layers.forEach((layer) => {
+            layer.x(cx * 14 * layer.depth);
+            layer.y(cy * 10 * layer.depth);
+          });
+        };
 
-      section.addEventListener("mousemove", onMove);
-      return () => section.removeEventListener("mousemove", onMove);
+        section.addEventListener("mousemove", onMove);
+        return () => section.removeEventListener("mousemove", onMove);
+      });
+      return () => mm.revert();
     },
     { scope: sectionRef, dependencies: [reduced] },
   );
@@ -105,20 +115,26 @@ export function Hero() {
 
       <div className="relative z-10 mx-auto grid w-full max-w-6xl items-center gap-10 lg:grid-cols-2 lg:gap-12">
         <div className="max-w-xl">
-          <p className="text-label mb-5 inline-flex items-center gap-2 rounded-full bg-primary-soft px-3 py-1 text-(--pink-700)">
+          <p
+            data-hero="eyebrow"
+            className="text-label mb-5 inline-flex items-center gap-2 rounded-full bg-primary-soft px-3 py-1 text-primary-ink"
+          >
             <PawPrint size={14} aria-hidden />
             {t.brand}
           </p>
           <AnimatedHeading
             as="h1"
-            className="text-display text-text"
+            delay={0.12}
+            className="text-display text-balance text-text"
             parts={[
               { text: t.hero.titleLine1 },
               { text: t.hero.titleHighlight, className: "text-primary" },
             ]}
           />
-          <p className="text-body-lg mt-4 max-w-md text-text-secondary">{t.hero.body}</p>
-          <div className="mt-8 flex flex-wrap items-center gap-3">
+          <p data-hero="body" className="text-body-lg mt-5 max-w-md text-text-secondary">
+            {t.hero.body}
+          </p>
+          <div data-hero="cta" className="mt-8 flex flex-wrap items-center gap-3">
             <Button href="/register" variant="primary">
               <PawPrint size={18} aria-hidden />
               {t.hero.ctaAccount}
@@ -131,12 +147,12 @@ export function Hero() {
         </div>
 
         <div className="relative mx-auto w-full max-w-lg lg:max-w-none">
-          <div data-depth="0.45" data-float className="relative">
+          <div data-depth="0.45" className="relative">
             <Blob
               className="absolute -top-10 -left-8 size-44 text-warning/45 sm:size-56"
               variant={0}
             />
-            <div className="relative w-full rotate-[-2.5deg]">
+            <div data-hero="photo" className="relative w-full rotate-[-2.5deg]">
               <div
                 className="relative aspect-[4/5] w-full bg-surface-accent shadow-lg lg:aspect-[5/6] lg:min-h-[32rem]"
                 style={{ clipPath: HERO_MASK }}
@@ -151,14 +167,24 @@ export function Hero() {
                 />
               </div>
 
-              <span className="text-caption absolute top-3 right-3 z-10 inline-flex rotate-6 items-center gap-1 rounded-full bg-surface px-2.5 py-1 font-display text-text shadow-md">
-                <MapPin size={12} className="text-primary" aria-hidden />
-                2.4 km
+              <span data-hero="chip" className="absolute top-3 right-3 z-10">
+                <span
+                  data-float
+                  className="text-caption inline-flex rotate-6 items-center gap-1 rounded-full bg-surface px-2.5 py-1 font-display text-text shadow-md"
+                >
+                  <MapPin size={12} className="text-primary" aria-hidden />
+                  2.4 km
+                </span>
               </span>
 
-              <span className="text-caption absolute bottom-4 left-3 z-10 inline-flex -rotate-6 items-center gap-1.5 rounded-full bg-honey-600 px-2.5 py-1 font-display text-text shadow-md">
-                <HeartDoodle className="size-4 text-(--pink-700)" />
-                {t.solution.pillars.match.title}
+              <span data-hero="chip" className="absolute bottom-4 left-3 z-10">
+                <span
+                  data-float
+                  className="text-caption inline-flex -rotate-6 items-center gap-1.5 rounded-full bg-honey-600 px-2.5 py-1 font-display text-text shadow-md"
+                >
+                  <HeartDoodle className="size-4 text-primary-ink" />
+                  {t.solution.pillars.match.title}
+                </span>
               </span>
             </div>
           </div>

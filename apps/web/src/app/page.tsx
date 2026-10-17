@@ -29,7 +29,7 @@ export default function HomePage() {
         <CurvedLoop
           marqueeText={t.marquees.green}
           speed={40}
-          ribbonFill="var(--pastel-green)"
+          ribbonFill="var(--success-soft)"
           bridgeAbove
         />
 
@@ -42,11 +42,11 @@ export default function HomePage() {
           marqueeText={t.marquees.pink}
           speed={42}
           direction="right"
-          ribbonFill="var(--pastel-pink)"
+          ribbonFill="var(--background)"
           bridgeAbove
           bridgeBelow
           bridgeBelowFill="var(--footer)"
-          className="bg-pastel-pink"
+          className="bg-background"
         />
       </main>
       <Footer showDivider={false} />

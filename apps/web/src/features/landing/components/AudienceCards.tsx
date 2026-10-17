@@ -1,193 +1,196 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import Image from "next/image";
-import { Heart, Building2, Stethoscope, Landmark } from "lucide-react";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useGSAP } from "@gsap/react";
+import { Heart, Building2, Stethoscope, Landmark, type LucideIcon } from "lucide-react";
 import { useT } from "@/i18n";
-import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
-import { Blob } from "@/components/bits";
+import { AnimatedContent, Blob } from "@/components/bits";
 import { SectionDivider } from "./SectionDivider";
+import { AUDIENCE_EVENT, AUDIENCE_KEYS, type AudienceKey } from "../audience";
 
-gsap.registerPlugin(ScrollTrigger);
-
-const AUDIENCE_META = [
-  {
-    key: "guardians" as const,
+const AUDIENCE_META: Record<
+  AudienceKey,
+  { icon: LucideIcon; tone: string; photo: string; fit: "cover" | "contain" }
+> = {
+  guardians: {
     icon: Heart,
-    tone: "bg-pastel-pink",
-    iconColor: "text-brand-pink",
-    rotateClass: "-rotate-3",
+    tone: "bg-primary-soft text-primary-ink",
+    photo: "/images/hero-pet.jpg",
+    fit: "cover",
   },
-  {
-    key: "ngos" as const,
+  ngos: {
     icon: Building2,
-    tone: "bg-pastel-green",
-    iconColor: "text-brand-green",
-    rotateClass: "rotate-2",
+    tone: "bg-success-soft text-success-ink",
+    photo: "/images/auth/rescue.png",
+    fit: "cover",
   },
-  {
-    key: "clinics" as const,
+  clinics: {
     icon: Stethoscope,
-    tone: "bg-pastel-sky",
-    iconColor: "text-brand-green",
-    rotateClass: "-rotate-2",
+    tone: "bg-info-soft text-info-ink",
+    photo: "/images/auth/adoption.png",
+    fit: "cover",
   },
-  {
-    key: "agencies" as const,
+  agencies: {
     icon: Landmark,
-    tone: "bg-white",
-    iconColor: "text-brand-pink",
-    rotateClass: "rotate-3",
+    tone: "bg-secondary-soft text-secondary-ink",
+    photo: "/images/auth/wildlife.png",
+    fit: "cover",
   },
-];
+};
 
 const PHOTO_MASK =
   "polygon(58% 2%, 74% 0%, 88% 7%, 98% 20%, 100% 40%, 97% 58%, 92% 76%, 80% 92%, 62% 99%, 44% 100%, 26% 94%, 12% 82%, 2% 64%, 0% 44%, 4% 26%, 16% 12%, 34% 4%)";
 
+function audienceFromHash(): AudienceKey | null {
+  const key = window.location.hash.replace("#audience-", "");
+  return (AUDIENCE_KEYS as readonly string[]).includes(key) ? (key as AudienceKey) : null;
+}
+
 export function AudienceCards() {
   const t = useT();
-  const wrapRef = useRef<HTMLElement>(null);
-  const reduced = usePrefersReducedMotion();
+  const [active, setActive] = useState<AudienceKey>("guardians");
+  const tabRefs = useRef<Partial<Record<AudienceKey, HTMLButtonElement | null>>>({});
 
-  const audiences = AUDIENCE_META.map((a) => ({
-    ...a,
-    title: t.audience.cards[a.key].title,
-    body: t.audience.cards[a.key].body,
-  }));
+  useEffect(() => {
+    const sync = () => {
+      const fromHash = audienceFromHash();
+      if (fromHash) setActive(fromHash);
+    };
+    sync();
+    window.addEventListener("hashchange", sync);
+    return () => window.removeEventListener("hashchange", sync);
+  }, []);
 
-  useGSAP(
-    () => {
-      if (reduced || !wrapRef.current) return;
-      const photo = wrapRef.current.querySelector<HTMLElement>("[data-float]");
-      if (photo) {
-        gsap.to(photo, {
-          y: -10,
-          duration: 3.4,
-          ease: "sine.inOut",
-          yoyo: true,
-          repeat: -1,
-        });
-      }
-      const cards = wrapRef.current.querySelectorAll<HTMLElement>(".polaroid-card");
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent(AUDIENCE_EVENT, { detail: active }));
+  }, [active]);
 
-      gsap.fromTo(
-        cards,
-        { y: 40, opacity: 0, scale: 0.9 },
-        {
-          y: 0,
-          opacity: 1,
-          scale: 1,
-          stagger: 0.1,
-          duration: 0.7,
-          ease: "back.out(1.6)",
-          immediateRender: false,
-          scrollTrigger: {
-            trigger: wrapRef.current,
-            start: "top 75%",
-            once: true,
-          },
-        },
-      );
-    },
-    { scope: wrapRef, dependencies: [reduced] },
-  );
-
-  const flipCaption = (el: HTMLElement) => {
-    if (reduced) return;
-    const cap = el.querySelector(".polaroid-cap");
-    if (!cap) return;
-    gsap.fromTo(
-      cap,
-      { scale: 1 },
-      {
-        scale: 1.15,
-        color: getComputedStyle(document.documentElement)
-          .getPropertyValue("--primary")
-          .trim(),
-        duration: 0.25,
-        yoyo: true,
-        repeat: 1,
-        ease: "back.out(2)",
-      },
-    );
+  const onTabKeyDown = (e: KeyboardEvent<HTMLButtonElement>) => {
+    const index = AUDIENCE_KEYS.indexOf(active);
+    let next = index;
+    if (e.key === "ArrowRight" || e.key === "ArrowDown") next = (index + 1) % AUDIENCE_KEYS.length;
+    else if (e.key === "ArrowLeft" || e.key === "ArrowUp")
+      next = (index - 1 + AUDIENCE_KEYS.length) % AUDIENCE_KEYS.length;
+    else if (e.key === "Home") next = 0;
+    else if (e.key === "End") next = AUDIENCE_KEYS.length - 1;
+    else return;
+    e.preventDefault();
+    const key = AUDIENCE_KEYS[next];
+    setActive(key);
+    tabRefs.current[key]?.focus();
   };
+
+  const card = t.audience.cards[active];
+  const ActiveIcon = AUDIENCE_META[active].icon;
 
   return (
     <section
       id="audience"
-      ref={wrapRef}
-      className="relative z-10 flex min-h-[100svh] flex-col justify-center overflow-hidden bg-gray-soft px-5 py-24 sm:px-8 md:py-32"
+      className="relative z-10 flex min-h-[100svh] flex-col justify-center overflow-hidden bg-background px-5 py-24 sm:px-8 md:py-32"
     >
-      <div className="relative z-10 mx-auto grid w-full max-w-6xl items-center gap-10 lg:grid-cols-12 lg:gap-12">
-        <div className="min-w-0 lg:col-span-5">
-          <p className="mb-2 text-xs font-bold uppercase tracking-wider text-brand-green">
-            {t.audience.eyebrow}
-          </p>
-          <h2 className="text-h1 text-text">
-            {t.audience.titleBefore}{" "}
-            <span className="text-(--mint-700)">{t.audience.titleHighlight}</span>
-          </h2>
-          <p className="text-body mt-4 mb-10 max-w-lg text-text-secondary">
-            {t.audience.body}
-          </p>
+      {AUDIENCE_KEYS.map((key) => (
+        <span
+          key={key}
+          id={`audience-${key}`}
+          className="absolute top-0 scroll-mt-16"
+          aria-hidden
+        />
+      ))}
 
-          <div className="grid gap-4 sm:grid-cols-2">
-            {audiences.map((a) => (
-              <button
-                key={a.key}
-                id={`audience-${a.key}`}
-                type="button"
-                className={`polaroid-card group cursor-pointer rounded-2xl border border-border-subtle p-3 text-left transition-colors duration-200 hover:border-primary/30 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${a.tone}`}
-                onClick={(e) => flipCaption(e.currentTarget)}
+      <div className="relative z-10 mx-auto grid w-full max-w-6xl items-center gap-12 lg:grid-cols-12">
+        <AnimatedContent stagger className="min-w-0 lg:col-span-6">
+          <p className="text-label mb-4 text-success-ink">{t.audience.eyebrow}</p>
+          <h2 className="text-h1 text-balance text-text">
+            {t.audience.titleBefore}{" "}
+            <span className="text-success-ink">{t.audience.titleHighlight}</span>
+          </h2>
+          <p className="text-body-lg mt-5 max-w-lg text-text-secondary">{t.audience.body}</p>
+
+          <div
+            role="tablist"
+            aria-label={t.audience.eyebrow}
+            className="mt-10 grid grid-cols-2 gap-2 sm:flex sm:flex-wrap"
+          >
+            {AUDIENCE_KEYS.map((key) => {
+              const { icon: Icon, tone } = AUDIENCE_META[key];
+              const selected = key === active;
+              return (
+                <button
+                  key={key}
+                  ref={(el) => {
+                    tabRefs.current[key] = el;
+                  }}
+                  type="button"
+                  role="tab"
+                  id={`audience-tab-${key}`}
+                  aria-selected={selected}
+                  aria-controls="audience-panel"
+                  tabIndex={selected ? 0 : -1}
+                  onClick={() => setActive(key)}
+                  onKeyDown={onTabKeyDown}
+                  className={[
+                    "inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-full px-4 py-2 text-body-sm font-semibold transition-colors duration-(--duration-fast)",
+                    "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary",
+                    selected ? tone : "text-text-secondary hover:bg-surface hover:text-text",
+                  ].join(" ")}
+                >
+                  <Icon size={16} strokeWidth={2.25} aria-hidden />
+                  {t.audience.cards[key].title}
+                </button>
+              );
+            })}
+          </div>
+
+          <div
+            id="audience-panel"
+            role="tabpanel"
+            aria-labelledby={`audience-tab-${active}`}
+            className="mt-6 min-h-36 rounded-[1.6rem] bg-surface p-6"
+          >
+            <div key={active} className="animate-fade-in">
+              <span
+                className={`mb-3 flex size-10 items-center justify-center rounded-full ${AUDIENCE_META[active].tone}`}
               >
-                <div className="rounded-[1.1rem] bg-white/85 px-5 py-4">
-                  <div
-                    className={`mb-2.5 flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-sm ${a.iconColor}`}
-                  >
-                    <a.icon size={18} strokeWidth={2.25} aria-hidden />
-                  </div>
-                  <span className="text-h4 block text-text">{a.title}</span>
-                  <span className="text-caption mt-1 block text-text-secondary md:text-body-sm">
-                    {a.body}
-                  </span>
-                </div>
-                <span className="polaroid-cap text-caption mt-1.5 block px-2 pb-0.5 text-center font-display text-text/45">
-                  {t.brand}
-                </span>
-              </button>
+                <ActiveIcon size={18} strokeWidth={2.25} aria-hidden />
+              </span>
+              <h3 className="text-h3 text-text">{card.title}</h3>
+              <p className="text-body mt-2 text-text-secondary">{card.body}</p>
+            </div>
+          </div>
+        </AnimatedContent>
+
+        <div className="relative mx-auto w-full max-w-xl lg:col-span-6 lg:mr-0">
+          <Blob
+            variant={0}
+            className="absolute -top-8 -left-8 size-28 text-primary/20 sm:size-36"
+          />
+          <Blob
+            variant={2}
+            className="absolute -right-6 -bottom-8 size-36 text-secondary/25"
+          />
+          <div
+            className="relative aspect-[5/4] w-full bg-surface-accent shadow-lg"
+            style={{ clipPath: PHOTO_MASK }}
+          >
+            {AUDIENCE_KEYS.map((key) => (
+              <Image
+                key={key}
+                src={AUDIENCE_META[key].photo}
+                alt={key === active ? t.audience.cards[key].title : ""}
+                aria-hidden={key !== active}
+                fill
+                sizes="(max-width: 1024px) 90vw, 36rem"
+                className={[
+                  AUDIENCE_META[key].fit === "cover" ? "object-cover" : "object-contain p-8",
+                  "transition-[opacity,scale] duration-700 ease-(--ease-out) motion-reduce:transition-none",
+                  key === active ? "scale-100 opacity-100" : "scale-[1.03] opacity-0",
+                ].join(" ")}
+              />
             ))}
           </div>
         </div>
-
-        <div className="relative flex w-full items-center justify-center lg:col-span-7 lg:justify-end">
-          <div data-float className="relative w-full max-w-xl">
-            <Blob
-              variant={0}
-              className="absolute -top-8 -left-8 size-28 text-primary/25 sm:size-36"
-            />
-            <Blob
-              variant={2}
-              className="absolute -right-6 -bottom-8 size-36 text-secondary/30"
-            />
-            <div
-              className="relative aspect-[5/4] w-full bg-surface-accent shadow-lg"
-              style={{ clipPath: PHOTO_MASK }}
-            >
-              <Image
-                src="/images/hero-pet.jpg"
-                alt={t.hero.imageAlt}
-                fill
-                sizes="(max-width: 1024px) 90vw, 36rem"
-                className="object-cover"
-              />
-            </div>
-          </div>
-        </div>
       </div>
-      <SectionDivider fill="var(--pastel-yellow)" />
+      <SectionDivider fill="var(--warning-soft)" />
     </section>
   );
 }

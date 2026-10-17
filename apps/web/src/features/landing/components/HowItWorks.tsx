@@ -1,50 +1,21 @@
 "use client";
 
 import { useRef } from "react";
-import {
-  UserPlus,
-  UserRound,
-  Sparkles,
-  HeartHandshake,
-} from "lucide-react";
+import { UserPlus, UserRound, Sparkles, HeartHandshake } from "lucide-react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
-import { AnimatedContent } from "@/components/bits";
 import { useT } from "@/i18n";
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
+import { DISTANCE, DURATION, EASE, STAGGER } from "@/lib/motion";
 
 gsap.registerPlugin(ScrollTrigger);
 
 const STEP_META = [
-  {
-    key: "account" as const,
-    icon: UserPlus,
-    color: "bg-pastel-pink text-brand-pink",
-    border: "border-brand-pink/30",
-    badge: "bg-brand-pink text-white",
-  },
-  {
-    key: "profile" as const,
-    icon: UserRound,
-    color: "bg-pastel-green text-brand-green",
-    border: "border-brand-green/30",
-    badge: "bg-brand-green text-white",
-  },
-  {
-    key: "match" as const,
-    icon: Sparkles,
-    color: "bg-pastel-pink text-brand-pink",
-    border: "border-brand-pink/30",
-    badge: "bg-brand-pink text-white",
-  },
-  {
-    key: "adopt" as const,
-    icon: HeartHandshake,
-    color: "bg-pastel-green text-brand-green",
-    border: "border-brand-green/30",
-    badge: "bg-brand-green text-white",
-  },
+  { key: "account" as const, icon: UserPlus },
+  { key: "profile" as const, icon: UserRound },
+  { key: "match" as const, icon: Sparkles },
+  { key: "adopt" as const, icon: HeartHandshake },
 ];
 
 export function HowItWorks() {
@@ -53,18 +24,45 @@ export function HowItWorks() {
   const leashRef = useRef<SVGPathElement>(null);
   const reduced = usePrefersReducedMotion();
 
-  const steps = STEP_META.map((step) => ({
-    ...step,
-    title: t.howItWorks.steps[step.key].title,
-    desc: t.howItWorks.steps[step.key].desc,
-  }));
-
   useGSAP(
     () => {
       const section = sectionRef.current;
-      const leash = leashRef.current;
-      if (!section || reduced) return;
+      if (!section) return;
+      const q = gsap.utils.selector(section);
+      const numbers = q("[data-step-number]") as HTMLElement[];
 
+      if (reduced) {
+        numbers.forEach((n) => (n.dataset.lit = "true"));
+        return;
+      }
+
+      gsap.fromTo(
+        q("[data-step]"),
+        { y: DISTANCE.enter, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: DURATION.enter,
+          stagger: STAGGER * 2,
+          ease: EASE.settle,
+          clearProps: "transform",
+          scrollTrigger: { trigger: q("ol")[0], start: "top 85%", once: true },
+        },
+      );
+
+      numbers.forEach((n) => {
+        ScrollTrigger.create({
+          trigger: n,
+          start: "top 65%",
+          once: true,
+          onEnter: () => {
+            n.dataset.lit = "true";
+            gsap.fromTo(n, { scale: 0.85 }, { scale: 1, duration: 0.5, ease: EASE.celebrate });
+          },
+        });
+      });
+
+      const leash = leashRef.current;
       if (leash) {
         const length = leash.getTotalLength();
         gsap.set(leash, { strokeDasharray: length, strokeDashoffset: length });
@@ -72,88 +70,71 @@ export function HowItWorks() {
           strokeDashoffset: 0,
           ease: "none",
           scrollTrigger: {
-            trigger: section,
-            start: "top 70%",
-            end: "top 25%",
+            trigger: q("ol")[0],
+            start: "top 75%",
+            end: "top 35%",
             scrub: 0.5,
           },
         });
       }
     },
-    { scope: sectionRef, dependencies: [reduced, t.howItWorks.titleBefore] },
+    { scope: sectionRef, dependencies: [reduced] },
   );
 
   return (
     <section
       id="how-it-works"
       ref={sectionRef}
-      className="relative z-10 overflow-hidden bg-background px-5 py-24 sm:px-8 md:py-32"
+      className="relative z-10 overflow-hidden bg-success-soft px-5 py-24 sm:px-8 md:py-32"
     >
       <div className="relative z-10 mx-auto w-full max-w-6xl">
-        <div className="mb-10 flex flex-col items-center gap-4 md:flex-row md:items-end md:justify-center md:gap-6">
-          <div className="max-w-2xl text-center md:text-left">
-            <h2 className="text-h1 text-text">
-              {t.howItWorks.titleBefore}{" "}
-              <span className="text-brand-pink">{t.howItWorks.titleHighlight}</span>
-            </h2>
-            <p className="text-body mt-4 text-text-secondary md:text-body-lg">{t.howItWorks.subtitle}</p>
-          </div>
+        <div className="mx-auto mb-14 max-w-2xl text-center">
+          <h2 className="text-h1 text-balance text-text">
+            {t.howItWorks.titleBefore}{" "}
+            <span className="text-primary-ink">{t.howItWorks.titleHighlight}</span>
+          </h2>
+          <p className="text-body-lg mt-4 text-text-secondary">{t.howItWorks.subtitle}</p>
         </div>
 
-        <div className="relative mb-8">
-          <ol className="mb-4 flex items-center justify-center gap-2 md:hidden" aria-hidden>
-            {steps.map((step, index) => (
-              <li key={step.key} className="flex items-center gap-2">
-                <span className="size-2.5 rounded-full bg-primary" />
-                {index < steps.length - 1 ? (
-                  <span className="h-0.5 w-6 bg-primary/40" />
-                ) : null}
-              </li>
-            ))}
-          </ol>
+        <div className="relative">
           <svg
-            className="pointer-events-none absolute inset-x-8 top-1/2 hidden h-16 -translate-y-1/2 opacity-50 md:block"
-            viewBox="0 0 800 80"
+            className="pointer-events-none absolute top-0 right-[12.5%] left-[12.5%] hidden h-10 lg:block"
+            viewBox="0 0 600 40"
             fill="none"
             preserveAspectRatio="none"
             aria-hidden
           >
             <path
               ref={leashRef}
-              d="M20 40 C 140 10, 260 70, 400 40 C 540 10, 660 70, 780 40"
+              d="M0 20 C 60 4, 130 36, 200 20 C 270 4, 330 36, 400 20 C 470 4, 540 36, 600 20"
               stroke="var(--primary)"
+              strokeOpacity="0.5"
               strokeWidth="3"
               strokeLinecap="round"
+              vectorEffect="non-scaling-stroke"
             />
           </svg>
 
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {steps.map((step, idx) => (
-              <AnimatedContent key={step.key} delay={idx * 0.08} distance={24}>
-                <button
-                  type="button"
-                  className={`how-card group relative flex h-full w-full cursor-pointer flex-col items-start rounded-2xl border border-border-subtle ${step.border} bg-surface p-5 text-left transition-colors duration-200 hover:border-primary/30 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary`}
+          <ol className="relative grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
+            {STEP_META.map(({ key, icon: Icon }, index) => (
+              <li key={key} data-step className="flex flex-col items-center text-center">
+                <span
+                  data-step-number
+                  className="relative z-10 flex size-10 items-center justify-center rounded-full bg-surface font-display text-body text-success-ink ring-4 ring-success-soft transition-colors duration-(--duration-base) data-[lit=true]:bg-primary data-[lit=true]:text-surface"
                 >
-                  <span
-                    className={`absolute -top-2.5 left-4 flex h-8 w-8 items-center justify-center rounded-full font-display text-sm shadow-sm ${step.badge}`}
-                  >
-                    {idx + 1}
-                  </span>
-                  <div
-                    className={`how-icon-wrap mb-4 flex h-11 w-11 items-center justify-center rounded-xl ${step.color}`}
-                  >
-                    <step.icon size={26} strokeWidth={2.25} aria-hidden />
-                  </div>
-                  <span className="text-h4 mb-1.5 text-text">{step.title}</span>
-                  <span className="text-caption text-text-secondary md:text-body-sm">
-                    {step.desc}
-                  </span>
-                </button>
-              </AnimatedContent>
+                  {index + 1}
+                </span>
+                <div className="mt-5 flex w-full flex-1 flex-col items-center rounded-[1.6rem] bg-surface px-5 py-6">
+                  <Icon size={22} strokeWidth={2.25} className="mb-3 text-success-ink" aria-hidden />
+                  <h3 className="text-h4 text-text">{t.howItWorks.steps[key].title}</h3>
+                  <p className="text-body-sm mt-1.5 text-text-secondary">
+                    {t.howItWorks.steps[key].desc}
+                  </p>
+                </div>
+              </li>
             ))}
-          </div>
+          </ol>
         </div>
-
       </div>
     </section>
   );

@@ -31,19 +31,19 @@ export function CookieBanner() {
     <div
       role="dialog"
       aria-label={t.cookies.aria}
-      className="fixed inset-x-4 bottom-4 z-[60] mx-auto max-w-lg rounded-[2rem] border-2 border-border-soft bg-white p-5 shadow-xl md:inset-x-auto md:right-6 md:bottom-6"
+      className="animate-modal-in fixed inset-x-4 bottom-4 z-[60] mx-auto max-w-md rounded-[1.6rem] border border-border-subtle bg-surface-elevated p-5 shadow-lg md:inset-x-auto md:right-6 md:bottom-6"
     >
-      <p className="text-sm font-bold text-ink-muted">
+      <p className="text-body-sm text-text-secondary">
         {t.cookies.body}{" "}
-        <Link href="/#privacy" className="underline underline-offset-2">
+        <Link href="/#privacy" className="font-semibold text-text underline underline-offset-2">
           {t.cookies.learnMore}
         </Link>
         .
       </p>
-      <div className="mt-4 flex flex-wrap gap-3">
+      <div className="mt-4 flex flex-wrap gap-2">
         <Button
           type="button"
-          variant="pink"
+          variant="primary"
           size="sm"
           magnetic={false}
           onClick={() => choose("accepted")}
@@ -52,7 +52,7 @@ export function CookieBanner() {
         </Button>
         <Button
           type="button"
-          variant="white"
+          variant="outline"
           size="sm"
           magnetic={false}
           onClick={() => choose("rejected")}

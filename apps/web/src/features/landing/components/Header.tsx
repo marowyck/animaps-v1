@@ -20,62 +20,60 @@ import { Button } from "@/components/Button";
 import { LocaleSwitcher } from "@/components/LocaleSwitcher";
 import { useT } from "@/i18n";
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
-
-function readToken(name: string): string {
-  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-}
+import { DURATION, EASE, STAGGER } from "@/lib/motion";
+import { AUDIENCE_EVENT, type AudienceKey } from "../audience";
 
 const NAV_META: {
   href: string;
   key: "home" | "benefits" | "howToStart" | "faq" | "createAccount" | "login";
-  rotation: number;
-  /** CSS variable name, resolved at interaction time so GSAP gets a real color. */
-  hoverBg: "--primary" | "--secondary";
   Icon: LucideIcon;
 }[] = [
-  {
-    href: "/#top",
-    key: "home",
-    rotation: -3,
-    hoverBg: "--primary",
-    Icon: Home,
-  },
-  {
-    href: "/#solution",
-    key: "benefits",
-    rotation: -3,
-    hoverBg: "--secondary",
-    Icon: Sparkles,
-  },
-  {
-    href: "/#how-it-works",
-    key: "howToStart",
-    rotation: 3,
-    hoverBg: "--primary",
-    Icon: ListChecks,
-  },
-  {
-    href: "/#faq",
-    key: "faq",
-    rotation: -2,
-    hoverBg: "--secondary",
-    Icon: CircleHelp,
-  },
-  {
-    href: "/register",
-    key: "createAccount",
-    rotation: 2,
-    hoverBg: "--primary",
-    Icon: UserPlus,
-  },
-  {
-    href: "/login",
-    key: "login",
-    rotation: -2,
-    hoverBg: "--secondary",
-    Icon: LogIn,
-  },
+  { href: "/#top", key: "home", Icon: Home },
+  { href: "/#solution", key: "benefits", Icon: Sparkles },
+  { href: "/#how-it-works", key: "howToStart", Icon: ListChecks },
+  { href: "/#faq", key: "faq", Icon: CircleHelp },
+  { href: "/register", key: "createAccount", Icon: UserPlus },
+  { href: "/login", key: "login", Icon: LogIn },
 ];
+
+const DESKTOP_NAV = [
+  { href: "/#how-it-works", key: "howToStart", section: "how-it-works" },
+  { href: "/#audience-guardians", key: "forPeople", section: "audience", audience: "guardians" },
+  { href: "/#audience-ngos", key: "forOrganizations", section: "audience", audience: "ngos" },
+  { href: "/#audience-agencies", key: "forInstitutions", section: "audience", audience: "agencies" },
+] as const;
+
+/** Which landing section is under the header, plus the audience tab currently shown. */
+function useActiveSection() {
+  const [section, setSection] = useState<string | null>(null);
+  const [audience, setAudience] = useState<AudienceKey>("guardians");
+
+  useEffect(() => {
+    const ids = ["how-it-works", "audience"];
+    const nodes = ids
+      .map((id) => document.getElementById(id))
+      .filter((n): n is HTMLElement => !!n);
+    if (!nodes.length) return;
+    const visible = new Map<string, boolean>();
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => visible.set(e.target.id, e.isIntersecting));
+        setSection(ids.find((id) => visible.get(id)) ?? null);
+      },
+      { rootMargin: "-40% 0px -50% 0px" },
+    );
+    nodes.forEach((n) => observer.observe(n));
+
+    const onAudience = (e: Event) => setAudience((e as CustomEvent<AudienceKey>).detail);
+    window.addEventListener(AUDIENCE_EVENT, onAudience);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener(AUDIENCE_EVENT, onAudience);
+    };
+  }, []);
+
+  return { section, audience };
+}
 
 export function Header() {
   const t = useT();
@@ -86,6 +84,7 @@ export function Header() {
   const clusterRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const itemsRef = useRef<(HTMLAnchorElement | null)[]>([]);
+  const { section, audience } = useActiveSection();
 
   const nav = NAV_META.map((item) => ({
     ...item,
@@ -107,33 +106,34 @@ export function Header() {
         return;
       }
 
+      gsap.killTweensOf(menu);
       if (isOpen) {
-        gsap.killTweensOf(menu);
         gsap.to(menu, {
           scale: 1,
+          y: 0,
           opacity: 1,
-          duration: 0.45,
-          ease: "back.out(1.4)",
+          duration: DURATION.state,
+          ease: EASE.settle,
           pointerEvents: "auto",
         });
         gsap.fromTo(
           itemsRef.current.filter(Boolean),
-          { y: 28, opacity: 0 },
+          { y: 8, opacity: 0 },
           {
             y: 0,
             opacity: 1,
-            duration: 0.45,
-            stagger: 0.06,
-            ease: "power3.out",
+            duration: DURATION.state,
+            stagger: STAGGER / 2,
+            ease: EASE.settle,
           },
         );
       } else {
-        gsap.killTweensOf(menu);
         gsap.to(menu, {
-          scale: 0.92,
+          scale: 0.98,
+          y: -4,
           opacity: 0,
-          duration: 0.25,
-          ease: "power2.in",
+          duration: DURATION.hover,
+          ease: EASE.exit,
           pointerEvents: "none",
         });
       }
@@ -172,28 +172,6 @@ export function Header() {
     };
   }, [isOpen]);
 
-  function handleMouseEnter(index: number, bgToken: "--primary" | "--secondary") {
-    if (reduced) return;
-    gsap.to(itemsRef.current[index], {
-      backgroundColor: readToken(bgToken),
-      color: readToken("--surface"),
-      scale: 1.02,
-      duration: 0.25,
-      ease: "power2.out",
-    });
-  }
-
-  function handleMouseLeave(index: number) {
-    if (reduced) return;
-    gsap.to(itemsRef.current[index], {
-      backgroundColor: "transparent",
-      color: readToken("--text"),
-      scale: 1,
-      duration: 0.25,
-      ease: "power2.out",
-    });
-  }
-
   return (
     <header
       ref={containerRef}
@@ -216,22 +194,26 @@ export function Header() {
       </Link>
 
       <nav className="hidden items-center gap-1 lg:flex" aria-label={t.nav.menu}>
-        {(
-          [
-            { href: "/#how-it-works", key: "howToStart" },
-            { href: "/#audience-guardians", key: "forPeople" },
-            { href: "/#audience-ngos", key: "forOrganizations" },
-            { href: "/#audience-agencies", key: "forInstitutions" },
-          ] as const
-        ).map((item) => (
-          <a
-            key={item.key}
-            href={item.href}
-            className="rounded-full px-3 py-2 text-body-sm font-semibold text-text-secondary transition-colors hover:bg-surface-hover hover:text-text"
-          >
-            {t.nav[item.key]}
-          </a>
-        ))}
+        {DESKTOP_NAV.map((item) => {
+          const active =
+            section === item.section &&
+            (!("audience" in item) || item.audience === audience);
+          return (
+            <a
+              key={item.key}
+              href={item.href}
+              aria-current={active ? "true" : undefined}
+              className={[
+                "rounded-full px-3 py-2 text-body-sm font-semibold transition-colors duration-(--duration-fast)",
+                active
+                  ? "bg-primary-soft text-primary-ink"
+                  : "text-text-secondary hover:bg-surface-hover hover:text-text",
+              ].join(" ")}
+            >
+              {t.nav[item.key]}
+            </a>
+          );
+        })}
       </nav>
 
       <div ref={clusterRef} className="relative">
@@ -239,7 +221,7 @@ export function Header() {
           <LocaleSwitcher tone="light" variant="menu" />
           <Button
             href="/login"
-            variant="white"
+            variant="outline"
             size="sm"
             magnetic={false}
             className="!hidden md:!inline-flex"
@@ -249,7 +231,7 @@ export function Header() {
           </Button>
           <Button
             href="/register"
-            variant="pink"
+            variant="primary"
             size="sm"
             magnetic={false}
             className="!hidden md:!inline-flex"
@@ -276,11 +258,12 @@ export function Header() {
         <div
           id="bubble-menu"
           ref={menuRef}
-          className="absolute top-[calc(100%+0.65rem)] right-0 z-10 flex min-w-64 origin-top-right scale-95 flex-col items-stretch gap-1 rounded-2xl border border-border-subtle bg-surface-elevated p-3 opacity-0 shadow-lg lg:hidden"
+          className="absolute top-[calc(100%+0.65rem)] right-0 z-10 flex w-[min(18rem,calc(100vw-2.5rem))] origin-top-right scale-[0.98] flex-col items-stretch gap-0.5 rounded-2xl border border-border-subtle bg-surface-elevated p-2 opacity-0 shadow-lg lg:hidden"
           style={{ pointerEvents: "none" }}
           aria-hidden={!isOpen}
+          inert={!isOpen}
         >
-          <div className="mb-1 px-3 text-xs font-semibold uppercase tracking-wider text-ink-muted">
+          <div className="px-3 pt-1 pb-2 text-label text-text-muted">
             {t.nav.menu}
           </div>
           {nav.map((item, index) => {
@@ -292,13 +275,15 @@ export function Header() {
                 ref={(el) => {
                   itemsRef.current[index] = el;
                 }}
-                className="flex cursor-pointer items-center justify-between gap-3 rounded-full px-4 py-2.5 text-left text-base font-semibold tracking-tight text-ink"
-                onMouseEnter={() => handleMouseEnter(index, item.hoverBg)}
-                onMouseLeave={() => handleMouseLeave(index)}
+                className="group flex min-h-11 cursor-pointer items-center justify-between gap-3 rounded-xl px-3 py-2.5 text-left text-body font-semibold text-text transition-colors duration-(--duration-fast) hover:bg-primary-soft hover:text-primary-ink focus-visible:bg-primary-soft focus-visible:outline-none"
                 onClick={() => setIsOpen(false)}
               >
                 <span>{item.label}</span>
-                <Icon size={18} className="shrink-0 opacity-80" aria-hidden />
+                <Icon
+                  size={18}
+                  className="shrink-0 text-text-muted transition-colors duration-(--duration-fast) group-hover:text-primary-ink"
+                  aria-hidden
+                />
               </Link>
             );
           })}
