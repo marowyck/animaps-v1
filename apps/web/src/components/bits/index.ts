@@ -1,4 +1,5 @@
 export { default as AnimatedContent } from "./AnimatedContent";
+export { default as Reveal } from "./AnimatedContent";
 export { default as CurvedLoop } from "./CurvedLoop";
 export { AnimatedHeading } from "./AnimatedHeading";
 export { Blob } from "./Blob";

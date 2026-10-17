@@ -108,14 +108,14 @@ export function CodeInput({
               if (index < LENGTH - 1) focusAt(index + 1);
             }}
             className={[
-              "size-12 rounded-2xl border-2 text-center text-xl font-bold text-ink sm:size-14",
-              "outline-none transition-all duration-200",
+              "size-12 rounded-xl border text-center font-display text-h4 text-text sm:size-14",
+              "outline-none transition-[border-color,background-color,box-shadow] duration-(--duration-fast) ease-(--ease-out)",
               "focus:border-primary focus:bg-surface focus:shadow-[0_0_0_4px_var(--primary-soft)]",
               error
-                ? "border-error bg-danger-soft focus:shadow-[0_0_0_4px_var(--danger-soft)]"
+                ? "border-danger bg-danger-soft focus:shadow-[0_0_0_4px_var(--danger-soft)]"
                 : digit
-                  ? "border-brand-green/30 bg-white shadow-sm"
-                  : "border-border-soft bg-gray-soft",
+                  ? "border-success/40 bg-surface"
+                  : "border-border bg-background",
               disabled ? "cursor-not-allowed opacity-60" : "",
             ]
               .filter(Boolean)

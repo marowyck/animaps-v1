@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type InputHTMLAttributes, type ReactNode } from "react";
-import { Eye, EyeOff } from "lucide-react";
+import { CircleAlert, Eye, EyeOff } from "lucide-react";
 import { useT } from "@/i18n";
 
 type InputProps = {
@@ -22,10 +22,14 @@ type InputProps = {
 } & Omit<InputHTMLAttributes<HTMLInputElement>, "className">;
 
 const fieldClass =
-  "w-full rounded-xl border border-border bg-background px-4 py-3 text-body text-text outline-none transition-[border-color,background-color,box-shadow] duration-150 placeholder:text-text-muted focus:border-primary focus:bg-surface focus:shadow-[0_0_0_4px_var(--primary-soft)] disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-danger";
+  "w-full rounded-xl border border-border bg-background px-4 py-3 text-body text-text outline-none transition-[border-color,background-color,box-shadow] duration-(--duration-fast) ease-(--ease-out) placeholder:text-text-muted focus:border-primary focus:bg-surface focus:shadow-[0_0_0_4px_var(--primary-soft)] disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-danger";
 
 const fieldClassCompact =
-  "w-full rounded-xl border border-border bg-background px-4 py-2.5 text-body-sm text-text outline-none transition-[border-color,background-color,box-shadow] duration-150 placeholder:text-text-muted focus:border-primary focus:bg-surface focus:shadow-[0_0_0_4px_var(--primary-soft)] disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-danger";
+  "w-full rounded-xl border border-border bg-background px-4 py-2.5 text-body-sm text-text outline-none transition-[border-color,background-color,box-shadow] duration-(--duration-fast) ease-(--ease-out) placeholder:text-text-muted focus:border-primary focus:bg-surface focus:shadow-[0_0_0_4px_var(--primary-soft)] disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-danger";
+
+/** Shared skin for native `<select>` where a custom Select is too heavy. */
+export const nativeSelectClass =
+  "h-12 w-full min-h-12 cursor-pointer rounded-xl border border-border bg-background px-4 text-body-sm text-text outline-none transition-[border-color,background-color,box-shadow] duration-(--duration-fast) ease-(--ease-out) focus:border-primary focus:bg-surface focus:shadow-[0_0_0_4px_var(--primary-soft)] disabled:cursor-not-allowed disabled:opacity-50";
 
 export function Input({
   label,
@@ -87,12 +91,20 @@ export function Input({
           </button>
         ) : null}
       </div>
-      {error ? (
-        <span className="mt-1.5 block text-caption font-semibold text-danger" role="alert">
-          {error}
-        </span>
-      ) : null}
+      {error ? <FieldError message={error} /> : null}
     </div>
+  );
+}
+
+export function FieldError({ message }: { message: string }) {
+  return (
+    <span
+      className="mt-1.5 flex items-center gap-1.5 text-caption font-semibold text-danger-ink"
+      role="alert"
+    >
+      <CircleAlert className="size-3.5 shrink-0" aria-hidden />
+      {message}
+    </span>
   );
 }
 

@@ -49,7 +49,7 @@ export function ProfileAvatar({
       role="img"
       aria-label={label}
       className={[
-        "inline-flex items-center justify-center rounded-full bg-primary-soft font-semibold text-primary ring-2 ring-surface",
+        "inline-flex items-center justify-center rounded-full bg-primary-soft font-semibold text-primary-ink ring-2 ring-surface",
         SIZE[size],
         className,
       ]

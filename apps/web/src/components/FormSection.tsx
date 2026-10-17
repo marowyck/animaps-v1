@@ -25,24 +25,27 @@ export function FormSection({
       disabled={disabled}
       onClick={onClick}
       className={[
-        "flex w-full cursor-pointer items-center justify-between gap-3 rounded-2xl border-2 border-border-soft bg-white px-4 py-3.5 text-left transition-all duration-200 active:scale-[0.98]",
-        "hover:border-brand-green/45 hover:bg-pastel-green/20 hover:shadow-sm",
-        "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-pink",
-        "disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100 disabled:hover:shadow-none",
+        "group flex w-full cursor-pointer items-center justify-between gap-3 rounded-xl border border-border bg-surface px-4 py-3.5 text-left transition-[background-color,border-color] duration-(--duration-fast) ease-(--ease-out)",
+        "hover:border-primary/40 hover:bg-surface-hover",
+        "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary",
+        "disabled:cursor-not-allowed disabled:opacity-50",
       ].join(" ")}
     >
       <span className="min-w-0">
-        <span className="block text-sm font-bold text-ink">{label}</span>
+        <span className="block text-body-sm font-semibold text-text">{label}</span>
         <span
           className={[
-            "mt-0.5 block truncate text-sm",
-            value?.trim() ? "text-ink-muted" : "text-ink-muted/80",
+            "mt-0.5 block truncate text-body-sm",
+            value?.trim() ? "text-text-secondary" : "text-text-muted",
           ].join(" ")}
         >
           {display}
         </span>
       </span>
-      <ChevronRight className="size-5 shrink-0 text-ink-muted" aria-hidden />
+      <ChevronRight
+        className="size-5 shrink-0 text-text-muted transition-[translate] duration-(--duration-fast) ease-(--ease-out) group-hover:translate-x-0.5"
+        aria-hidden
+      />
     </button>
   );
 }

@@ -14,10 +14,10 @@ type VerificationStatusBadgeProps = {
 
 const STYLES: Record<VerificationStatus, string> = {
   pending: "bg-background-secondary text-text-secondary border-border-subtle",
-  processing: "bg-info-soft text-info border-info/30",
-  approved: "bg-success-soft text-success border-success/30",
-  rejected: "bg-danger-soft text-danger border-danger/30",
-  retry_required: "bg-warning-soft text-warning border-warning/40",
+  processing: "bg-info-soft text-info-ink border-info/30",
+  approved: "bg-success-soft text-success-ink border-success/30",
+  rejected: "bg-danger-soft text-danger-ink border-danger/30",
+  retry_required: "bg-warning-soft text-warning-ink border-warning/40",
 };
 
 export function VerificationStatusBadge({

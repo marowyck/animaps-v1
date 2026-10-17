@@ -105,7 +105,7 @@ function ToastCard({
   return (
     <div
       role="status"
-      className={`pointer-events-auto flex items-center gap-3 rounded-2xl border-2 px-4 py-3 text-sm font-semibold transition-[transform,opacity] ease-out will-change-transform ${toneClasses(
+      className={`pointer-events-auto flex items-center gap-3 rounded-2xl border px-4 py-3 text-body-sm font-semibold transition-[transform,opacity] duration-(--duration-base) ease-(--ease-out) will-change-transform ${toneClasses(
         tone,
       )} ${
         visible
@@ -123,7 +123,7 @@ function ToastCard({
       <p className="min-w-0 flex-1 leading-snug">{item.message}</p>
       <button
         type="button"
-        className="inline-flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-full text-ink-muted transition-colors hover:bg-gray-soft hover:text-ink"
+        className="inline-flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-full text-text-muted transition-colors duration-(--duration-fast) hover:bg-surface-hover hover:text-text"
         aria-label={t.chrome.dismiss}
         onClick={() => onRequestClose(item.id)}
       >

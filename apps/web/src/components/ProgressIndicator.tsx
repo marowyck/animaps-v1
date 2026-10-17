@@ -24,7 +24,7 @@ export function ProgressIndicator({
         <span aria-hidden>{pct}%</span>
       </div>
       <div
-        className="h-3 w-full rounded-full bg-primary-soft"
+        className="h-2.5 w-full overflow-hidden rounded-full bg-primary-soft"
         role="progressbar"
         aria-valuenow={clamped}
         aria-valuemin={0}
@@ -32,8 +32,8 @@ export function ProgressIndicator({
         aria-label={label ?? `Step ${clamped} of ${safeTotal}`}
       >
         <div
-          className="h-full rounded-full bg-primary transition-[width] duration-500 ease-out"
-          style={{ width: `${pct}%` }}
+          className="h-full w-full origin-left rounded-full bg-primary transition-transform duration-(--duration-slow) ease-(--ease-out) motion-reduce:transition-none"
+          style={{ transform: `scaleX(${pct / 100})` }}
         />
       </div>
     </div>

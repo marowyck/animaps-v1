@@ -19,10 +19,13 @@ export function PrivacySelector({
 }: PrivacySelectorProps) {
   return (
     <fieldset>
-      <legend className="mb-2 text-xs font-bold uppercase tracking-wide text-ink-muted">
+      <legend className="mb-2 text-caption font-semibold text-text-secondary">
         {groupLabel}
       </legend>
-      <div className="inline-flex rounded-full border-2 border-border-soft bg-gray-soft p-1">
+      <div
+        className="inline-flex rounded-full bg-surface p-1 shadow-sm"
+        role="group"
+      >
         {ORDER.map((key) => {
           const selected = value === key;
           return (
@@ -32,11 +35,11 @@ export function PrivacySelector({
               aria-pressed={selected}
               onClick={() => onChange(key)}
               className={[
-                "rounded-full px-3 py-1.5 text-xs font-bold transition-colors",
-                "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-pink",
+                "min-h-11 cursor-pointer rounded-full px-4 py-1.5 text-body-sm font-semibold transition-colors duration-(--duration-fast) ease-(--ease-out)",
+                "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary",
                 selected
-                  ? "bg-white text-ink shadow-sm"
-                  : "text-ink-muted hover:text-ink",
+                  ? "bg-primary-soft text-primary-ink"
+                  : "text-text-secondary hover:text-text",
               ].join(" ")}
             >
               {labels[key]}

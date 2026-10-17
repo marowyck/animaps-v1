@@ -34,7 +34,7 @@ export function SearchInput({
         {fieldLabel}
       </label>
       <Search
-        className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-ink-muted"
+        className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-text-muted"
         aria-hidden
       />
       <input
@@ -44,9 +44,9 @@ export function SearchInput({
         placeholder={fieldPlaceholder}
         onChange={(e) => onChange(e.target.value)}
         className={[
-          "w-full rounded-full border-2 border-border-soft bg-gray-soft py-3 pl-11 pr-11 text-sm font-medium text-ink",
-          "placeholder:text-ink-muted/70",
-          "outline-none focus:border-brand-pink focus:bg-white",
+          "w-full rounded-xl border border-border bg-background py-3 pl-11 pr-11 text-body-sm font-medium text-text",
+          "placeholder:text-text-muted",
+          "outline-none transition-[border-color,background-color,box-shadow] duration-(--duration-fast) focus:border-primary focus:bg-surface focus:shadow-[0_0_0_4px_var(--primary-soft)]",
         ].join(" ")}
         {...rest}
       />

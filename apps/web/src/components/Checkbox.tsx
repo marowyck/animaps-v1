@@ -20,7 +20,7 @@ export function Checkbox({
   return (
     <label
       htmlFor={inputId}
-      className={`group flex cursor-pointer items-start gap-3 text-sm font-medium text-ink-muted ${className}`}
+      className={`group flex cursor-pointer items-start gap-3 text-body-sm font-medium text-text-secondary ${className}`}
     >
       <span className="relative mt-0.5 inline-flex h-6 w-6 shrink-0">
         <input
@@ -37,7 +37,7 @@ export function Checkbox({
           <Check
             size={16}
             strokeWidth={3}
-            className={`text-surface-elevated transition-all duration-200 ${
+            className={`text-surface-elevated transition-[scale,opacity] duration-(--duration-base) ease-(--ease-out) ${
               checked ? "scale-100 opacity-100" : "scale-50 opacity-0"
             }`}
           />

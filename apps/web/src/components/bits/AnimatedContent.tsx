@@ -5,6 +5,7 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
+import { DISTANCE, DURATION, EASE, STAGGER } from "@/lib/motion";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -13,57 +14,50 @@ type AnimatedContentProps = {
   className?: string;
   delay?: number;
   distance?: number;
-  ease?: string;
-  pop?: boolean;
+  /** Reveal direct children one after another instead of the wrapper as a block. */
+  stagger?: boolean;
+  as?: "div" | "ul" | "ol" | "section";
 };
 
-/** Default physics: elastic pop — back.out(1.6) */
+/** Reveal on scroll: fade + short rise, settled ease. Plays once. */
 export default function AnimatedContent({
   children,
   className = "",
   delay = 0,
-  distance = 32,
-  ease = "back.out(1.6)",
-  pop = true,
+  distance = DISTANCE.enter,
+  stagger = false,
+  as: Tag = "div",
 }: AnimatedContentProps) {
-  const ref = useRef<HTMLDivElement>(null);
+  const ref = useRef<HTMLElement>(null);
   const reduced = usePrefersReducedMotion();
 
   useGSAP(
     () => {
-      if (reduced || !ref.current) return;
+      const root = ref.current;
+      if (reduced || !root) return;
+      const targets = stagger ? Array.from(root.children) : root;
       gsap.fromTo(
-        ref.current,
-        {
-          y: distance,
-          scale: pop ? 0.86 : 1,
-          rotate: pop ? -1.5 : 0,
-          opacity: 0,
-        },
+        targets,
+        { y: distance, opacity: 0 },
         {
           y: 0,
-          scale: 1,
-          rotate: 0,
           opacity: 1,
-          duration: 0.75,
+          duration: DURATION.enter,
           delay,
-          ease,
+          stagger: stagger ? STAGGER : 0,
+          ease: EASE.settle,
           immediateRender: false,
-          scrollTrigger: {
-            trigger: ref.current,
-            start: "top 90%",
-            once: true,
-            toggleActions: "play none none none",
-          },
+          clearProps: "transform",
+          scrollTrigger: { trigger: root, start: "top 88%", once: true },
         },
       );
     },
-    { dependencies: [reduced, delay, distance, ease, pop] },
+    { dependencies: [reduced, delay, distance, stagger] },
   );
 
   return (
-    <div ref={ref} className={className}>
+    <Tag ref={ref as never} className={className}>
       {children}
-    </div>
+    </Tag>
   );
 }

@@ -26,9 +26,9 @@ export function NavigationItem({
     "flex items-center gap-3 rounded-full px-3 py-2.5 text-body-sm font-semibold transition-colors duration-200",
     "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary",
     tone === "exit"
-      ? "bg-danger-soft text-(--coral-700) hover:bg-danger/20"
+      ? "bg-danger-soft text-danger-ink hover:bg-danger/20"
       : active
-        ? "bg-primary-soft text-(--pink-700)"
+        ? "bg-primary-soft text-primary-ink"
         : "text-text-secondary hover:bg-primary-soft/60 hover:text-text",
     disabled ? "pointer-events-none opacity-45" : "",
   ]

@@ -13,7 +13,10 @@ import { SelectListbox } from "./SelectListbox";
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 import { Button } from "@/components/Button";
+import { FieldError } from "@/components/Input";
+import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
 import { useT } from "@/i18n";
+import { DURATION, EASE } from "@/lib/motion";
 
 export type SelectOption = {
   value: string;
@@ -33,11 +36,6 @@ type SelectProps = {
   error?: string;
   compact?: boolean;
 };
-
-function prefersReducedMotion(): boolean {
-  if (typeof window === "undefined") return false;
-  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-}
 
 export function Select({
   label,
@@ -66,16 +64,17 @@ export function Select({
 
   const selected = options.find((o) => o.value === value);
   const displayLabel = selected?.label ?? place;
+  const reducedMotion = usePrefersReducedMotion();
 
   useGSAP(
     () => {
       const list = listRef.current;
       if (!list) return;
 
-      if (prefersReducedMotion()) {
+      if (reducedMotion) {
         gsap.set(list, {
           opacity: open ? 1 : 0,
-          scale: open ? 1 : 0.9,
+          scale: 1,
           pointerEvents: open ? "auto" : "none",
         });
         return;
@@ -84,40 +83,40 @@ export function Select({
       if (open) {
         gsap.fromTo(
           list,
-          { opacity: 0, scale: 0.9, y: -8 },
+          { opacity: 0, scale: 0.98, y: -6 },
           {
             opacity: 1,
             scale: 1,
             y: 0,
-            duration: 0.35,
-            ease: "back.out(1.5)",
+            duration: DURATION.state,
+            ease: EASE.settle,
             pointerEvents: "auto",
           },
         );
         gsap.fromTo(
           optionRefs.current.filter(Boolean),
-          { opacity: 0, y: 12 },
+          { opacity: 0, y: 6 },
           {
             opacity: 1,
             y: 0,
-            duration: 0.3,
-            stagger: 0.05,
-            ease: "power2.out",
-            delay: 0.05,
+            duration: DURATION.state,
+            stagger: 0.03,
+            ease: EASE.settle,
+            delay: 0.04,
           },
         );
       } else {
         gsap.to(list, {
           opacity: 0,
-          scale: 0.9,
-          y: -8,
-          duration: 0.2,
-          ease: "power2.in",
+          scale: 0.98,
+          y: -4,
+          duration: DURATION.hover,
+          ease: EASE.exit,
           pointerEvents: "none",
         });
       }
     },
-    { dependencies: [open] },
+    { dependencies: [open, reducedMotion] },
   );
 
   useEffect(() => {
@@ -216,7 +215,7 @@ export function Select({
     <div ref={rootRef} className={`relative block ${className}`}>
       <span
         id={labelId}
-        className="mb-1.5 block text-sm font-bold text-ink"
+        className="mb-1.5 block text-body-sm font-semibold text-text"
       >
         {label}
         {required ? <span className="sr-only"> (obrigatório)</span> : null}
@@ -250,16 +249,16 @@ export function Select({
         onClick={() => !disabled && setOpen((v) => !v)}
         onKeyDown={onTriggerKeyDown}
         className={`${open ? "border-primary bg-surface" : ""} ${
-          error ? "border-error" : ""
-        } ${selected ? "text-text" : "text-text-secondary"} ${
-          compact ? "!px-5 !py-3 !text-[0.95rem]" : ""
+          error ? "border-danger" : ""
+        } ${selected ? "text-text" : "text-text-muted"} ${
+          compact ? "!px-4 !py-2.5 !text-body-sm" : ""
         }`}
       >
         <span className="truncate">{displayLabel}</span>
         <ChevronDown
           size={20}
           strokeWidth={2.5}
-          className={`shrink-0 text-brand-pink transition-transform duration-300 ${
+          className={`shrink-0 text-primary transition-transform duration-(--duration-base) ease-(--ease-out) ${
             open ? "rotate-180" : ""
           }`}
           aria-hidden
@@ -279,11 +278,7 @@ export function Select({
         onHighlight={setHighlight}
       />
 
-      {error ? (
-        <span className="text-body-sm mt-1.5 block font-bold text-error" role="alert">
-          {error}
-        </span>
-      ) : null}
+      {error ? <FieldError message={error} /> : null}
     </div>
   );
 }

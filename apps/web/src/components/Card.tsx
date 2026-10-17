@@ -21,7 +21,7 @@ const LEVEL: Record<CardLevel, string> = {
   surface: "bg-surface",
   card: "border border-border-subtle bg-surface",
   interactive:
-    "border border-border-subtle bg-surface transition-[border-color,background-color,transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:border-primary/30 hover:bg-surface-hover hover:shadow-md",
+    "border border-border-subtle bg-surface transition-[border-color,translate,box-shadow] duration-(--duration-fast) ease-(--ease-out) hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-sm",
   elevated: "border border-border-subtle bg-surface-elevated shadow-md",
 };
 

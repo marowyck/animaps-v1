@@ -8,27 +8,27 @@
  * A future dark theme overrides only the semantic block under [data-theme="dark"].
  */
 :root {
-  /* Primitives — not for direct use in components */
-  --pink-700: #c7407b;
-  --pink-600: #ff7faa;
-  --pink-500: #ff9bbd;
+  /* Primitives — calibrated for WCAG 2.2 AA contrast while keeping warm pastel identity */
+  --pink-700: #ad265c;
+  --pink-600: #d13874;
+  --pink-500: #ff7faa;
   --pink-100: #ffe3ed;
   --pink-50: #fff1f6;
-  --lilac-700: #7c5fc4;
-  --lilac-600: #9b7fe0;
-  --lilac-500: #b39aec;
+  --lilac-700: #5c3da6;
+  --lilac-600: #7656c2;
+  --lilac-500: #9b7fe0;
   --lilac-100: #ece3fb;
-  --sky-700: #2f7eae;
-  --sky-600: #5fb8e8;
+  --sky-700: #1b5c85;
+  --sky-600: #2473a3;
   --sky-100: #dff1fc;
-  --mint-700: #2f8f62;
-  --mint-600: #57c08c;
+  --mint-700: #1b6b45;
+  --mint-600: #248256;
   --mint-100: #def7e9;
-  --honey-700: #b07a1e;
-  --honey-600: #f2b84b;
+  --honey-700: #8a5a0c;
+  --honey-600: #e09f2b;
   --honey-100: #fff1d6;
-  --coral-700: #d4564d;
-  --coral-600: #ff8177;
+  --coral-700: #a82e26;
+  --coral-600: #cc443b;
   --coral-100: #ffe4e1;
   --cream-50: #fff9f2;
   --cream-100: #fdf3e7;
@@ -36,18 +36,20 @@
   --cream-300: #eadcce;
   --paper: #ffffff;
   --plum-ink-900: #3a2e4d;
-  --plum-ink-700: #645878;
-  --plum-ink-500: #9086a0;
+  --plum-ink-700: #5d5170;
+  --plum-ink-500: #796e8c;
 
   /* Semantic color */
   --primary: var(--pink-600);
   --primary-hover: var(--pink-700);
-  --primary-active: #a82d66;
+  --primary-active: #8f1d4b;
   --primary-soft: var(--pink-100);
+  --primary-ink: var(--pink-700);
 
   --secondary: var(--lilac-600);
   --secondary-hover: var(--lilac-700);
   --secondary-soft: var(--lilac-100);
+  --secondary-ink: var(--lilac-700);
 
   --background: var(--cream-50);
   --background-secondary: var(--cream-200);
@@ -67,14 +69,18 @@
 
   --success: var(--mint-600);
   --success-soft: var(--mint-100);
+  --success-ink: var(--mint-700);
   --warning: var(--honey-600);
   --warning-soft: var(--honey-100);
+  --warning-ink: var(--honey-700);
   --warning-border: color-mix(in srgb, var(--warning) 42%, var(--surface));
   --danger: var(--coral-600);
   --danger-soft: var(--coral-100);
+  --danger-ink: var(--coral-700);
   --error: var(--danger);
   --info: var(--sky-600);
   --info-soft: var(--sky-100);
+  --info-ink: var(--sky-700);
 
   /* Legacy aliases — keep class names, new meaning */
   --gray-soft: var(--background);
@@ -148,11 +154,12 @@
   --font-size-label: 0.75rem;
   --font-size-caption: 0.75rem;
 
-  /* Motion */
-  --duration-fast: 150ms;
-  --duration-base: 250ms;
-  --duration-slow: 400ms;
+  /* Motion — keep in sync with src/lib/motion.ts */
+  --duration-fast: 160ms;
+  --duration-base: 240ms;
+  --duration-slow: 520ms;
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in: cubic-bezier(0.55, 0, 1, 0.45);
 
   /* Stacking */
   --z-header: 50;
@@ -175,11 +182,17 @@
   --border: #4a3c5e;
   --border-subtle: #3a2e4c;
   --primary-soft: #4a2740;
+  --primary-ink: #ff9bbd;
   --secondary-soft: #3a2c58;
+  --secondary-ink: #d4c2fa;
   --success-soft: #1d3a30;
+  --success-ink: #7be0ae;
   --warning-soft: #3d3018;
+  --warning-ink: #f7cb74;
   --danger-soft: #432424;
+  --danger-ink: #ff9e96;
   --info-soft: #1c3344;
+  --info-ink: #82cbf2;
   --footer: #1a1324;
 
   --gray-soft: var(--background);
@@ -227,22 +240,28 @@
 
   --color-success: var(--success);
   --color-success-soft: var(--success-soft);
+  --color-success-ink: var(--success-ink);
   --color-warning: var(--warning);
   --color-warning-soft: var(--warning-soft);
+  --color-warning-ink: var(--warning-ink);
   --color-warning-border: var(--warning-border);
   --color-error: var(--error);
   --color-danger: var(--danger);
   --color-danger-soft: var(--danger-soft);
+  --color-danger-ink: var(--danger-ink);
   --color-info: var(--info);
   --color-info-soft: var(--info-soft);
+  --color-info-ink: var(--info-ink);
 
   --color-primary: var(--primary);
   --color-primary-hover: var(--primary-hover);
   --color-primary-active: var(--primary-active);
   --color-primary-soft: var(--primary-soft);
+  --color-primary-ink: var(--primary-ink);
   --color-secondary: var(--secondary);
   --color-secondary-hover: var(--secondary-hover);
   --color-secondary-soft: var(--secondary-soft);
+  --color-secondary-ink: var(--secondary-ink);
   --color-surface: var(--surface);
   --color-surface-hover: var(--surface-hover);
   --color-surface-elevated: var(--surface-elevated);
@@ -505,6 +524,21 @@ body::-webkit-scrollbar-thumb {
   animation: match-pop 420ms var(--ease-out) forwards;
 }
 
+@keyframes enter-from-start {
+  0% {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-enter-from-start {
+  animation: enter-from-start var(--duration-slow) var(--ease-out) forwards;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html.lenis,
   html.lenis body {
@@ -515,6 +549,7 @@ body::-webkit-scrollbar-thumb {
   .animate-modal-in,
   .animate-fade-in,
   .animate-match-pop,
+  .animate-enter-from-start,
   .skeleton-shimmer {
     animation: none !important;
   }

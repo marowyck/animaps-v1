@@ -53,7 +53,7 @@ export type ButtonProps = AsButton | AsLink;
 
 const SIZE: Record<ButtonSize, string> = {
   md: "min-h-12 justify-center px-5 py-3 text-body-sm font-semibold",
-  sm: "min-h-10 justify-center px-4 py-2 text-body-sm font-semibold",
+  sm: "min-h-11 justify-center px-4 py-2 text-body-sm font-semibold",
   xs: "min-h-8 justify-center px-3 text-caption font-semibold",
   icon: "size-11 shrink-0 justify-center p-0",
   stretch: "w-full justify-between gap-4 px-5 py-4 text-left text-body font-semibold",
@@ -81,23 +81,23 @@ function skinClasses(
 ): string {
   switch (resolveVariant(variant)) {
     case "green":
-      return "bg-success text-surface-elevated shadow-sm hover:brightness-95";
+      return "bg-success text-surface-elevated shadow-sm hover:-translate-y-px hover:shadow-md hover:brightness-95 active:translate-y-0";
     case "primary":
-      return "bg-primary text-surface-elevated shadow-sm hover:bg-primary-hover hover:shadow-[var(--shadow-glow-primary)] active:bg-primary-active";
+      return "bg-primary text-surface-elevated shadow-sm hover:-translate-y-px hover:bg-primary-hover hover:shadow-md active:translate-y-0 active:bg-primary-active";
     case "secondary":
-      return "bg-secondary text-surface-elevated shadow-sm hover:bg-secondary-hover hover:shadow-[var(--shadow-glow-secondary)]";
+      return "bg-secondary text-surface-elevated shadow-sm hover:-translate-y-px hover:bg-secondary-hover hover:shadow-md active:translate-y-0";
     case "outline":
       return "border border-border bg-surface text-text hover:border-primary/40 hover:bg-primary-soft";
     case "danger":
-      return "bg-danger text-surface-elevated shadow-sm hover:brightness-95";
+      return "bg-danger text-surface-elevated shadow-sm hover:-translate-y-px hover:shadow-md hover:brightness-95 active:translate-y-0";
     case "link":
-      return "h-auto min-h-0 bg-transparent px-0 py-0 text-primary underline-offset-4 hover:underline";
+      return "h-auto min-h-0 bg-transparent px-0 py-0 text-primary-ink underline-offset-4 hover:underline";
     case "ink":
       return "bg-text text-surface-elevated hover:opacity-90";
     case "soft":
       return selected
         ? "bg-primary text-surface-elevated"
-        : "bg-primary-soft text-primary hover:bg-primary hover:text-surface-elevated";
+        : "bg-primary-soft text-primary-ink hover:bg-primary hover:text-surface-elevated";
     case "ghost":
       return "bg-transparent text-text hover:bg-surface-hover";
     case "segment":
@@ -133,9 +133,10 @@ export function Button({
   const resolvedSize = variant === "field" && size === "md" ? "field" : size;
   const isDisabled = disabled || loading;
   const base = [
-    "group relative inline-flex cursor-pointer items-center gap-2 rounded-full transition-[background-color,color,border-color,transform,box-shadow] duration-150 ease-out",
+    "group relative inline-flex cursor-pointer items-center gap-2 rounded-full transition-[background-color,color,border-color,translate,scale,box-shadow] duration-(--duration-fast) ease-(--ease-out)",
     "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary",
-    "disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100",
+    "disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none disabled:hover:translate-y-0 disabled:active:scale-100",
+    "aria-disabled:pointer-events-none aria-disabled:opacity-50",
     "active:scale-[0.98]",
     SIZE[resolvedSize],
     skinClasses(variant, selected, tone),

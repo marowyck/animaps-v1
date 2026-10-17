@@ -38,13 +38,13 @@ export function SelectableCard({
       tabIndex={tabIndex}
       onClick={onClick}
       className={[
-        "group flex w-full cursor-pointer flex-col text-left transition-[transform,background-color,border-color] duration-200 hover:-translate-y-0.5 active:scale-[0.98]",
+        "group flex w-full cursor-pointer flex-col text-left transition-[translate,scale,background-color,border-color] duration-(--duration-fast) ease-(--ease-out) hover:-translate-y-0.5 active:scale-[0.98]",
         "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary",
         compact ? "gap-1 rounded-[1.25rem] border p-2.5 sm:p-3" : "gap-2 rounded-[1.5rem] border p-4",
         selected
           ? "border-transparent bg-primary-soft shadow-sm"
           : "border-transparent bg-surface hover:bg-surface-hover",
-        disabled ? "cursor-not-allowed opacity-50 hover:border-border-soft hover:bg-white" : "",
+        disabled ? "cursor-not-allowed opacity-50 hover:translate-y-0 hover:bg-surface" : "",
         className,
       ]
         .filter(Boolean)
@@ -55,21 +55,21 @@ export function SelectableCard({
           className={[
             "inline-flex items-center justify-center rounded-full",
             compact ? "size-8 text-base" : "size-11 text-xl",
-            selected ? "bg-surface text-(--pink-700)" : "bg-background text-text",
+            selected ? "bg-surface text-primary-ink" : "bg-background text-text",
           ].join(" ")}
           aria-hidden
         >
           {icon}
         </span>
       ) : null}
-      <span className={["font-bold text-ink", compact ? "text-sm" : "text-base"].join(" ")}>
+      <span className={["font-semibold text-text", compact ? "text-body-sm" : "text-body"].join(" ")}>
         {title}
       </span>
       {description ? (
         <span
           className={[
-            "leading-snug text-ink-muted",
-            compact ? "text-xs line-clamp-2" : "text-sm",
+            "leading-snug text-text-secondary",
+            compact ? "line-clamp-2 text-caption" : "text-body-sm",
           ].join(" ")}
         >
           {description}

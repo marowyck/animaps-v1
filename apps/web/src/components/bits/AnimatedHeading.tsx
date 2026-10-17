@@ -5,6 +5,7 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
+import { DURATION, EASE } from "@/lib/motion";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -45,15 +46,14 @@ export function AnimatedHeading({
       if (reduced || !ref.current || !words?.length) return;
       gsap.fromTo(
         words,
-        { yPercent: 115, rotate: 6, opacity: 0 },
+        { yPercent: 110, opacity: 0 },
         {
           yPercent: 0,
-          rotate: 0,
           opacity: 1,
-          duration: 0.7,
+          duration: DURATION.enter + 0.1,
           delay,
-          stagger: 0.055,
-          ease: "back.out(1.45)",
+          stagger: 0.05,
+          ease: EASE.settle,
           scrollTrigger:
             trigger === "scroll"
               ? { trigger: ref.current, start: "top 88%", once: true }
