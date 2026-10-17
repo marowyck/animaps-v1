@@ -1,16 +1,24 @@
 "use client";
 
 import { useRef } from "react";
-import { MapPin, PawPrint } from "lucide-react";
+import Link from "next/link";
+import { MapPin } from "lucide-react";
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
+import { Badge } from "@/components/Badge";
 import { Button } from "@/components/Button";
+import { EmptyState } from "@/components/StateBlocks";
 import { Blob } from "@/components/bits";
 import { HeartDoodle, PawDoodle } from "@/components/illustrations/Doodles";
-import { useDiscoverActivity } from "@/features/discover";
+import { getMockDiscoverItems, useDiscoverActivity } from "@/features/discover";
 import type { PublicUserType } from "@/features/user-types";
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
 import { useT } from "@/i18n";
+import { CountUp } from "@/components/CountUp";
+import { DURATION, EASE, STAGGER } from "@/lib/motion";
+
+const TILE_HOVER =
+  "transition-[translate,box-shadow] duration-(--duration-fast) ease-(--ease-out) hover:-translate-y-0.5 hover:shadow-md";
 
 type DynamicDashboardProps = {
   userType: PublicUserType;
@@ -41,6 +49,9 @@ export function DynamicDashboard({
         ? { href: "/profile", label: t.dashboard.actionProfile }
         : { href: "/discover", label: t.dashboard.actionDiscover };
 
+  const catalog = new Map(
+    getMockDiscoverItems(t).map((item) => [item.id, item] as const),
+  );
   const likes = activity.likes.filter((id) => !activity.matches.includes(id));
   const quiet =
     activity.likes.length === 0 && activity.matches.length === 0;
@@ -51,14 +62,15 @@ export function DynamicDashboard({
       if (reduced || !pins?.length) return;
       gsap.fromTo(
         pins,
-        { scale: 0, opacity: 0 },
+        { scale: 0.6, y: 6, opacity: 0 },
         {
           scale: 1,
+          y: 0,
           opacity: 1,
-          duration: 0.45,
-          stagger: 0.09,
-          ease: "back.out(1.7)",
-          delay: 0.12,
+          duration: DURATION.enter,
+          stagger: STAGGER * 1.5,
+          ease: EASE.settle,
+          delay: 0.3,
         },
       );
     },
@@ -83,39 +95,41 @@ export function DynamicDashboard({
       </header>
 
       <section className="grid items-stretch gap-4 lg:grid-cols-5">
-        <a
+        <Link
           href="/matches"
-          className="relative flex min-h-56 flex-col justify-between overflow-hidden rounded-[2rem] bg-primary-soft p-6 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary sm:p-7 lg:col-span-3"
+          className={`relative flex min-h-56 flex-col justify-between overflow-hidden rounded-[2rem] bg-primary-soft p-6 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary sm:p-7 lg:col-span-3 ${TILE_HOVER}`}
         >
           <HeartDoodle className="pointer-events-none absolute -right-3 -bottom-6 size-36 rotate-12 text-primary/25" />
-          <span className="text-label text-(--pink-700)">{t.dashboard.summary.matches}</span>
-          <span className="relative font-display text-6xl leading-none text-text tabular-nums">
-            {activity.matches.length}
-          </span>
+          <span className="text-label text-primary-ink">{t.dashboard.summary.matches}</span>
+          <CountUp
+            value={activity.matches.length}
+            className="relative font-display text-6xl leading-none text-text"
+          />
           <span className="relative max-w-[16rem] text-body-sm text-text-secondary">
             {t.dashboard.nav.matches}
           </span>
-        </a>
+        </Link>
 
         <div className="flex flex-col gap-4 lg:col-span-2">
-          <a
+          <Link
             href="/favorites"
-            className="relative flex flex-1 flex-col justify-between overflow-hidden rounded-[1.6rem] bg-secondary-soft px-5 py-5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+            className={`relative flex flex-1 flex-col justify-between overflow-hidden rounded-[1.6rem] bg-secondary-soft px-5 py-5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${TILE_HOVER}`}
           >
-            <span className="text-label text-(--lilac-700)">{t.dashboard.summary.favorites}</span>
-            <span className="font-display text-4xl leading-none text-text tabular-nums">
-              {activity.favorites.length}
-            </span>
-          </a>
-          <a
+            <span className="text-label text-secondary-ink">{t.dashboard.summary.favorites}</span>
+            <CountUp
+              value={activity.favorites.length}
+              className="font-display text-4xl leading-none text-text"
+            />
+          </Link>
+          <Link
             href="/discover"
-            className="flex items-center justify-between gap-3 rounded-full bg-warning-soft px-5 py-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+            className={`group flex items-center justify-between gap-3 rounded-full bg-warning-soft px-5 py-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${TILE_HOVER}`}
           >
-            <span className="font-display text-lg text-(--honey-700)">
+            <span className="font-display text-lg text-warning-ink">
               {t.dashboard.nav.discover}
             </span>
-            <PawDoodle className="size-8 text-(--honey-700)" />
-          </a>
+            <PawDoodle className="size-8 text-warning-ink" />
+          </Link>
         </div>
       </section>
 
@@ -155,37 +169,72 @@ export function DynamicDashboard({
       <section>
         <h2 className="text-h2 text-text">{t.dashboard.activityTitle}</h2>
         {quiet ? (
-          <div className="mt-5 flex flex-col items-start gap-4">
-            <span className="flex size-12 items-center justify-center rounded-full bg-secondary-soft text-(--lilac-700)">
-              <PawPrint className="size-6" aria-hidden />
-            </span>
-            <div>
-              <p className="max-w-sm text-body text-text-secondary">{t.dashboard.activityEmpty}</p>
-              <Button href="/discover" variant="primary" size="sm" className="mt-4">
-                {t.dashboard.actionDiscover}
-              </Button>
-            </div>
+          <div className="mt-4">
+            <EmptyState
+              illustration="dog"
+              title={t.dashboard.activityTitle}
+              description={t.dashboard.activityEmpty}
+              action={
+                <Button href="/discover" variant="primary" size="sm">
+                  {t.dashboard.actionDiscover}
+                </Button>
+              }
+            />
           </div>
         ) : (
-          <ul className="mt-4 space-y-2">
-            {activity.matches.map((id) => (
-              <li key={`m-${id}`} className="flex items-stretch gap-3 py-1">
-                <span className="mt-0.5 min-h-5 w-1.5 shrink-0 self-stretch rounded-full bg-primary" aria-hidden />
-                <span className="text-body-sm text-text">
-                  <span className="font-semibold">{t.discover.matched}</span>
-                  <span className="text-text-muted"> · {id}</span>
-                </span>
-              </li>
-            ))}
-            {likes.map((id) => (
-              <li key={`l-${id}`} className="flex items-stretch gap-3 py-1">
-                <span className="mt-0.5 min-h-5 w-1.5 shrink-0 self-stretch rounded-full bg-secondary" aria-hidden />
-                <span className="text-body-sm text-text">
-                  <span className="font-semibold">{t.discover.liked}</span>
-                  <span className="text-text-muted"> · {id}</span>
-                </span>
-              </li>
-            ))}
+          <ul className="mt-4 divide-y divide-border-subtle rounded-3xl border border-border-subtle bg-surface p-2 shadow-sm">
+            {activity.matches.map((id) => {
+              const item = catalog.get(id);
+              return (
+                <li key={`m-${id}`}>
+                  <Link
+                    href="/matches"
+                    className="flex items-center justify-between gap-3 rounded-2xl px-3 py-2.5 transition-colors hover:bg-surface-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                  >
+                    <div className="flex min-w-0 items-center gap-3">
+                      <span className="h-5 w-1.5 shrink-0 rounded-full bg-primary" aria-hidden />
+                      <div className="min-w-0">
+                        <p className="truncate text-body-sm font-semibold text-text">
+                          {item?.title ?? id}
+                        </p>
+                        {item?.subtitle ? (
+                          <p className="truncate text-caption text-text-secondary">
+                            {item.subtitle}
+                          </p>
+                        ) : null}
+                      </div>
+                    </div>
+                    <Badge tone="primary">{t.discover.matched}</Badge>
+                  </Link>
+                </li>
+              );
+            })}
+            {likes.map((id) => {
+              const item = catalog.get(id);
+              return (
+                <li key={`l-${id}`}>
+                  <Link
+                    href="/discover"
+                    className="flex items-center justify-between gap-3 rounded-2xl px-3 py-2.5 transition-colors hover:bg-surface-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                  >
+                    <div className="flex min-w-0 items-center gap-3">
+                      <span className="h-5 w-1.5 shrink-0 rounded-full bg-secondary" aria-hidden />
+                      <div className="min-w-0">
+                        <p className="truncate text-body-sm font-semibold text-text">
+                          {item?.title ?? id}
+                        </p>
+                        {item?.subtitle ? (
+                          <p className="truncate text-caption text-text-secondary">
+                            {item.subtitle}
+                          </p>
+                        ) : null}
+                      </div>
+                    </div>
+                    <Badge tone="neutral">{t.discover.liked}</Badge>
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         )}
       </section>
