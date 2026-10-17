@@ -6,9 +6,11 @@ import Link from "next/link";
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 import { Button } from "@/components/Button";
+import { EmptyState } from "@/components/StateBlocks";
 import { HeartDoodle, PawDoodle } from "@/components/illustrations/Doodles";
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
 import { useT } from "@/i18n";
+import { DISTANCE, DURATION, EASE, STAGGER } from "@/lib/motion";
 import { useDiscoverActivity } from "./activity";
 import { getMockDiscoverItems } from "./mockDiscoverItems";
 import type { DiscoverEntityKind } from "./types";
@@ -25,10 +27,10 @@ const FALLBACK_IMAGE: Record<DiscoverEntityKind, string> = {
 };
 
 const TAG_TONES = [
-  "bg-primary-soft text-(--pink-700)",
-  "bg-success-soft text-(--mint-700)",
-  "bg-warning-soft text-(--honey-700)",
-  "bg-secondary-soft text-(--lilac-700)",
+  "bg-primary-soft text-primary-ink",
+  "bg-success-soft text-success-ink",
+  "bg-warning-soft text-warning-ink",
+  "bg-secondary-soft text-secondary-ink",
 ] as const;
 
 const PORTRAIT = [
@@ -63,8 +65,16 @@ export function SavedList({ kind }: SavedListProps) {
       if (reduced || !rows?.length) return;
       gsap.fromTo(
         rows,
-        { y: 16, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.45, stagger: 0.06, ease: "power3.out" },
+        { y: DISTANCE.small, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: DURATION.enter,
+          delay: 0.12,
+          stagger: STAGGER,
+          ease: EASE.settle,
+          clearProps: "transform",
+        },
       );
     },
     { scope: listRef, dependencies: [reduced, ids.join("|")] },
@@ -80,35 +90,30 @@ export function SavedList({ kind }: SavedListProps) {
         {kind === "matches" ? (
           <HeartDoodle className="hidden size-10 shrink-0 text-primary sm:block" />
         ) : (
-          <span className="hidden size-10 items-center justify-center rounded-full bg-secondary-soft text-(--lilac-700) sm:flex">
+          <span className="hidden size-10 items-center justify-center rounded-full bg-secondary-soft text-secondary-ink sm:flex">
             <PawDoodle className="size-6" />
           </span>
         )}
       </header>
 
       {items.length === 0 ? (
-        <div className="flex flex-col items-start gap-4">
-          <span className="flex size-12 items-center justify-center rounded-full bg-primary-soft text-(--pink-700) sm:hidden">
-            {kind === "matches" ? (
-              <HeartDoodle className="size-6" />
-            ) : (
-              <PawDoodle className="size-6" />
-            )}
-          </span>
-          <div>
-            <p className="max-w-sm text-body text-text-secondary">{copy.empty}</p>
-            <Button href="/discover" variant="primary" size="sm" className="mt-4">
+        <EmptyState
+          illustration={kind === "matches" ? "dog" : "cat"}
+          title={copy.title}
+          description={copy.empty}
+          action={
+            <Button href="/discover" variant="primary" size="sm">
               {t.saved.openDiscover}
             </Button>
-          </div>
-        </div>
+          }
+        />
       ) : (
         <ul ref={listRef} className="flex flex-col gap-2">
           {items.map((item, index) => (
             <li key={item.id} data-saved>
               <Link
                 href="/discover"
-                className="group flex items-center gap-4 rounded-[1.6rem] px-2 py-2 transition-colors hover:bg-primary-soft/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                className="group flex items-center gap-4 rounded-[1.6rem] px-2 py-2 transition-colors duration-(--duration-fast) hover:bg-primary-soft/70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
               >
                 <span
                   className={`relative size-20 shrink-0 overflow-hidden bg-surface-accent sm:size-24 ${PORTRAIT[index % PORTRAIT.length]}`}
@@ -118,11 +123,11 @@ export function SavedList({ kind }: SavedListProps) {
                     alt=""
                     fill
                     sizes="6rem"
-                    className="object-cover transition-transform duration-300 group-hover:scale-105"
+                    className="object-cover transition-transform duration-(--duration-slow) ease-(--ease-out) group-hover:scale-[1.04]"
                   />
                 </span>
                 <span className="min-w-0 py-1">
-                  <span className="text-caption font-semibold text-(--pink-700)">
+                  <span className="text-caption font-semibold text-primary-ink">
                     {t.discover.kinds[item.kind]}
                     {typeof item.distanceKm === "number"
                       ? ` · ${item.distanceKm.toFixed(1)} km`

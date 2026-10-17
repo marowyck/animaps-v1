@@ -9,6 +9,7 @@ import { ParticleBurst } from "@/components/bits";
 import { PawDoodle } from "@/components/illustrations/Doodles";
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
 import { useT } from "@/i18n";
+import { DISTANCE, DURATION, EASE } from "@/lib/motion";
 import type { DiscoverAction, DiscoverEntityKind, DiscoverItem } from "./types";
 import { useSwipeGesture } from "./useSwipeGesture";
 
@@ -20,10 +21,10 @@ const FALLBACK_IMAGE: Record<DiscoverEntityKind, string> = {
 };
 
 const TAG_TONES = [
-  "bg-primary-soft text-(--pink-700)",
-  "bg-success-soft text-(--mint-700)",
-  "bg-warning-soft text-(--honey-700)",
-  "bg-secondary-soft text-(--lilac-700)",
+  "bg-primary-soft text-primary-ink",
+  "bg-success-soft text-success-ink",
+  "bg-warning-soft text-warning-ink",
+  "bg-secondary-soft text-secondary-ink",
 ] as const;
 
 type DiscoverCardProps = {
@@ -59,8 +60,8 @@ export function DiscoverCard({ item, onAction }: DiscoverCardProps) {
       if (reduced || !enterRef.current) return;
       gsap.fromTo(
         enterRef.current,
-        { scale: 0.96, y: 18, opacity: 0 },
-        { scale: 1, y: 0, opacity: 1, duration: 0.45, ease: "power3.out" },
+        { scale: 0.98, y: DISTANCE.small, opacity: 0 },
+        { scale: 1, y: 0, opacity: 1, duration: DURATION.enter, ease: EASE.settle },
       );
     },
     { dependencies: [reduced, item.id] },
@@ -73,10 +74,10 @@ export function DiscoverCard({ item, onAction }: DiscoverCardProps) {
         { scale: 1 },
         {
           scale: 1.16,
-          duration: 0.16,
+          duration: DURATION.hover,
           yoyo: true,
           repeat: 1,
-          ease: "back.out(2)",
+          ease: EASE.celebrate,
           onComplete: () => {
             if (favRef.current) gsap.set(favRef.current, { clearProps: "transform" });
           },
@@ -150,7 +151,7 @@ export function DiscoverCard({ item, onAction }: DiscoverCardProps) {
               <div className="absolute inset-0 bg-gradient-to-t from-text/50 via-transparent to-transparent" />
 
               <span
-                className="pointer-events-none absolute top-5 left-5 inline-flex -rotate-12 items-center gap-1.5 rounded-full border-[3px] border-(--mint-700) bg-surface/90 px-3 py-1 font-display text-lg text-(--mint-700)"
+                className="pointer-events-none absolute top-5 left-5 inline-flex -rotate-12 items-center gap-1.5 rounded-full border-[3px] border-success-ink bg-surface/90 px-3 py-1 font-display text-lg text-success-ink"
                 style={{ opacity: likeOpacity }}
                 aria-hidden
               >
@@ -158,14 +159,14 @@ export function DiscoverCard({ item, onAction }: DiscoverCardProps) {
                 {t.discover.actions.like}
               </span>
               <span
-                className="pointer-events-none absolute top-5 right-5 inline-flex rotate-12 items-center rounded-full border-[3px] border-(--coral-700) bg-surface/90 px-3 py-1 font-display text-lg text-(--coral-700)"
+                className="pointer-events-none absolute top-5 right-5 inline-flex rotate-12 items-center rounded-full border-[3px] border-danger-ink bg-surface/90 px-3 py-1 font-display text-lg text-danger-ink"
                 style={{ opacity: skipOpacity }}
                 aria-hidden
               >
                 {t.discover.actions.skip}
               </span>
 
-              <span className="absolute bottom-4 left-4 rounded-full bg-surface px-3 py-1 font-display text-sm text-(--pink-700) shadow-sm">
+              <span className="absolute bottom-4 left-4 rounded-full bg-surface px-3 py-1 font-display text-sm text-primary-ink shadow-sm">
                 {t.discover.kinds[item.kind]}
               </span>
               {typeof item.distanceKm === "number" ? (
@@ -202,7 +203,7 @@ export function DiscoverCard({ item, onAction }: DiscoverCardProps) {
           type="button"
           aria-label={t.discover.actions.skip}
           disabled={exiting}
-          className="inline-flex size-14 cursor-pointer items-center justify-center rounded-full border border-border bg-surface text-text-secondary shadow-sm transition duration-150 hover:scale-105 hover:border-danger/40 hover:text-danger focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary active:scale-95 disabled:pointer-events-none disabled:opacity-50"
+          className="inline-flex size-14 cursor-pointer items-center justify-center rounded-full border border-border bg-surface text-text-secondary shadow-sm transition-[translate,scale,color,border-color,box-shadow] duration-(--duration-fast) ease-(--ease-out) hover:-translate-y-0.5 hover:border-danger/40 hover:text-danger-ink hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary active:scale-95 disabled:pointer-events-none disabled:opacity-50"
           onClick={() => playExit("left", "skip")}
         >
           <SkipForward className="size-6" aria-hidden />
@@ -213,7 +214,7 @@ export function DiscoverCard({ item, onAction }: DiscoverCardProps) {
             type="button"
             aria-label={t.discover.actions.favorite}
             disabled={exiting}
-            className="inline-flex size-12 cursor-pointer items-center justify-center rounded-full border border-border bg-surface text-(--sky-700) shadow-sm transition duration-150 hover:scale-105 hover:bg-info-soft focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary active:scale-95 disabled:pointer-events-none disabled:opacity-50"
+            className="inline-flex size-12 cursor-pointer items-center justify-center rounded-full border border-border bg-surface text-info-ink shadow-sm transition-[translate,background-color,box-shadow] duration-(--duration-fast) ease-(--ease-out) hover:-translate-y-0.5 hover:bg-info-soft hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary active:scale-95 disabled:pointer-events-none disabled:opacity-50"
             onClick={popFavorite}
           >
             <Star className="size-5" aria-hidden />
@@ -224,13 +225,15 @@ export function DiscoverCard({ item, onAction }: DiscoverCardProps) {
           type="button"
           aria-label={t.discover.actions.like}
           disabled={exiting}
-          className="inline-flex size-14 cursor-pointer items-center justify-center rounded-full bg-primary text-surface-elevated shadow-sm transition duration-150 hover:scale-105 hover:bg-primary-hover hover:shadow-[var(--shadow-glow-primary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary active:scale-95 disabled:pointer-events-none disabled:opacity-50"
+          className="inline-flex size-14 cursor-pointer items-center justify-center rounded-full bg-primary text-surface-elevated shadow-sm transition-[translate,scale,background-color,box-shadow] duration-(--duration-fast) ease-(--ease-out) hover:-translate-y-0.5 hover:bg-primary-hover hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary active:scale-95 disabled:pointer-events-none disabled:opacity-50"
           onClick={() => playExit("right", "like")}
         >
           <Heart className="size-6 fill-current" aria-hidden />
         </button>
       </div>
-      <p className="mt-2 text-center text-caption text-ink-muted">{t.discover.keyboardHint}</p>
+      <p className="mt-2 hidden text-center text-caption text-text-muted md:block">
+        {t.discover.keyboardHint}
+      </p>
     </div>
   );
 }

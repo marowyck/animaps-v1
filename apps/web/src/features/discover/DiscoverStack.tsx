@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
@@ -11,6 +11,7 @@ import { EmptyState } from "@/components/StateBlocks";
 import { useToast } from "@/components/Toast";
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
 import { useT } from "@/i18n";
+import { EASE } from "@/lib/motion";
 import { recordDiscoverAction } from "./activity";
 import { DiscoverCard } from "./DiscoverCard";
 import { getMockDiscoverItems } from "./mockDiscoverItems";
@@ -28,6 +29,15 @@ function MatchCelebration({
   const root = useRef<HTMLDivElement>(null);
   const photo = item.imageUrl ?? "/images/auth/adoption.png";
 
+  useEffect(() => {
+    root.current?.focus();
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onContinue();
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [onContinue]);
+
   useGSAP(
     () => {
       const frames = root.current?.querySelectorAll<HTMLElement>(".match-frame");
@@ -41,7 +51,7 @@ function MatchCelebration({
           opacity: 1,
           duration: 0.7,
           stagger: 0.08,
-          ease: "back.out(1.6)",
+          ease: EASE.celebrate,
         },
       );
     },
@@ -55,10 +65,11 @@ function MatchCelebration({
       aria-labelledby="match-title"
       className="absolute inset-0 z-20 flex items-center justify-center p-4"
     >
-      <div className="absolute inset-0 bg-text/40 animate-fade-in" />
+      <div className="absolute inset-0 bg-text/40 animate-fade-in" onClick={onContinue} />
       <div
         ref={root}
-        className="relative w-full max-w-sm overflow-visible rounded-[2rem] bg-primary-soft px-5 pt-8 pb-5 shadow-lg"
+        tabIndex={-1}
+        className="animate-modal-in relative w-full max-w-sm overflow-visible rounded-[2rem] bg-primary-soft px-5 pt-8 pb-5 shadow-lg outline-none"
       >
         <ParticleBurst play={reduced ? 0 : 1} count={16} className="z-20" />
         <div className="relative mx-auto h-52">
@@ -93,11 +104,11 @@ function PeekCard({ item, label }: { item: DiscoverItem; label: string }) {
   return (
     <div
       aria-hidden
-      className="pointer-events-none absolute inset-x-10 top-0 h-[4.5rem] rounded-[2rem] border-2 border-border-soft bg-pastel-green/50 shadow-md"
+      className="pointer-events-none absolute inset-x-10 top-0 h-[4.5rem] rounded-[2rem] bg-success-soft"
     >
-      <div className="flex h-full flex-col justify-end p-5">
-        <p className="text-caption font-bold uppercase tracking-wide text-ink-muted">{label}</p>
-        <p className="font-display text-2xl text-ink/70">{item.title}</p>
+      <div className="flex h-full flex-col justify-start px-5 pt-2">
+        <p className="text-caption font-semibold text-success-ink">{label}</p>
+        <p className="font-display text-h4 truncate text-text/70">{item.title}</p>
       </div>
     </div>
   );
@@ -115,6 +126,7 @@ export function DiscoverStack() {
   if (!item) {
     return (
       <EmptyState
+        illustration="dog"
         title={t.discover.empty}
         description={t.discover.subtitle}
       />
