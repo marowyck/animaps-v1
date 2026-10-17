@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Badge } from "@/components/Badge";
 import { Button } from "@/components/Button";
 import { DataTable } from "@/components/DataTable";
-import { PawPrint } from "lucide-react";
+import { EmptyState } from "@/components/StateBlocks";
 import { useT } from "@/i18n";
 import type { CaseRecord } from "./types";
 
@@ -30,31 +31,29 @@ export function CaseList({
 
   if (cases.length === 0) {
     return (
-      <div className="flex flex-col items-start gap-4">
-        <span className="flex size-12 items-center justify-center rounded-full bg-secondary-soft text-(--lilac-700)">
-          <PawPrint className="size-6" aria-hidden />
-        </span>
-        <div>
-          <h1 className="text-h2 text-text">{emptyTitle ?? t.cases.list.emptyTitle}</h1>
-          <p className="mt-2 max-w-sm text-body-sm text-text-secondary">
-            {emptyDescription ??
-              (mode === "institution"
-                ? t.cases.list.emptyInstitution
-                : t.cases.list.emptyCitizen)}
-          </p>
-          {canCreate ? (
-            <Button href="/cases/new" variant="primary" size="sm" className="mt-4">
+      <EmptyState
+        illustration="bird"
+        title={emptyTitle ?? t.cases.list.emptyTitle}
+        description={
+          emptyDescription ??
+          (mode === "institution"
+            ? t.cases.list.emptyInstitution
+            : t.cases.list.emptyCitizen)
+        }
+        action={
+          canCreate ? (
+            <Button href="/cases/new" variant="primary" size="sm">
               {t.cases.list.createCta}
             </Button>
-          ) : null}
-        </div>
-      </div>
+          ) : undefined
+        }
+      />
     );
   }
 
   return (
-    <div className="space-y-3">
-      <div className="flex flex-wrap items-center justify-between gap-2">
+    <div className="space-y-6">
+      <div className="flex flex-wrap items-end justify-between gap-4">
         {showHeading ? (
           <div>
             <h1 className="text-h1 text-text">
@@ -87,22 +86,23 @@ export function CaseList({
         onRowClick={(row) => router.push(`/cases/${row.id}`)}
         columns={[
           {
-            id: "ref",
-            header: t.cases.list.institutionTitle,
-            cell: (row) => row.referenceNumber,
-            className: "text-text-muted",
-          },
-          {
             id: "title",
-            header: t.cases.list.citizenTitle,
+            header: t.cases.create.typeLabel,
             cell: (row) =>
               row.title && row.title !== row.caseTypeId
                 ? row.title
                 : t.cases.types[row.caseTypeId].title,
+            className: "font-semibold",
+          },
+          {
+            id: "ref",
+            header: "#",
+            cell: (row) => row.referenceNumber,
+            className: "text-text-muted tabular-nums",
           },
           {
             id: "place",
-            header: t.dashboard.nav.location ?? t.dashboard.nav.map ?? "",
+            header: t.cases.create.city,
             cell: (row) =>
               row.location.city
                 ? `${row.location.city}/${row.location.state}`
@@ -111,13 +111,26 @@ export function CaseList({
           {
             id: "status",
             header: t.cases.detail.citizenStatus,
-            cell: (row) => t.cases.citizenStatus[row.citizenStatus],
+            cell: (row) => (
+              <Badge
+                tone={
+                  row.citizenStatus === "resolved"
+                    ? "success"
+                    : row.citizenStatus === "in_progress" ||
+                        row.citizenStatus === "under_analysis"
+                      ? "primary"
+                      : "info"
+                }
+              >
+                {t.cases.citizenStatus[row.citizenStatus]}
+              </Badge>
+            ),
           },
         ]}
       />
 
-      <p className="text-center text-xs font-semibold text-ink-muted">
-        <Link href="/cases/claim" className="underline underline-offset-2">
+      <p className="pt-2 text-center text-caption font-semibold text-text-muted">
+        <Link href="/cases/claim" className="text-primary-ink underline underline-offset-2">
           {t.cases.claim.link}
         </Link>
       </p>

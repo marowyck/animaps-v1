@@ -16,7 +16,7 @@ export function CaseDetailClaimBanner({
   const t = useT();
   return (
     <div className="rounded-[1.6rem] bg-primary-soft px-5 py-4">
-      <p className="text-body-sm font-semibold text-(--pink-700)">{t.cases.claim.saveToken}</p>
+      <p className="text-body-sm font-semibold text-primary-ink">{t.cases.claim.saveToken}</p>
       <p className="mt-1 font-display text-2xl tracking-wide text-text">
         {token}
       </p>

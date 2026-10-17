@@ -33,7 +33,7 @@ export default function CaseDetailPage({
         <ErrorState
           title={t.cases.errors.notFound}
           action={
-            <Button href="/cases" variant="pink" size="sm">
+            <Button href="/cases" variant="primary" size="sm">
               {t.cases.detail.back}
             </Button>
           }

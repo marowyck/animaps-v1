@@ -2,6 +2,7 @@
 
 import { FormEvent, useMemo, useState } from "react";
 import { Button } from "@/components/Button";
+import { nativeSelectClass } from "@/components/Input";
 import { useToast } from "@/components/Toast";
 import { useInstitutionOrg } from "@/features/institution/team/useInstitutionOrg";
 import { hasPermission } from "@/features/permissions";
@@ -79,13 +80,13 @@ export function CaseAssignmentPanel({
       <p className="text-body-sm text-text-secondary">{t.cases.assignment.hint}</p>
 
       {record.assignedMemberLabel || record.assignedTeamLabel ? (
-        <p className="rounded-full bg-success-soft px-4 py-2 text-body-sm font-semibold text-(--mint-700)">
+        <p className="rounded-full bg-success-soft px-4 py-2 text-body-sm font-semibold text-success-ink">
           {[record.assignedMemberLabel, record.assignedTeamLabel]
             .filter(Boolean)
             .join(" · ")}
         </p>
       ) : (
-        <p className="text-xs text-ink-muted">{t.cases.assignment.unassigned}</p>
+        <p className="text-caption text-text-muted">{t.cases.assignment.unassigned}</p>
       )}
 
       {canAssign ? (
@@ -95,7 +96,7 @@ export function CaseAssignmentPanel({
               {t.cases.assignment.member}
             </span>
             <select
-              className="w-full rounded-[1.25rem] border border-border bg-background px-4 py-2.5 text-body-sm text-text outline-none focus-visible:border-primary"
+              className={nativeSelectClass}
               value={memberId}
               onChange={(e) => setMemberId(e.target.value)}
             >
@@ -112,7 +113,7 @@ export function CaseAssignmentPanel({
               {t.cases.assignment.team}
             </span>
             <select
-              className="w-full rounded-[1.25rem] border border-border bg-background px-4 py-2.5 text-body-sm text-text outline-none focus-visible:border-primary"
+              className={nativeSelectClass}
               value={teamId}
               onChange={(e) => setTeamId(e.target.value)}
             >
@@ -141,9 +142,9 @@ export function CaseAssignmentPanel({
           </div>
         </form>
       ) : !verified ? (
-        <p className="text-xs text-ink-muted">{t.cases.assignment.softGate}</p>
+        <p className="text-caption text-text-muted">{t.cases.assignment.softGate}</p>
       ) : (
-        <p className="text-xs text-ink-muted">{t.cases.assignment.noPermission}</p>
+        <p className="text-caption text-text-muted">{t.cases.assignment.noPermission}</p>
       )}
     </section>
   );

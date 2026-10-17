@@ -109,7 +109,7 @@ export function CaseDetailInstitutionPanel({
           </form>
         </>
       ) : (
-        <p className="text-xs text-ink-muted">
+        <p className="text-caption text-text-muted">
           {t.institution.inbox.readOnlyHint}
         </p>
       )}

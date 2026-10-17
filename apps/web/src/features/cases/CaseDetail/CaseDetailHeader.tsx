@@ -16,7 +16,7 @@ export function CaseDetailHeader({ record }: CaseDetailHeaderProps) {
       <div className="flex items-end gap-3">
         <PawDoodle className="mb-1 hidden size-12 shrink-0 -rotate-12 text-primary sm:block" />
         <div>
-          <p className="text-label inline-flex rounded-full bg-primary-soft px-2.5 py-1 text-(--pink-700)">
+          <p className="text-label inline-flex rounded-full bg-primary-soft px-2.5 py-1 text-primary-ink">
             {record.referenceNumber}
           </p>
           <h1 className="text-h1 mt-2 text-text">

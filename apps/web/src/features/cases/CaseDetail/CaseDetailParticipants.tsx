@@ -20,7 +20,7 @@ export function CaseDetailParticipants({
           <li key={p.id} className="flex items-center justify-between gap-3">
             <span className="h-8 w-1.5 shrink-0 rounded-full bg-secondary" aria-hidden />
             <span className="min-w-0 flex-1 text-body-sm text-text">{p.userLabel ?? "—"}</span>
-            <span className="text-caption font-semibold text-(--lilac-700)">
+            <span className="text-caption font-semibold text-secondary-ink">
               {t.cases.roles[p.role]}
             </span>
           </li>

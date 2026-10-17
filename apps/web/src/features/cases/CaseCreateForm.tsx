@@ -6,6 +6,7 @@ import { Button } from "@/components/Button";
 import { Checkbox } from "@/components/Checkbox";
 import { Input } from "@/components/Input";
 import { SelectableCard } from "@/components/SelectableCard";
+import { Textarea } from "@/components/Textarea";
 import { useToast } from "@/components/Toast";
 import { useT } from "@/i18n";
 import type { PublicUserType } from "@/features/user-types";
@@ -105,7 +106,7 @@ export function CaseCreateForm({
       </div>
 
       <fieldset>
-        <legend className="mb-2 text-xs font-bold text-ink">
+        <legend className="mb-2 text-body-sm font-semibold text-text">
           {t.cases.create.typeLabel}
         </legend>
         <div className="grid gap-2 sm:grid-cols-2">
@@ -127,17 +128,13 @@ export function CaseCreateForm({
         value={title}
         onChange={(e) => setTitle(e.target.value)}
       />
-      <label className="block space-y-1.5">
-        <span className="text-xs font-bold text-ink">
-          {t.cases.create.descriptionLabel}
-        </span>
-        <textarea
-          className="min-h-28 w-full rounded-[1.4rem] border border-border bg-background px-4 py-3 text-body-sm text-text outline-none focus-visible:border-primary focus-visible:bg-surface"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          required
-        />
-      </label>
+      <Textarea
+        label={t.cases.create.descriptionLabel}
+        name="description"
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+        required
+      />
 
       <div className="grid gap-3 sm:grid-cols-2">
         <Input

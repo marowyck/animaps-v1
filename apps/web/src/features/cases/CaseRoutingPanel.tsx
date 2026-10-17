@@ -2,6 +2,7 @@
 
 import { FormEvent, useMemo, useState } from "react";
 import { Button } from "@/components/Button";
+import { inputFieldClass, nativeSelectClass } from "@/components/Input";
 import { useToast } from "@/components/Toast";
 import { useRoutingCatalog } from "@/features/institution/routing/useRoutingCatalog";
 import { matchInstitutions } from "@/features/institution/routing/matcher";
@@ -126,7 +127,7 @@ export function CaseRoutingPanel({ record, verified }: CaseRoutingPanelProps) {
       )}
 
       <div className="rounded-[1.4rem] bg-info-soft px-4 py-3 text-body-sm text-text-secondary">
-        <p className="font-semibold text-(--sky-700)">{t.cases.routing.preview}</p>
+        <p className="font-semibold text-info-ink">{t.cases.routing.preview}</p>
         <p className="mt-1">
           {preview.status === "matched"
             ? t.cases.routing.previewMatch.replace(
@@ -144,9 +145,9 @@ export function CaseRoutingPanel({ record, verified }: CaseRoutingPanelProps) {
           {t.cases.routing.runMatcher}
         </Button>
       ) : !verified ? (
-        <p className="text-xs text-ink-muted">{t.cases.routing.softGate}</p>
+        <p className="text-caption text-text-muted">{t.cases.routing.softGate}</p>
       ) : (
-        <p className="text-xs text-ink-muted">{t.cases.routing.noPermission}</p>
+        <p className="text-caption text-text-muted">{t.cases.routing.noPermission}</p>
       )}
 
       {canForward && otherInstitutions.length > 0 ? (
@@ -162,7 +163,7 @@ export function CaseRoutingPanel({ record, verified }: CaseRoutingPanelProps) {
               {t.cases.routing.forwardTo}
             </span>
             <select
-              className="w-full rounded-[1.25rem] border border-border bg-background px-4 py-2.5 text-body-sm text-text outline-none focus-visible:border-primary"
+              className={nativeSelectClass}
               value={forwardToId}
               onChange={(e) => setForwardToId(e.target.value)}
             >
@@ -179,7 +180,7 @@ export function CaseRoutingPanel({ record, verified }: CaseRoutingPanelProps) {
               {t.cases.routing.forwardReason}
             </span>
             <select
-              className="w-full rounded-[1.25rem] border border-border bg-background px-4 py-2.5 text-body-sm text-text outline-none focus-visible:border-primary"
+              className={nativeSelectClass}
               value={forwardReason}
               onChange={(e) =>
                 setForwardReason(e.target.value as CaseRoutingReason)
@@ -197,7 +198,7 @@ export function CaseRoutingPanel({ record, verified }: CaseRoutingPanelProps) {
               {t.cases.routing.forwardNote}
             </span>
             <input
-              className="w-full rounded-[1.25rem] border border-border bg-background px-4 py-2.5 text-body-sm text-text outline-none focus-visible:border-primary"
+              className={inputFieldClass}
               value={forwardNote}
               onChange={(e) => setForwardNote(e.target.value)}
             />
