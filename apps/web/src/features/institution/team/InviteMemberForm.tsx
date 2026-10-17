@@ -2,7 +2,7 @@
 
 import type { FormEvent } from "react";
 import { Button } from "@/components/Button";
-import { Input } from "@/components/Input";
+import { Input, nativeSelectClass } from "@/components/Input";
 import { useT } from "@/i18n";
 import {
   INSTITUTION_MEMBER_ROLES,
@@ -59,11 +59,11 @@ export function InviteMemberForm({
         onChange={(e) => onInviteNameChange(e.target.value)}
       />
       <label className="block space-y-1">
-        <span className="text-xs font-bold text-ink">
+        <span className="text-body-sm font-semibold text-text">
           {t.institution.team.inviteRole}
         </span>
         <select
-          className="w-full rounded-2xl border-2 border-border-soft bg-white px-3 py-2 text-sm outline-none focus-visible:border-brand-green"
+          className={nativeSelectClass}
           value={inviteRole}
           onChange={(e) =>
             onInviteRoleChange(e.target.value as InstitutionMemberRole)
@@ -77,11 +77,11 @@ export function InviteMemberForm({
         </select>
       </label>
       <label className="block space-y-1">
-        <span className="text-xs font-bold text-ink">
+        <span className="text-body-sm font-semibold text-text">
           {t.institution.team.inviteDept}
         </span>
         <select
-          className="w-full rounded-2xl border-2 border-border-soft bg-white px-3 py-2 text-sm outline-none focus-visible:border-brand-green"
+          className={nativeSelectClass}
           value={inviteDeptId}
           onChange={(e) => onInviteDeptIdChange(e.target.value)}
         >
@@ -94,11 +94,11 @@ export function InviteMemberForm({
         </select>
       </label>
       <label className="block space-y-1">
-        <span className="text-xs font-bold text-ink">
+        <span className="text-body-sm font-semibold text-text">
           {t.institution.team.inviteTeam}
         </span>
         <select
-          className="w-full rounded-2xl border-2 border-border-soft bg-white px-3 py-2 text-sm outline-none focus-visible:border-brand-green"
+          className={nativeSelectClass}
           value={inviteTeamId}
           onChange={(e) => onInviteTeamIdChange(e.target.value)}
         >
@@ -111,7 +111,7 @@ export function InviteMemberForm({
         </select>
       </label>
       <div className="flex items-end">
-        <Button type="submit" size="sm" variant="pink">
+        <Button type="submit" size="sm" variant="primary">
           {t.institution.team.sendInvite}
         </Button>
       </div>

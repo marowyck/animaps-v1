@@ -3,7 +3,8 @@
 import { FormEvent, useEffect, useState } from "react";
 import { MapPinned, Trash2 } from "lucide-react";
 import { Button } from "@/components/Button";
-import { Input } from "@/components/Input";
+import { Checkbox } from "@/components/Checkbox";
+import { Input, nativeSelectClass } from "@/components/Input";
 import { useToast } from "@/components/Toast";
 import { CASE_TYPE_IDS } from "@/features/cases/types";
 import { hasPermission } from "@/features/permissions";
@@ -89,7 +90,7 @@ export function InstitutionRoutingConfig() {
   return (
     <div className="space-y-4">
       {!verified ? (
-        <p className="text-sm text-ink-muted">
+        <p className="text-body-sm text-text-secondary">
           {t.institution.routing.readOnlyHint}
         </p>
       ) : null}
@@ -103,12 +104,12 @@ export function InstitutionRoutingConfig() {
 
         {canManage ? (
           <form onSubmit={onAddJurisdiction} className="grid gap-2 sm:grid-cols-3">
-            <label className="block space-y-1">
-              <span className="text-xs font-bold text-ink">
+            <label className="block space-y-1.5">
+              <span className="text-body-sm font-semibold text-text">
                 {t.institution.routing.jurType}
               </span>
               <select
-                className="w-full rounded-2xl border-2 border-border-soft bg-white px-3 py-2 text-sm outline-none focus-visible:border-brand-green"
+                className={nativeSelectClass}
                 value={jurType}
                 onChange={(e) =>
                   setJurType(e.target.value as JurisdictionType)
@@ -128,7 +129,7 @@ export function InstitutionRoutingConfig() {
               className="sm:col-span-1"
             />
             <div className="flex items-end">
-              <Button type="submit" size="sm" variant="pink">
+              <Button type="submit" size="sm" variant="primary">
                 {t.institution.routing.addJur}
               </Button>
             </div>
@@ -136,26 +137,26 @@ export function InstitutionRoutingConfig() {
         ) : null}
 
         {!institution || institution.jurisdictions.length === 0 ? (
-          <p className="text-xs text-ink-muted">
+          <p className="text-body-sm text-text-muted">
             {t.institution.routing.noJurs}
           </p>
         ) : (
-          <ul className="divide-y divide-border-soft text-sm">
+          <ul className="divide-y divide-border-subtle text-body-sm">
             {institution.jurisdictions.map((j) => (
               <li
                 key={j.id}
                 className="flex items-center justify-between gap-2 py-2"
               >
                 <span>
-                  <span className="font-semibold text-ink">{j.value}</span>
-                  <span className="ml-2 text-xs text-ink-muted">
+                  <span className="font-semibold text-text">{j.value}</span>
+                  <span className="ml-2 text-caption text-text-muted">
                     {t.institution.routing.jurTypes[j.jurisdictionType]}
                   </span>
                 </span>
                 {canManage ? (
                   <button
                     type="button"
-                    className="rounded-lg p-1.5 text-ink-muted hover:bg-pastel-pink/40 hover:text-brand-pink"
+                    className="rounded-lg p-1.5 text-text-muted transition-colors duration-(--duration-fast) hover:bg-danger-soft hover:text-danger-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                     aria-label={t.institution.routing.remove}
                     onClick={() => {
                       deleteJurisdiction(institution.id, j.id);
@@ -186,18 +187,16 @@ export function InstitutionRoutingConfig() {
                 ?.accepts ?? false;
             return (
               <li key={typeId}>
-                <label className="flex items-center gap-2 text-sm">
-                  <input
-                    type="checkbox"
-                    checked={accepted}
-                    disabled={!canManage || !institution}
-                    onChange={(e) => {
-                      if (!institution) return;
-                      toggleCapability(institution.id, typeId, e.target.checked);
-                    }}
-                  />
-                  <span>{t.cases.types[typeId].title}</span>
-                </label>
+                <Checkbox
+                  id={`capability-${typeId}`}
+                  label={t.cases.types[typeId].title}
+                  checked={accepted}
+                  disabled={!canManage || !institution}
+                  onChange={(e) => {
+                    if (!institution) return;
+                    toggleCapability(institution.id, typeId, e.target.checked);
+                  }}
+                />
               </li>
             );
           })}
@@ -205,23 +204,21 @@ export function InstitutionRoutingConfig() {
       </WorkspaceSection>
 
       <WorkspaceSection title={t.institution.routing.policyTitle} tone="warning">
-        <label className="flex items-center gap-2 text-sm">
-          <input
-            type="checkbox"
-            checked={institution?.anonymousReports ?? true}
-            disabled={!canManage || !institution}
-            onChange={(e) => {
-              if (!institution) return;
-              patchAnonymous(institution.id, e.target.checked);
-              toast({
-                message: t.institution.routing.policySaved,
-                tone: "success",
-              });
-            }}
-          />
-          <span>{t.institution.routing.anonymousReports}</span>
-        </label>
-        <p className="text-xs text-ink-muted">
+        <Checkbox
+          id="routing-anonymous-reports"
+          label={t.institution.routing.anonymousReports}
+          checked={institution?.anonymousReports ?? true}
+          disabled={!canManage || !institution}
+          onChange={(e) => {
+            if (!institution) return;
+            patchAnonymous(institution.id, e.target.checked);
+            toast({
+              message: t.institution.routing.policySaved,
+              tone: "success",
+            });
+          }}
+        />
+        <p className="text-caption text-text-muted">
           {t.institution.routing.policyHint}
         </p>
       </WorkspaceSection>

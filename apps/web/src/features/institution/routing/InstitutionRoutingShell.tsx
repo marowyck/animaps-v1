@@ -96,9 +96,9 @@ export function InstitutionRoutingShell() {
           {t.institution.routing.queueTitle}
         </h2>
         {awaiting.length === 0 ? (
-          <p className="text-xs text-ink-muted">{t.institution.routing.queueEmpty}</p>
+          <p className="text-body-sm text-text-muted">{t.institution.routing.queueEmpty}</p>
         ) : (
-          <ul className="divide-y divide-border-soft text-sm">
+          <ul className="divide-y divide-border-subtle text-body-sm">
             {awaiting.map((c) => (
               <li
                 key={c.id}
@@ -107,11 +107,11 @@ export function InstitutionRoutingShell() {
                 <div>
                   <Link
                     href={`/cases/${c.id}`}
-                    className="font-bold text-ink underline-offset-2 hover:underline"
+                    className="font-semibold text-text underline-offset-2 hover:underline"
                   >
                     {c.referenceNumber}
                   </Link>
-                  <p className="text-xs text-ink-muted">
+                  <p className="text-caption text-text-muted">
                     {c.location.city || "—"}
                     {c.location.state ? ` / ${c.location.state}` : ""} ·{" "}
                     {t.cases.types[c.caseTypeId].title}

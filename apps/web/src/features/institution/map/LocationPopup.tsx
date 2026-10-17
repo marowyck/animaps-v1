@@ -13,8 +13,8 @@ export function LocationPopup({
   return (
     <Popup>
       <div className="min-w-32">
-        <p className="text-sm font-bold text-ink">{title}</p>
-        <p className="text-xs font-semibold text-ink-muted">{detail}</p>
+        <p className="text-body-sm font-semibold text-text">{title}</p>
+        <p className="text-caption font-semibold text-text-muted">{detail}</p>
       </div>
     </Popup>
   );

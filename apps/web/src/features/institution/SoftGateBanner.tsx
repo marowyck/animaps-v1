@@ -26,7 +26,7 @@ export function SoftGateBanner({
         ].join(" ")}
       >
         <div className="flex items-start gap-3">
-          <AlertTriangle className="mt-0.5 size-5 shrink-0 text-(--honey-700)" />
+          <AlertTriangle className="mt-0.5 size-5 shrink-0 text-warning-ink" />
           <div className="min-w-0 space-y-2">
             <h2 className="text-h4 text-text">
               {t.institution.softGate.title}
@@ -35,7 +35,7 @@ export function SoftGateBanner({
               {t.institution.softGate.body}
             </p>
             <div className="flex flex-wrap gap-2 pt-1">
-              <Button href="/institution" variant="pink" size="sm">
+              <Button href="/institution" variant="primary" size="sm">
                 {t.institution.softGate.ctaProfile}
               </Button>
               <Button href="/settings" variant="ghost" size="sm">

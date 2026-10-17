@@ -1,3 +1,5 @@
+import { CountUp } from "@/components/CountUp";
+
 const TONES = [
   "rounded-[1.7rem] bg-primary-soft",
   "rounded-[1.35rem] bg-secondary-soft",
@@ -17,7 +19,13 @@ export function MetricTile({ label, value, tone = 0 }: MetricTileProps) {
   return (
     <div className={`px-4 py-4 ${TONES[Math.abs(tone) % TONES.length]}`}>
       <p className="text-caption font-semibold text-text-secondary">{label}</p>
-      <p className="mt-1 font-display text-4xl leading-none tabular-nums text-text">{value}</p>
+      <p className="mt-1 font-display text-4xl leading-none text-text">
+        {typeof value === "number" ? (
+          <CountUp value={value} delay={0.15 + Math.abs(tone) * 0.06} />
+        ) : (
+          <span className="tabular-nums">{value}</span>
+        )}
+      </p>
     </div>
   );
 }

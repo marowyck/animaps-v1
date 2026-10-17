@@ -43,25 +43,25 @@ export function TeamDepartmentsCard({
             onChange={(e) => onDeptNameChange(e.target.value)}
             className="min-w-[12rem] flex-1"
           />
-          <Button type="submit" size="sm" variant="pink" className="self-end">
+          <Button type="submit" size="sm" variant="primary" className="self-end">
             {t.institution.team.addDept}
           </Button>
         </form>
       ) : null}
       {departments.length === 0 ? (
-        <p className="text-xs text-ink-muted">{t.institution.team.noDepts}</p>
+        <p className="text-caption text-text-muted">{t.institution.team.noDepts}</p>
       ) : (
-        <ul className="divide-y divide-border-soft text-sm">
+        <ul className="divide-y divide-border-subtle text-body-sm">
           {departments.map((d) => (
             <li
               key={d.id}
               className="flex items-center justify-between gap-2 py-2"
             >
-              <span className="font-semibold text-ink">{d.name}</span>
+              <span className="font-semibold text-text">{d.name}</span>
               {canManage ? (
                 <button
                   type="button"
-                  className="rounded-lg p-1.5 text-ink-muted hover:bg-pastel-pink/40 hover:text-brand-pink"
+                  className="inline-flex size-10 cursor-pointer items-center justify-center rounded-full text-text-muted transition-colors duration-(--duration-fast) hover:bg-danger-soft hover:text-danger-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary"
                   aria-label={t.institution.team.remove}
                   onClick={() => {
                     onDelete(d.id);

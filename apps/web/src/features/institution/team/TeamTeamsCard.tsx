@@ -3,7 +3,7 @@
 import { FormEvent } from "react";
 import { Trash2, Users } from "lucide-react";
 import { Button } from "@/components/Button";
-import { Input } from "@/components/Input";
+import { Input, nativeSelectClass } from "@/components/Input";
 import { useToast } from "@/components/Toast";
 import { useT } from "@/i18n";
 import { WorkspaceSection } from "../WorkspaceSection";
@@ -54,11 +54,11 @@ export function TeamTeamsCard({
             onChange={(e) => onTeamNameChange(e.target.value)}
           />
           <label className="block space-y-1">
-            <span className="text-xs font-bold text-ink">
+            <span className="text-body-sm font-semibold text-text">
               {t.institution.team.teamDept}
             </span>
             <select
-              className="w-full rounded-2xl border-2 border-border-soft bg-white px-3 py-2 text-sm outline-none focus-visible:border-brand-green"
+              className={nativeSelectClass}
               value={teamDeptId}
               onChange={(e) => onTeamDeptIdChange(e.target.value)}
             >
@@ -70,23 +70,23 @@ export function TeamTeamsCard({
               ))}
             </select>
           </label>
-          <Button type="submit" size="sm" variant="pink">
+          <Button type="submit" size="sm" variant="primary">
             {t.institution.team.addTeam}
           </Button>
         </form>
       ) : null}
       {teams.length === 0 ? (
-        <p className="text-xs text-ink-muted">{t.institution.team.noTeams}</p>
+        <p className="text-caption text-text-muted">{t.institution.team.noTeams}</p>
       ) : (
-        <ul className="divide-y divide-border-soft text-sm">
+        <ul className="divide-y divide-border-subtle text-body-sm">
           {teams.map((tm) => (
             <li
               key={tm.id}
               className="flex items-center justify-between gap-2 py-2"
             >
               <div>
-                <p className="font-semibold text-ink">{tm.name}</p>
-                <p className="text-xs text-ink-muted">
+                <p className="font-semibold text-text">{tm.name}</p>
+                <p className="text-caption text-text-muted">
                   {tm.departmentId
                     ? deptById.get(tm.departmentId) ?? "—"
                     : t.institution.team.noDeptLink}
@@ -95,7 +95,7 @@ export function TeamTeamsCard({
               {canManage ? (
                 <button
                   type="button"
-                  className="rounded-lg p-1.5 text-ink-muted hover:bg-pastel-pink/40 hover:text-brand-pink"
+                  className="inline-flex size-10 cursor-pointer items-center justify-center rounded-full text-text-muted transition-colors duration-(--duration-fast) hover:bg-danger-soft hover:text-danger-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary"
                   aria-label={t.institution.team.remove}
                   onClick={() => {
                     onDelete(tm.id);

@@ -32,25 +32,25 @@ export function SyncLogsCard({ logs, connections }: SyncLogsCardProps) {
       tone="secondary"
     >
       {logs.length === 0 ? (
-        <p className="text-xs text-ink-muted">
+        <p className="text-body-sm text-text-muted">
           {t.institution.integrations.noLogs}
         </p>
       ) : (
-        <ul className="divide-y divide-border-soft text-sm">
+        <ul className="divide-y divide-border-subtle text-body-sm">
           {logs.map((log) => {
             const conn = connections.find((c) => c.id === log.connectionId);
             return (
               <li key={log.id} className="py-2">
-                <p className="font-semibold text-ink">
+                <p className="font-semibold text-text">
                   {conn?.name ?? log.connectionId.slice(0, 8)} ·{" "}
                   {t.institution.integrations.statuses[log.status]}
                 </p>
-                <p className="text-xs text-ink-muted">
+                <p className="text-caption text-text-muted">
                   {t.institution.integrations.directions[log.direction]}
                   {log.httpStatus ? ` · HTTP ${log.httpStatus}` : ""} ·{" "}
                   {formatDateTime(log.createdAt, locale)}
                 </p>
-                <p className="mt-1 text-xs text-ink">
+                <p className="mt-1 text-caption text-text">
                   {translateLogMessage(log.message, t)}
                 </p>
               </li>

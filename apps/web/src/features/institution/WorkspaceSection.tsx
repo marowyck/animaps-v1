@@ -1,11 +1,11 @@
 import type { ReactNode } from "react";
 
 const TONE = {
-  primary: "bg-primary-soft text-(--pink-700)",
-  secondary: "bg-secondary-soft text-(--lilac-700)",
-  success: "bg-success-soft text-(--mint-700)",
-  warning: "bg-warning-soft text-(--honey-700)",
-  info: "bg-info-soft text-(--sky-700)",
+  primary: "bg-primary-soft text-primary-ink",
+  secondary: "bg-secondary-soft text-secondary-ink",
+  success: "bg-success-soft text-success-ink",
+  warning: "bg-warning-soft text-warning-ink",
+  info: "bg-info-soft text-info-ink",
 } as const;
 
 type WorkspaceSectionProps = {

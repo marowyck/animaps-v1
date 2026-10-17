@@ -1,6 +1,10 @@
 "use client";
 
-import { useId } from "react";
+import { useId, useRef } from "react";
+import { gsap } from "gsap";
+import { useGSAP } from "@gsap/react";
+import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
+import { DURATION, EASE, STAGGER } from "@/lib/motion";
 
 type BarListProps = {
   items: { key: string; label: string; count: number }[];
@@ -8,9 +12,32 @@ type BarListProps = {
   className?: string;
 };
 
-/** SVG bar chart with a text table for the same values. */
+/** SVG bar chart with a text table for the same values. Bars grow in on mount and on data change. */
 export function BarList({ items, empty, className = "" }: BarListProps) {
   const titleId = useId();
+  const svgRef = useRef<SVGSVGElement>(null);
+  const reduced = usePrefersReducedMotion();
+  const signature = items.map((i) => `${i.key}:${i.count}`).join("|");
+
+  useGSAP(
+    () => {
+      const bars = svgRef.current?.querySelectorAll("rect");
+      if (reduced || !bars?.length) return;
+      gsap.fromTo(
+        bars,
+        { scaleX: 0 },
+        {
+          scaleX: 1,
+          transformOrigin: "left center",
+          duration: DURATION.enter + 0.2,
+          stagger: STAGGER,
+          ease: EASE.settle,
+          delay: 0.15,
+        },
+      );
+    },
+    { scope: svgRef, dependencies: [reduced, signature] },
+  );
 
   if (items.length === 0) {
     return <p className="text-body-sm text-text-secondary">{empty}</p>;
@@ -23,6 +50,7 @@ export function BarList({ items, empty, className = "" }: BarListProps) {
   return (
     <figure className={className}>
       <svg
+        ref={svgRef}
         role="img"
         aria-labelledby={titleId}
         viewBox={`0 0 100 ${height}`}
@@ -49,14 +77,14 @@ export function BarList({ items, empty, className = "" }: BarListProps) {
           );
         })}
       </svg>
-      <table className="mt-2 w-full text-sm">
+      <table className="mt-3 w-full text-body-sm">
         <tbody>
           {items.map((item) => (
-            <tr key={item.key}>
-              <th scope="row" className="py-1 pr-3 text-left font-semibold text-ink">
+            <tr key={item.key} className="border-b border-border-subtle last:border-0">
+              <th scope="row" className="py-1.5 pr-3 text-left font-semibold text-text">
                 {item.label}
               </th>
-              <td className="py-1 text-right font-bold tabular-nums text-ink-muted">
+              <td className="py-1.5 text-right font-semibold tabular-nums text-text-secondary">
                 {item.count}
               </td>
             </tr>

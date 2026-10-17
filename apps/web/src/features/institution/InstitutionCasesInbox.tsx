@@ -1,6 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { SearchInput } from "@/components/SearchInput";
+import { nativeSelectClass } from "@/components/Input";
 import { CaseList } from "@/features/cases";
 import type { CasePriority, CaseRecord, CaseStatus } from "@/features/cases";
 import { useT } from "@/i18n";
@@ -39,9 +41,6 @@ export function InstitutionCasesInbox({
     });
   }, [cases, query, priority, status]);
 
-  const fieldClass =
-    "w-full rounded-full border border-border bg-background px-4 py-2.5 text-body-sm text-text outline-none focus-visible:border-primary focus-visible:bg-surface";
-
   return (
     <div className="space-y-5">
       <WorkspaceHeader
@@ -52,23 +51,23 @@ export function InstitutionCasesInbox({
       {!verified ? <SoftGateBanner /> : null}
 
       <div className="grid gap-3 sm:grid-cols-3">
-        <label className="block space-y-1.5">
+        <div className="block space-y-1.5">
           <span className="text-caption font-semibold text-text-secondary">
             {t.institution.inbox.search}
           </span>
-          <input
-            className={fieldClass}
+          <SearchInput
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={setQuery}
+            label={t.institution.inbox.search}
             placeholder={t.institution.inbox.searchPlaceholder}
           />
-        </label>
+        </div>
         <label className="block space-y-1.5">
           <span className="text-caption font-semibold text-text-secondary">
             {t.institution.inbox.priority}
           </span>
           <select
-            className={fieldClass}
+            className={nativeSelectClass}
             value={priority}
             onChange={(e) => setPriority(e.target.value as PriorityFilter)}
           >
@@ -84,7 +83,7 @@ export function InstitutionCasesInbox({
             {t.institution.inbox.status}
           </span>
           <select
-            className={fieldClass}
+            className={nativeSelectClass}
             value={status}
             onChange={(e) => setStatus(e.target.value as StatusFilter)}
           >

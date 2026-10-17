@@ -42,7 +42,7 @@ export function InstitutionGatedPage({ children }: { children: ReactNode }) {
         <ErrorState
           title={t.institution.errors.institutionOnly}
           action={
-            <Button href="/dashboard" variant="pink" size="sm">
+            <Button href="/dashboard" variant="primary" size="sm">
               {t.cases.detail.back}
             </Button>
           }

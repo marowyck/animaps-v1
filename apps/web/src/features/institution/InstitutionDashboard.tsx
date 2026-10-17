@@ -195,18 +195,18 @@ export function InstitutionDashboard() {
         </ul>
       </section>
 
-      <p className="text-xs text-ink-muted">{t.institution.overview.honesty}</p>
+      <p className="text-caption text-text-muted">{t.institution.overview.honesty}</p>
     </div>
   );
 }
 
 const MODULE_TONES = [
-  "bg-primary-soft text-(--pink-700)",
-  "bg-info-soft text-(--sky-700)",
-  "bg-secondary-soft text-(--lilac-700)",
-  "bg-success-soft text-(--mint-700)",
-  "bg-warning-soft text-(--honey-700)",
-  "bg-primary-soft text-(--pink-700)",
+  "bg-primary-soft text-primary-ink",
+  "bg-info-soft text-info-ink",
+  "bg-secondary-soft text-secondary-ink",
+  "bg-success-soft text-success-ink",
+  "bg-warning-soft text-warning-ink",
+  "bg-primary-soft text-primary-ink",
 ] as const;
 
 function ModuleLink({

@@ -47,7 +47,7 @@ export function CityMap({
   );
 
   return (
-    <div className="animaps-map h-[28rem] overflow-hidden rounded-3xl border border-border-soft">
+    <div className="animaps-map h-[28rem] overflow-hidden rounded-3xl border border-border">
       <MapContainer
         center={BRAZIL}
         zoom={4}

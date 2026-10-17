@@ -93,18 +93,18 @@ export function TeamMembersCard({
       ) : null}
 
       {members.length === 0 ? (
-        <p className="text-xs text-ink-muted">{t.institution.team.noMembers}</p>
+        <p className="text-caption text-text-muted">{t.institution.team.noMembers}</p>
       ) : (
-        <ul className="divide-y divide-border-soft">
+        <ul className="divide-y divide-border-subtle">
           {members.map((m) => (
             <li
               key={m.id}
-              className="flex flex-col gap-2 py-3 sm:flex-row sm:items-center sm:justify-between"
+              className="flex flex-col gap-3 py-4 sm:flex-row sm:items-center sm:justify-between"
             >
-              <div>
-                <p className="font-bold text-ink">{m.displayName}</p>
-                <p className="text-xs text-ink-muted">{m.email}</p>
-                <p className="mt-1 text-xs font-semibold text-ink-muted">
+              <div className="min-w-0">
+                <p className="font-semibold text-text">{m.displayName}</p>
+                <p className="truncate text-caption text-text-muted">{m.email}</p>
+                <p className="mt-1 text-caption font-semibold text-text-secondary">
                   {roleLabel(m.role)} · {statusLabel(m.status)}
                   {m.departmentId
                     ? ` · ${deptById.get(m.departmentId) ?? ""}`
@@ -178,12 +178,12 @@ export function TeamMembersCard({
                       {t.institution.team.removeMember}
                     </Button>
                   ) : null}
-                  <label className="flex items-center gap-1 text-xs">
+                  <label className="flex items-center gap-1">
                     <span className="sr-only">
                       {t.institution.team.inviteRole}
                     </span>
                     <select
-                      className="rounded-xl border border-border-soft bg-white px-2 py-1 text-xs"
+                      className="min-h-10 cursor-pointer rounded-full border border-border bg-surface px-3 py-1.5 text-caption font-semibold text-text outline-none transition-colors duration-(--duration-fast) hover:border-primary/40 focus:border-primary"
                       value={m.role}
                       onChange={(e) => {
                         onPatchRole(

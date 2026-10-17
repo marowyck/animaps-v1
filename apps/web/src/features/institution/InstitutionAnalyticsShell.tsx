@@ -11,6 +11,7 @@ import { useT } from "@/i18n";
 import {
   aggregatesToCsv,
   buildAnalyticsSnapshot,
+  filterCasesByPeriod,
   type AnalyticsPeriod,
 } from "./analytics";
 import { BarList } from "./BarList";
@@ -38,13 +39,9 @@ export function InstitutionAnalyticsShell() {
     () => buildAnalyticsSnapshot(cases, period),
     [cases, period],
   );
-  const overview = computeCaseMetrics(
-    cases.filter((c) => {
-      if (period === "all") return true;
-      const days = period === "7d" ? 7 : period === "30d" ? 30 : 90;
-      const start = Date.now() - days * 86400000;
-      return new Date(c.createdAt).getTime() >= start;
-    }),
+  const overview = useMemo(
+    () => computeCaseMetrics(filterCasesByPeriod(cases, period)),
+    [cases, period],
   );
 
   const periodLabels: Record<AnalyticsPeriod, string> = {
@@ -199,7 +196,7 @@ export function InstitutionAnalyticsShell() {
         {canExport ? (
           <Button
             type="button"
-            variant="pink"
+            variant="primary"
             size="sm"
             onClick={exportCsv}
             disabled={snapshot.filteredTotal === 0}

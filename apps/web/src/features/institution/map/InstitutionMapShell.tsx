@@ -30,7 +30,7 @@ const CityMap = dynamic(
 function MapLoading() {
   const t = useT();
   return (
-    <div className="flex h-[28rem] items-center justify-center rounded-3xl border border-border-soft bg-surface">
+    <div className="flex h-[28rem] items-center justify-center rounded-3xl border border-border bg-surface">
       <LoadingState title={t.common.loading} />
     </div>
   );
@@ -106,7 +106,7 @@ export function InstitutionMapShell() {
             title={t.institution.map.emptyTitle}
             description={t.institution.map.emptyBody}
             action={
-              <Button href="/cases" variant="pink" size="sm">
+              <Button href="/cases" variant="primary" size="sm">
                 {t.institution.overview.openInbox}
               </Button>
             }

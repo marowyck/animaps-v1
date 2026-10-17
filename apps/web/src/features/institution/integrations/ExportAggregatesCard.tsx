@@ -2,7 +2,7 @@
 
 import { Download } from "lucide-react";
 import { Button } from "@/components/Button";
-import { Input } from "@/components/Input";
+import { Input, nativeSelectClass } from "@/components/Input";
 import { formatDateTime, useLocale, useT } from "@/i18n";
 import { WorkspaceSection } from "../WorkspaceSection";
 import type { AnalyticsPeriod } from "../analytics";
@@ -40,12 +40,12 @@ export function ExportAggregatesCard({
 
       {canExport ? (
         <div className="grid gap-2 sm:grid-cols-3">
-          <label className="block space-y-1">
-            <span className="text-xs font-bold text-ink">
+          <label className="block space-y-1.5">
+            <span className="text-body-sm font-semibold text-text">
               {t.institution.integrations.exportPeriod}
             </span>
             <select
-              className="w-full rounded-2xl border-2 border-border-soft bg-white px-3 py-2 text-sm outline-none focus-visible:border-brand-green"
+              className={nativeSelectClass}
               value={exportPeriod}
               onChange={(e) =>
                 onExportPeriodChange(e.target.value as AnalyticsPeriod)
@@ -68,30 +68,30 @@ export function ExportAggregatesCard({
             className="sm:col-span-1"
           />
           <div className="flex items-end">
-            <Button type="button" size="sm" variant="pink" onClick={onExport}>
+            <Button type="button" size="sm" variant="primary" onClick={onExport}>
               {t.institution.integrations.exportCsv}
             </Button>
           </div>
         </div>
       ) : (
-        <p className="text-xs text-ink-muted">
+        <p className="text-body-sm text-text-muted">
           {t.institution.integrations.exportLocked}
         </p>
       )}
 
       {exports.length === 0 ? (
-        <p className="text-xs text-ink-muted">
+        <p className="text-body-sm text-text-muted">
           {t.institution.integrations.noExports}
         </p>
       ) : (
-        <ul className="divide-y divide-border-soft text-sm">
+        <ul className="divide-y divide-border-subtle text-body-sm">
           {exports.map((ex) => (
             <li key={ex.id} className="py-2">
-              <p className="font-semibold text-ink">
+              <p className="font-semibold text-text">
                 {ex.format.toUpperCase()} · {ex.period} · {ex.rowCount}{" "}
                 {t.institution.integrations.rows}
               </p>
-              <p className="text-xs text-ink-muted">
+              <p className="text-caption text-text-muted">
                 {ex.purpose} · {ex.requestedByLabel} ·{" "}
                 {formatDateTime(ex.createdAt, locale)}
               </p>

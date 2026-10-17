@@ -23,7 +23,7 @@ export function WorkspaceHeader({
       <div className="flex items-end gap-3">
         <PawDoodle className="mb-1 hidden size-10 shrink-0 -rotate-12 text-primary sm:block" />
         <div>
-          <p className="text-label inline-flex rounded-full bg-secondary-soft px-2.5 py-1 text-(--lilac-700)">
+          <p className="text-label inline-flex rounded-full bg-secondary-soft px-2.5 py-1 text-secondary-ink">
             {t.institution.workspaceEyebrow}
           </p>
           <h1 className="text-h1 mt-2 text-text">{title}</h1>

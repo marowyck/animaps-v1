@@ -132,7 +132,7 @@ export function runMockSync(connectionId: string): {
   const connections = [...state.connections];
   connections[idx] = updated;
 
-  let next = appendLog(
+  const next = appendLog(
     { ...state, connections },
     {
       connectionId,

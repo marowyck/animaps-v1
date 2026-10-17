@@ -112,10 +112,10 @@ export function InstitutionTeamShell() {
 
       {!verified ? <SoftGateBanner /> : null}
       {verified && !canManage ? (
-        <p className="text-sm text-ink-muted">{t.institution.team.noPermission}</p>
+        <p className="text-body-sm text-text-muted">{t.institution.team.noPermission}</p>
       ) : null}
       {!verified ? (
-        <p className="text-sm text-ink-muted">
+        <p className="text-body-sm text-text-muted">
           {t.institution.team.readOnlyHint}
         </p>
       ) : null}

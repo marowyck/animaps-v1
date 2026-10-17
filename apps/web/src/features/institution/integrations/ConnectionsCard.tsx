@@ -3,7 +3,7 @@
 import { FormEvent } from "react";
 import { Cable, Trash2 } from "lucide-react";
 import { Button } from "@/components/Button";
-import { Input } from "@/components/Input";
+import { Input, nativeSelectClass } from "@/components/Input";
 import { useToast } from "@/components/Toast";
 import { useT } from "@/i18n";
 import { WorkspaceSection } from "../WorkspaceSection";
@@ -66,12 +66,12 @@ export function ConnectionsCard({
             onChange={(e) => onNameChange(e.target.value)}
             required
           />
-          <label className="block space-y-1">
-            <span className="text-xs font-bold text-ink">
+          <label className="block space-y-1.5">
+            <span className="text-body-sm font-semibold text-text">
               {t.institution.integrations.connKind}
             </span>
             <select
-              className="w-full rounded-2xl border-2 border-border-soft bg-white px-3 py-2 text-sm outline-none focus-visible:border-brand-green"
+              className={nativeSelectClass}
               value={kind}
               onChange={(e) => onKindChange(e.target.value as IntegrationKind)}
             >
@@ -93,11 +93,11 @@ export function ConnectionsCard({
             value={notes}
             onChange={(e) => onNotesChange(e.target.value)}
           />
-          <p className="sm:col-span-2 text-xs text-ink-muted">
+          <p className="sm:col-span-2 text-caption text-text-muted">
             {t.institution.integrations.noSecrets}
           </p>
           <div>
-            <Button type="submit" size="sm" variant="pink">
+            <Button type="submit" size="sm" variant="primary">
               {t.institution.integrations.addConnection}
             </Button>
           </div>
@@ -105,26 +105,26 @@ export function ConnectionsCard({
       ) : null}
 
       {connections.length === 0 ? (
-        <p className="text-xs text-ink-muted">
+        <p className="text-body-sm text-text-muted">
           {t.institution.integrations.noConnections}
         </p>
       ) : (
-        <ul className="divide-y divide-border-soft">
+        <ul className="divide-y divide-border-subtle">
           {connections.map((c) => (
             <li
               key={c.id}
               className="flex flex-col gap-2 py-3 sm:flex-row sm:items-center sm:justify-between"
             >
               <div>
-                <p className="font-bold text-ink">{c.name}</p>
-                <p className="text-xs text-ink-muted">
+                <p className="font-semibold text-text">{c.name}</p>
+                <p className="text-caption text-text-muted">
                   {t.institution.integrations.kinds[c.kind]} ·{" "}
                   {t.institution.integrations.providers[c.provider] ??
                     c.provider}{" "}
                   · {t.institution.integrations.statuses[c.status]}
                 </p>
                 {c.config.endpointUrl ? (
-                  <p className="mt-1 truncate text-xs text-ink-muted">
+                  <p className="mt-1 truncate text-caption text-text-muted">
                     {c.config.endpointUrl}
                   </p>
                 ) : null}
@@ -182,7 +182,7 @@ export function ConnectionsCard({
                   )}
                   <button
                     type="button"
-                    className="rounded-lg p-1.5 text-ink-muted hover:bg-pastel-pink/40 hover:text-brand-pink"
+                    className="rounded-lg p-1.5 text-text-muted transition-colors duration-(--duration-fast) hover:bg-danger-soft hover:text-danger-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                     aria-label={t.institution.integrations.remove}
                     onClick={() => {
                       onRemove(c.id);

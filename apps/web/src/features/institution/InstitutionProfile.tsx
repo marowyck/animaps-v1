@@ -92,7 +92,7 @@ export function InstitutionProfile({
 
       <form onSubmit={onSave} className="flex flex-col gap-4">
         <fieldset className="space-y-3">
-          <legend className="text-sm font-bold text-ink">
+          <legend className="text-body-sm font-semibold text-text">
             {copy.sectionIdentity}
           </legend>
           <Input
@@ -113,7 +113,7 @@ export function InstitutionProfile({
         </fieldset>
 
         <fieldset className="space-y-3">
-          <legend className="text-sm font-bold text-ink">
+          <legend className="text-body-sm font-semibold text-text">
             {copy.sectionContact}
           </legend>
           <Input
@@ -140,7 +140,7 @@ export function InstitutionProfile({
         </fieldset>
 
         <fieldset className="space-y-3">
-          <legend className="text-sm font-bold text-ink">
+          <legend className="text-body-sm font-semibold text-text">
             {copy.sectionOps}
           </legend>
           <Input
@@ -156,10 +156,10 @@ export function InstitutionProfile({
         </fieldset>
 
         <fieldset className="space-y-3">
-          <legend className="text-sm font-bold text-ink">
+          <legend className="text-body-sm font-semibold text-text">
             {copy.sectionJurisdiction}
           </legend>
-          <p className="text-xs text-ink-muted">{copy.jurisdictionHint}</p>
+          <p className="text-caption text-text-muted">{copy.jurisdictionHint}</p>
           <Input
             label={copy.city}
             value={city}

@@ -117,7 +117,7 @@ export function InstitutionIntegrationsShell() {
 
       {!verified ? <SoftGateBanner /> : null}
       {!verified ? (
-        <p className="text-sm text-ink-muted">
+        <p className="text-body-sm text-text-muted">
           {t.institution.integrations.readOnlyHint}
         </p>
       ) : null}
@@ -151,7 +151,7 @@ export function InstitutionIntegrationsShell() {
         onExport={onExportAggregates}
       />
 
-      <p className="text-xs text-ink-muted">
+      <p className="text-caption text-text-muted">
         {t.institution.integrations.providersNote}:{" "}
         {INTEGRATION_PROVIDERS.map((p) => p).join(", ")}
       </p>
