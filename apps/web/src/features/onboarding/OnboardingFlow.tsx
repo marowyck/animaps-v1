@@ -137,7 +137,7 @@ export function OnboardingProgress({
   total: number;
 }) {
   return (
-    <span className="text-xs font-bold tabular-nums text-ink-muted">
+    <span className="text-caption font-semibold tabular-nums text-text-muted">
       {current}/{total}
     </span>
   );

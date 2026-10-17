@@ -53,12 +53,12 @@ export function LocationStep() {
     >
       <div className="space-y-4">
         <div className="flex flex-col items-start gap-3 rounded-[1.6rem] bg-success-soft px-4 py-4 sm:flex-row sm:items-center">
-          <span className="inline-flex size-11 items-center justify-center rounded-full bg-surface text-(--mint-700)">
+          <span className="inline-flex size-11 items-center justify-center rounded-full bg-surface text-success-ink">
             <MapPin className="size-5" aria-hidden />
           </span>
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-bold text-ink">{t.onboarding.location.title}</p>
-            <p className="text-xs text-ink-muted">{t.onboarding.location.body}</p>
+            <p className="text-body-sm font-semibold text-text">{t.onboarding.location.title}</p>
+            <p className="text-caption text-text-secondary">{t.onboarding.location.body}</p>
           </div>
           <Button variant="soft" size="sm" onClick={requestLocation}>
             {t.onboarding.location.allow}

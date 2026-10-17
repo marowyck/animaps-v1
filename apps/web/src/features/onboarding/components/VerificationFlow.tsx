@@ -64,7 +64,7 @@ function InstitutionalVerification() {
       onSkip={() => nav.goNext({ complete: true })}
     >
       <div className="mx-auto flex max-w-lg flex-col items-center gap-4 py-4 text-center">
-        <span className="inline-flex size-16 items-center justify-center rounded-full bg-success-soft text-(--mint-700)">
+        <span className="inline-flex size-16 items-center justify-center rounded-full bg-success-soft text-success-ink">
           <FileCheck2 className="size-7" aria-hidden />
         </span>
         <VerificationStatusBadge

@@ -62,7 +62,7 @@ export function AnimalPreferenceForm({
   return (
     <div className="space-y-6">
       <section className="space-y-2">
-        <h2 className="text-sm font-bold text-ink">
+        <h2 className="text-body-sm font-semibold text-text">
           {t.onboarding.animalType.title}
         </h2>
         <div className="grid gap-2 sm:grid-cols-2">
@@ -83,7 +83,7 @@ export function AnimalPreferenceForm({
       </section>
 
       <section className="space-y-2">
-        <h2 className="text-sm font-bold text-ink">
+        <h2 className="text-body-sm font-semibold text-text">
           {t.onboarding.animalSize.title}
         </h2>
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
@@ -101,7 +101,7 @@ export function AnimalPreferenceForm({
 
       {showFilters ? (
         <section className="space-y-3">
-          <h2 className="text-sm font-bold text-ink">
+          <h2 className="text-body-sm font-semibold text-text">
             {t.onboarding.preferences.title}
           </h2>
           {(

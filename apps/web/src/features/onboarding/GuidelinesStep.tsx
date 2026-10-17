@@ -41,7 +41,7 @@ export function GuidelinesStep() {
         <ul className="space-y-3">
           {RULE_KEYS.map((key) => (
             <li key={key} className="flex items-start gap-3 text-body-sm text-text">
-              <span className="mt-0.5 inline-flex size-7 shrink-0 items-center justify-center rounded-full bg-success-soft text-(--mint-700)">
+              <span className="mt-0.5 inline-flex size-7 shrink-0 items-center justify-center rounded-full bg-success-soft text-success-ink">
                 <Check className="size-3.5" aria-hidden />
               </span>
               <span className="font-semibold leading-snug">
@@ -54,15 +54,15 @@ export function GuidelinesStep() {
           <PawDoodle className="mt-0.5 size-6 shrink-0 text-primary" />
           <span>
             {t.onboarding.guidelines.legalBefore}{" "}
-            <a href="#" className="font-semibold text-(--pink-700) underline-offset-2 hover:underline">
+            <a href="#" className="font-semibold text-primary-ink underline-offset-2 hover:underline">
               {t.onboarding.guidelines.terms}
             </a>
             ,{" "}
-            <a href="#" className="font-semibold text-(--pink-700) underline-offset-2 hover:underline">
+            <a href="#" className="font-semibold text-primary-ink underline-offset-2 hover:underline">
               {t.onboarding.guidelines.privacy}
             </a>{" "}
             {t.onboarding.guidelines.legalAnd}{" "}
-            <a href="#" className="font-semibold text-(--pink-700) underline-offset-2 hover:underline">
+            <a href="#" className="font-semibold text-primary-ink underline-offset-2 hover:underline">
               {t.onboarding.guidelines.community}
             </a>
             .

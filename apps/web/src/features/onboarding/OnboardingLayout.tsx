@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/Button";
 import { IconButton } from "@/components/IconButton";
 import { ProgressIndicator } from "@/components/ProgressIndicator";
+import { usePageEnter } from "@/hooks/usePageEnter";
 import { useT } from "@/i18n";
 import { useOnboardingNavigation } from "./useOnboardingNavigation";
 import type { OnboardingStepId } from "./types";
@@ -60,6 +61,7 @@ export function OnboardingLayout({
   const total = progressTotal ?? nav.total;
   const canSkip = showSkip ?? Boolean(nav.definition?.skippable);
   const skip = onSkip ?? (() => nav.goSkip());
+  const stepRef = usePageEnter(step, "x");
 
   return (
     <div
@@ -95,7 +97,7 @@ export function OnboardingLayout({
         </IconButton>
         <span className="inline-flex items-center gap-2 font-display text-xl tracking-tight text-text">
           <PawDoodle className="size-5 text-primary" />
-          ANIMAPS
+          {t.brand}
           <LocaleSwitcher tone="light" variant="menu" />
         </span>
         <IconButton label={t.onboarding.close} onClick={() => router.push(closeHref)}>
@@ -112,26 +114,25 @@ export function OnboardingLayout({
         className={compact ? "relative z-10 mb-3" : "relative z-10 mb-6"}
       />
 
-      <div key={step} className="relative z-10 flex min-h-0 flex-1 flex-col animate-fade-in-up">
-        <div className={["space-y-1", compact ? "mb-3" : "mb-6 space-y-2"].join(" ")}>
-          <h1
-            className={[
-              "font-display leading-tight text-ink",
-              compact ? "text-2xl sm:text-3xl" : "text-3xl sm:text-4xl",
-            ].join(" ")}
-          >
-            {title}
-          </h1>
+      <div ref={stepRef} className="relative z-10 flex min-h-0 flex-1 flex-col">
+        <div data-enter className={compact ? "mb-4" : "mb-8"}>
+          <h1 className={compact ? "text-h2 text-text" : "text-h1 text-text"}>{title}</h1>
           {subtitle ? (
-            <p className={["text-ink-muted", compact ? "text-sm" : "text-base"].join(" ")}>
+            <p
+              className={[
+                "mt-2 text-text-secondary",
+                compact ? "text-body-sm" : "text-body-lg",
+              ].join(" ")}
+            >
               {subtitle}
             </p>
           ) : null}
         </div>
 
-        <div className="min-h-0 flex-1">{children}</div>
+        <div data-enter className="min-h-0 flex-1">{children}</div>
 
         <div
+          data-enter
           className={[
             "mt-4 flex flex-col gap-3 sm:flex-row sm:items-center",
             footerAlign === "center" ? "sm:justify-center" : "",
@@ -157,13 +158,14 @@ export function OnboardingLayout({
           ) : null}
           {onContinue ? (
             <Button
-              variant="pink"
+              variant="primary"
               size="md"
               className={[
-                "order-1 w-full sm:order-2 sm:w-auto",
+                "order-1 w-full sm:order-2 sm:w-auto sm:min-w-[11rem]",
                 footerAlign === "center" ? "sm:min-w-[14rem]" : "sm:ml-auto",
               ].join(" ")}
               disabled={continueDisabled || continueLoading}
+              loading={continueLoading}
               onClick={onContinue}
             >
               {continueLoading

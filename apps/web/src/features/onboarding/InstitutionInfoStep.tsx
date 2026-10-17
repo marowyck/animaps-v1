@@ -37,7 +37,7 @@ export function InstitutionInfoStep() {
     >
       <div className="mx-auto flex max-w-lg flex-col gap-6">
         <fieldset className="space-y-3">
-          <legend className="text-sm font-bold text-ink">
+          <legend className="text-h4 mb-1 text-text">
             {copy.sectionIdentity}
           </legend>
           <Input
@@ -59,7 +59,7 @@ export function InstitutionInfoStep() {
           />
         </fieldset>
         <fieldset className="space-y-3">
-          <legend className="text-sm font-bold text-ink">
+          <legend className="text-h4 mb-1 text-text">
             {copy.sectionContact}
           </legend>
           <Input
@@ -86,7 +86,7 @@ export function InstitutionInfoStep() {
           />
         </fieldset>
         <fieldset className="space-y-3">
-          <legend className="text-sm font-bold text-ink">
+          <legend className="text-h4 mb-1 text-text">
             {copy.sectionOps}
           </legend>
           <Input

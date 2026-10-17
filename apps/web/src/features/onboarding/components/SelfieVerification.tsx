@@ -127,7 +127,7 @@ export function SelfieVerification() {
               className="aspect-[3/4] w-full rounded-2xl bg-ink object-cover"
             />
             <Button
-              variant="pink"
+              variant="primary"
               size="md"
               className="w-full"
               onClick={() => void captureSelfie()}
@@ -146,13 +146,13 @@ export function SelfieVerification() {
           <img
             src={localPreview}
             alt=""
-            className="mx-auto max-h-56 rounded-3xl border-2 border-border-soft object-cover"
+            className="mx-auto max-h-56 rounded-3xl border border-border-subtle object-cover"
           />
         ) : null}
 
         {status === "pending" && !cameraOpen ? (
           <Button
-            variant="pink"
+            variant="primary"
             size="md"
             className="w-full"
             onClick={() => void openCamera()}
@@ -174,7 +174,7 @@ export function SelfieVerification() {
             title={t.onboarding.verification.approvedTitle}
             description={t.onboarding.verification.approvedBody}
             action={
-              <Button variant="pink" size="sm" onClick={finish}>
+              <Button variant="primary" size="sm" onClick={finish}>
                 {t.onboarding.verification.goDashboard}
               </Button>
             }
@@ -194,7 +194,7 @@ export function SelfieVerification() {
                 : t.onboarding.verification.retryBody
             }
             action={
-              <Button variant="pink" size="sm" onClick={() => void openCamera()}>
+              <Button variant="primary" size="sm" onClick={() => void openCamera()}>
                 {t.onboarding.verification.retry}
               </Button>
             }
